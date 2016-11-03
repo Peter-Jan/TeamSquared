@@ -24,11 +24,10 @@ Block::Block()
 
 void Block::draw()
 {
-	void DrawUnitCube(void)
-	{
+
 		glBegin(GL_QUADS);
 
-		glColor3ub(0, 0, 255);
+		glColor3ub(r, g, b);
 
 		glVertex3i(x, y, z);
 		glVertex3i(x + w, y, z);
@@ -61,7 +60,6 @@ void Block::draw()
 		glVertex3i(x+w, y + h, z);
 
 		glEnd();
-	}
 }
 
 void Block::setDimension(const int win, const int hin, const int lin)
