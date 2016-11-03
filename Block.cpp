@@ -2,6 +2,7 @@ class Block
 {
 public:
 	Block();
+	~Block();
 	int getX() const;
 	int getY() const;
 	int getZ() const;
@@ -20,6 +21,11 @@ private:
 Block::Block()
 {
 	setDimension(10, 10, 10);
+}
+
+Block::~Block()
+{
+
 }
 
 void Block::draw()
