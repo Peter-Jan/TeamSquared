@@ -8,6 +8,7 @@ public:
 	void setCoordinate(const int xin, const int yin, const int zin);
 	void setDimension(const int win, const int hin, const int lin);
 	void setColor(const int cin);
+	void draw();
 
 private:
 	int x, y, z;
@@ -20,6 +21,12 @@ Block::Block()
 {
 	setDimension(10, 10, 10);
 }
+
+void Block::draw()
+{
+
+}
+
 void Block::setDimension(const int win, const int hin, const int lin)
 {
 	w = win;
