@@ -7,6 +7,7 @@
 #include <time.h>
 #include <map>
 #include "fssimplewindow.h"
+
 #if defined(_WIN32_WINNT) // Windows mouse movement routine
 #else
 	//#include <CoreGraphics/Coregraphics.h>
@@ -102,9 +103,9 @@ public:
 	Block();
 	Block(int roomSize);
 	Block(int roomSize, int x, int y, int z);
-	Block(const Block &fromBlock);
-	Block &operator=(const Block &fromBlock);
-
+	Block(const std::unique_ptr<Block> &fromPtr);
+	Block &operator=(const std::unique_ptr<Block> &fromPtr);
+	void Initialize(int roomSize, int x, int y, int z);
 	void copyFrom(const Block &fromBlock);
 
 	~Block();
@@ -155,14 +156,14 @@ void Block::copyFrom(const Block &fromBlock)
 	index = getX() + roomSize*getZ() + Pow(roomSize, 2)*getY();
 }
 
-Block::Block(const Block &fromBlock)
+Block::Block(const std::unique_ptr<Block> &fromPtr)
 {
-	copyFrom(fromBlock);
+	copyFrom(*fromPtr);
 }
 
-Block &Block::operator=(const Block &fromBlock)
+Block &Block::operator=(const std::unique_ptr<Block> &fromPtr)
 {
-	copyFrom(fromBlock);
+	copyFrom(*fromPtr);
 	return *this;
 }
 
@@ -186,6 +187,11 @@ Block::Block(int roomSizeIn)
 }
 
 Block::Block(int roomSizeIn, int x, int y, int z)
+{
+	Initialize(roomSizeIn, x, y, z);
+}
+
+void Block::Initialize(int roomSizeIn, int x, int y, int z)
 {
 	roomSize = roomSizeIn;
 	blockSize = 8;
@@ -814,7 +820,8 @@ class Terrain
 public:
 	int roomSize, blockNum, totalSpace, drawCount;
 	int indexCheck[6];
-	std::map<int, Block> blockMap;
+	//std::map<int, Block> blockMap;
+	std::map<int, std::unique_ptr<Block>> blockMap;
 	std::map<int, int> renderMap;
 
 	Terrain();
@@ -902,7 +909,9 @@ void Terrain::GenerateFunctionTerrain(void)
 			while (y >= 0)
 			{
 				index = x + roomSize*z + Pow(roomSize, 2)*y;
-				blockMap[index] = Block(roomSize, x, y, z);
+				std::unique_ptr<Block> newPtr;
+				newPtr.reset(new Block(roomSize, x, y, z));
+				blockMap[index] = std::move(newPtr);
 				y--;
 				blockNum++;
 			}
@@ -921,8 +930,10 @@ void inline Terrain::GenerateRandom(void)
 	Block tempBlock;
 	for (int i = 0; i < blockNum; i++) // random blocks
 	{
-		tempBlock = Block(roomSize);
-		blockMap[tempBlock.index] = tempBlock;
+		//tempBlock = Block(roomSize);
+		std::unique_ptr<Block> newPtr;
+		newPtr.reset(new Block(roomSize));
+		blockMap[newPtr->index] = std::move(newPtr);
 	}
 }
 
@@ -938,88 +949,15 @@ void inline Terrain::GenerateOrdered(void) // ordered blocks (starts at "y=0" pl
 			for (int x = 0; x < roomSize; x++)
 			{
 				tempBlock = Block(roomSize, x, y, z);
-				blockMap[tempBlock.index] = tempBlock;
-				printf("Index = %d, BlockLocationIndex = %d\n", x + roomSize*z + roomSize*roomSize*y, blockMap[x + roomSize*z + roomSize*roomSize*y].index);
+				std::unique_ptr<Block> newPtr;
+				newPtr.reset(new Block(roomSize, x, y, z));
+				blockMap[tempBlock.index] = std::move(newPtr);
+				printf("Index = %d, BlockLocationIndex = %d\n", x + roomSize*z + roomSize*roomSize*y, blockMap[x + roomSize*z + roomSize*roomSize*y]->index);
 				blockNum++;
 			}
 		}
 	}
 }
-
-//void Terrain::MergeVecs(int index1, int end1, int index2, int end2)
-//{
-//	int startIndex = index1;
-//	int size = end2 - startIndex;
-//	std::vector<int> vec1;
-//	while (index1 < end1 && index2 < end2) // compare vecs, populate temp vec
-//	{
-//		if (blockVec[indexVec[index1]].index < blockVec[indexVec[index2]].index)
-//		{
-//			vec1.push_back(indexVec[index1]);
-//			index1++;
-//		}
-//		else
-//		{
-//			vec1.push_back(indexVec[index2]);
-//			index2++;
-//		}
-//	}
-//
-//	while (index1 < end1) // add rest of 1
-//	{
-//		vec1.push_back(indexVec[index1]);
-//		index1++;
-//	}
-//
-//	while (index2 < end2) // add rest of 2
-//	{
-//		vec1.push_back(indexVec[index2]);
-//		index2++;
-//	}
-//	//printf("size = %d\n", size);
-//
-//	for (int i = 0; i < size; i++) // modify orig vec
-//	{
-//		indexVec[startIndex + i] = vec1[i];
-//		//printf("%d | ", indexVec[startIndex + i]);
-//	}
-//	//printf("\n");
-//	//getchar();
-//	//for (int i = index1; i < end2; i++)
-//	//{
-//	//	printf("VecIndex = %d | BlockIndex = %d\n", indexVec[i], blockVec[indexVec[i]].index);
-//	//}
-//	//printf("\n");
-//	//getchar();
-//}
-
-//void Terrain::SortBlocks()
-//{
-//	int vecSize = 1;
-//	int start1, end1, start2, end2;
-//	//for (int i = 0; i < blockNum; i++)
-//	//{
-//	//	printf("VecIndex = %d | BlockIndex = %d\n", indexVec[i], blockVec[i].index);
-//	//}
-//	while (vecSize < blockNum)
-//	{
-//		//printf("vecSize = %d\n", vecSize);
-//		int j = 0;
-//		for (int i = 0; i < blockNum; i += (2 * vecSize))
-//		{
-//			j++;
-//			start1 = i;
-//			end1 = start1 + vecSize;
-//			start2 = end1;
-//			end2 = fmin(start2 + vecSize, blockNum);
-//			//printf("Iteration %d \n", j);
-//			//printf("start = %d\n", start1);
-//			//printf("end = %d\n", end2);
-//			MergeVecs(start1, end1, start2, end2);
-//		}
-//		vecSize *= 2;
-//	}
-//}
 
 void Terrain::HideSides(void)
 {
@@ -1034,11 +972,11 @@ void Terrain::HideSides(void)
 	for (auto &keyValPair : blockMap)
 	{
 		location = keyValPair.first;
-		if (renderMap.find(keyValPair.first) == renderMap.end() && keyValPair.second.renderable == TRUE) // visible object not in the map
+		if (renderMap.find(keyValPair.first) == renderMap.end() && keyValPair.second->renderable == TRUE) // visible object not in the map
 		{
 			renderMap[location] = location; // add renderable object to the renderMap
 		}
-		else if (renderMap.find(keyValPair.first) != renderMap.end() && keyValPair.second.renderable == FALSE)
+		else if (renderMap.find(keyValPair.first) != renderMap.end() && keyValPair.second->renderable == FALSE)
 		{
 			renderMap.erase(location);
 		}
@@ -1051,22 +989,22 @@ void Terrain::HideSingleBlockSides(int i) // for block i in the block-Vector, ch
 	//printf("Hide Blocks around index = %d", i);
 	int idx;
 	auto &b = blockMap[i];
-	b.renderable = FALSE;
+	b->renderable = FALSE;
 	int mostRecentIndex;
 	int eReverse;
 	for (int e = 0; e < 6; e++)
 	{
 		eReverse = e + (e % 2 == 0 ? 1 : -1);
 		//printf("%d vs %d\n", e, eReverse);
-		idx = b.index + indexCheck[e];
+		idx = b->index + indexCheck[e];
 
 		if (blockMap.find(idx) != blockMap.end())
 		{
 			auto &b1 = blockMap[idx];
 			if (BlockDist(b, b1) == 1)
 			{
-				b.sideVisible[e] = 0;
-				b1.sideVisible[eReverse] = 0;
+				b->sideVisible[e] = 0;
+				b1->sideVisible[eReverse] = 0;
 			}
 			else
 			{
@@ -1075,12 +1013,12 @@ void Terrain::HideSingleBlockSides(int i) // for block i in the block-Vector, ch
 					printf("Add block %d\n", idx);
 					renderMap[idx] = idx;
 				}
-				b.renderable = TRUE;
+				b->renderable = TRUE;
 			}
 		}
 		else
 		{
-			b.renderable = TRUE;
+			b->renderable = TRUE;
 		}
 	}
 }
@@ -1089,24 +1027,24 @@ void Terrain::ShowSingleBlockSides(int i) // for block i in the block-Vector, ch
 {
 	printf("Show Blocks around index = %d\n", i);
 	int idx;
-	auto &b = blockMap[i];
-	b.renderable = FALSE;
+	auto &&b = blockMap[i];
+	b->renderable = FALSE;
 	int eReverse;
 	for (int e = 0; e < 6; e++)
 	{
 		eReverse = e + (e % 2 == 0 ? 1 : -1);
 		printf("eRev = %d\n", eReverse);
-		idx = b.index + indexCheck[e];
+		idx = b->index + indexCheck[e];
 		
 		if (blockMap.find(idx) != blockMap.end())
 		{
-			auto &b1 = blockMap[idx];
+			auto &&b1 = blockMap[idx];
 			if (BlockDist(b, b1) == 1)
 			{
-				b.sideVisible[e] = 1;
-				b1.sideVisible[eReverse] = 1;
-				b1.renderable = TRUE;
-				b.renderable = TRUE;
+				b->sideVisible[e] = 1;
+				b1->sideVisible[eReverse] = 1;
+				b1->renderable = TRUE;
+				b->renderable = TRUE;
 				if (renderMap.find(idx) == renderMap.end()) // block not current present
 				{
 					printf("Add block %d\n", idx);
@@ -1116,8 +1054,8 @@ void Terrain::ShowSingleBlockSides(int i) // for block i in the block-Vector, ch
 		}
 		else
 		{
-			b.sideVisible[e] = 1;
-			b.renderable = TRUE;
+			b->sideVisible[e] = 1;
+			b->renderable = TRUE;
 		}
 	}
 }
@@ -1128,13 +1066,18 @@ void Terrain::AddBlock(int x, int y, int z)
 	
 	if (blockMap.find(newLocation) == blockMap.end()) // free spot
 	{
-		blockMap[newLocation] = Block(roomSize, x, y, z);
-		printf("Index = %d, BlockLocationIndex = %d\n", newLocation, blockMap[newLocation].index);
+		std::unique_ptr<Block> newPtr;
+		//printf("BEFORE x = %d, y = %d, z = %d\n", newPtr->getX(), newPtr->getY(), newPtr->getZ());
+		newPtr.reset(new Block(roomSize, x, y, z));
+		printf("AFTER x = %d, y = %d, z = %d\n", newPtr->getX(), newPtr->getY(), newPtr->getZ());
+		blockMap[newLocation] = std::move(newPtr);
+		printf("AFTER2 x = %d, y = %d, z = %d\n", blockMap[newLocation]->getX(), blockMap[newLocation]->getY(), blockMap[newLocation]->getZ());
+		printf("Index = %d, BlockLocationIndex = %d\n", newLocation, blockMap[newLocation]->index);
 		blockNum++;
 
 		HideSingleBlockSides(newLocation);
 
-		if (blockMap[newLocation].renderable == TRUE)
+		if (blockMap[newLocation]->renderable == TRUE)
 		{
 			renderMap[newLocation] = newLocation;
 		}
@@ -1193,14 +1136,14 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera)
 			auto &b = blockMap[keyVal.second];
 			for (int i = 0; i < 3; i++)
 			{
-				dist[i] = b.pos[i] - camera.pos[i]; // camera.forwardVector[i];
+				dist[i] = b->pos[i] - camera.pos[i]; // camera.forwardVector[i];
 			}
 			//printf("\n");
 			coneDist = Dot(dist, camera.forwardVector);
 			//printf("coneDist = %lf\n", coneDist);
 			if (VecLen(dist) <= 50)
 			{
-				b.DrawSolid();
+				b->DrawSolid();
 			}
 			else if (coneDist <= camera.farZ)
 			{
@@ -1213,7 +1156,7 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera)
 				//printf("OrthDist = %lf\n coneRad = %lf\n",orthDist, coneRad);
 				if (orthDist <= coneRad)
 				{
-					b.DrawSolid();
+					b->DrawSolid();
 				}
 			}
 		}
@@ -1224,14 +1167,14 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera)
 			auto &b = blockMap[keyVal.second];
 			for (int i = 0; i < 3; i++)
 			{
-				dist[i] = b.pos[i] - camera.pos[i];
+				dist[i] = b->pos[i] - camera.pos[i];
 			}
 			//printf("\n");
 			coneDist = Dot(dist, camera.forwardVector);
 			//printf("coneDist = %lf\n", coneDist);
 			if (VecLen(dist) <= 50)
 			{
-				b.DrawEdges();
+				b->DrawEdges();
 			}
 			else if (coneDist <= camera.farZ)
 			{
@@ -1244,7 +1187,7 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera)
 				//printf("OrthDist = %lf\n coneRad = %lf\n",orthDist, coneRad);
 				if (orthDist <= coneRad)
 				{
-					b.DrawEdges();
+					b->DrawEdges();
 					drawCount++;
 				}
 			}
@@ -1260,14 +1203,14 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera)
 			auto &b = keyVal.second;
 			for (int i = 0; i < 3; i++)
 			{
-				dist[i] = b.pos[i] - camera.pos[i];// camera.forwardVector[i];
+				dist[i] = b->pos[i] - camera.pos[i];// camera.forwardVector[i];
 			}
 			//printf("\n");
 			coneDist = Dot(dist, camera.forwardVector);
 			//printf("coneDist = %lf\n", coneDist);
 			if (VecLen(dist) <= 50)
 			{
-				b.DrawSolid();
+				b->DrawSolid();
 			}
 			else if (coneDist <= camera.farZ)
 			{
@@ -1280,7 +1223,7 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera)
 				//printf("OrthDist = %lf\n coneRad = %lf\n",orthDist, coneRad);
 				if (orthDist <= coneRad)
 				{
-					b.DrawSolid();
+					b->DrawSolid();
 				}
 			}
 		}
@@ -1292,13 +1235,13 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera)
 			auto &b = keyVal.second;
 			for (int i = 0; i < 3; i++)
 			{
-				dist[i] = b.pos[i] - camera.pos[i];
+				dist[i] = b->pos[i] - camera.pos[i];
 			}
 			coneDist = Dot(dist, camera.forwardVector);
 			//printf("coneDist = %lf\n", coneDist);
 			if (VecLen(dist) <= 50)
 			{
-				b.DrawEdges();
+				b->DrawEdges();
 			}
 			else if (coneDist <= camera.farZ)
 			{
@@ -1311,7 +1254,7 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera)
 				//printf("OrthDist = %lf\n coneRad = %lf\n",orthDist, coneRad);
 				if (orthDist <= coneRad)
 				{
-					b.DrawEdges();
+					b->DrawEdges();
 					drawCount++;
 				}
 			}
@@ -1353,7 +1296,7 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 			glBegin(GL_QUADS);
 			for (auto &keyVal : renderMap)
 			{
-				blockMap[keyVal.first].DrawSolid();
+				blockMap[keyVal.first]->DrawSolid();
 				drawCount++;
 			}
 			glEnd();
@@ -1362,7 +1305,7 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 			glColor3ub(0, 0, 0);
 			for (auto &keyVal : renderMap)
 			{
-				blockMap[keyVal.first].DrawEdges();
+				blockMap[keyVal.first]->DrawEdges();
 			}
 			glEnd();
 		}
@@ -1372,7 +1315,7 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 			glBegin(GL_QUADS);
 			for (auto &keyVal : blockMap)
 			{
-				keyVal.second.DrawSolid();
+				keyVal.second->DrawSolid();
 			}
 			glEnd();
 
@@ -1380,7 +1323,7 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 			glColor3ub(0, 0, 0);
 			for (auto &keyVal : blockMap)
 			{
-				keyVal.second.DrawEdges();
+				keyVal.second->DrawEdges();
 			}
 			glEnd();
 		}
@@ -1394,12 +1337,11 @@ int main(void)
 	int drawCount = 0;
 	CameraObject camera, camera2;
 
-	Terrain worldGrid(100, 2);
+	Terrain worldGrid(10, 1);
 
 	camera.playerBlock.roomSize = worldGrid.roomSize;
 	camera2.playerBlock.roomSize = worldGrid.roomSize;
 	FsOpenWindow(800, 100, WINWID, WINHEI, 1);
-
 
 	camera.pos[2] = 100.0;
 	camera2.pos[0] += worldGrid.roomSize / 2 * camera2.blockSize;
@@ -1484,7 +1426,7 @@ int main(void)
 			if (worldGrid.blockMap.find(randBlockIndex) != worldGrid.blockMap.end())
 			{
 				auto &b = worldGrid.blockMap[randBlockIndex];
-				int x = b.getX(), y = b.getY(), z = b.getZ();
+				int x = b->getX(), y = b->getY(), z = b->getZ();
 				printf("%d %d %d Trying to remove\n", x, y, z);
 				worldGrid.RemoveBlock(x, y, z);
 			}
