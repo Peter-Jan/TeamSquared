@@ -894,8 +894,8 @@ void Terrain::GenerateFunctionTerrain(void)
 	int stepSize = roomSize / 10;
 	//srand((int)time(nullptr));
 
-	int xScalar = rand() % (roomSize / 5 + 1) + 1;
-	int zScalar = rand() % (roomSize / 5 + 1) + 1;
+	int xScalar = rand() % (roomSize / 10 + 1) + 1;
+	int zScalar = rand() % (roomSize / 10 + 1) + 1;
 	double xFreq = rand() % 10 + 1;
 	double zFreq = rand() % 10 + 1;
 
@@ -904,7 +904,7 @@ void Terrain::GenerateFunctionTerrain(void)
 	{
 		for (int z = 0; z < roomSize; z++)
 		{
-			y = (int)(sin(x*xFreq*DEGTORAD + z*zFreq*DEGTORAD)*cos(x*DEGTORAD)*xScalar/2.0 + sin(x*zFreq*DEGTORAD*z*xFreq*DEGTORAD/2.0)*cos(z*DEGTORAD)*zScalar/2.0) + roomSize/4;
+			y = (int)(sin(x*xFreq*DEGTORAD + z*zFreq*DEGTORAD)*cos(x*DEGTORAD)*xScalar/2.0 + sin(x*zFreq*DEGTORAD*z*xFreq*DEGTORAD/2.0)*cos(z*DEGTORAD)*zScalar/2.0) + roomSize/10;
 
 			while (y >= 0)
 			{
@@ -997,7 +997,6 @@ void Terrain::HideSingleBlockSides(int i) // for block i in the block-Vector, ch
 		eReverse = e + (e % 2 == 0 ? 1 : -1);
 		//printf("%d vs %d\n", e, eReverse);
 		idx = b->index + indexCheck[e];
-
 		if (blockMap.find(idx) != blockMap.end())
 		{
 			auto &b1 = blockMap[idx];
@@ -1005,6 +1004,10 @@ void Terrain::HideSingleBlockSides(int i) // for block i in the block-Vector, ch
 			{
 				b->sideVisible[e] = 0;
 				b1->sideVisible[eReverse] = 0;
+			}
+			else if ((b->getX() % roomSize == 0 || (b->getY() / roomSize) % roomSize == 0) || b1->getX() % roomSize == 0 || (b1->getZ()/roomSize)%roomSize)
+			{
+				// don't render
 			}
 			else
 			{
@@ -1016,7 +1019,7 @@ void Terrain::HideSingleBlockSides(int i) // for block i in the block-Vector, ch
 				b->renderable = TRUE;
 			}
 		}
-		else
+		else if (b->getY() != 0) // don't draw the floor, saves a bunch of blocks being rendered if the roomSize gets large
 		{
 			b->renderable = TRUE;
 		}
@@ -1270,13 +1273,13 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 	glColor3ub(0, 0, 255);
 	glBegin(GL_LINES);
 
-	for (int i = 0; i <= 1024; i += 8)
+	for (int i = 0; i <= roomSize*8; i += 8)
 	{
 		glVertex3i(i, 0, 0);
-		glVertex3i(i, 0, 1024);
+		glVertex3i(i, 0, roomSize * 8);
 
 		glVertex3i(0, 0, i);
-		glVertex3i(1025, 0, i);
+		glVertex3i(roomSize * 8, 0, i);
 	}
 	glColor3ub(255, 0, 0);
 	glVertex3i(0, 0, 0);
@@ -1337,7 +1340,7 @@ int main(void)
 	int drawCount = 0;
 	CameraObject camera, camera2;
 
-	Terrain worldGrid(10, 1);
+	Terrain worldGrid(100, 2);
 
 	camera.playerBlock.roomSize = worldGrid.roomSize;
 	camera2.playerBlock.roomSize = worldGrid.roomSize;
