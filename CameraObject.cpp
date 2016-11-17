@@ -1,5 +1,6 @@
 #include "CameraObject.h"
 
+
 CameraObject::CameraObject()
 {
 	Initialize(0.0, 0.0, 0.0);
@@ -76,7 +77,6 @@ void CameraObject::Initialize(double startX, double startY, double startZ)
 	zoom = 0.0;
 
 	sensitivity = 1.0 / 5.0;
-	SetFrustrumCriteria();
 }
 
 void CameraObject::SetUpCameraProjection(void)
@@ -116,7 +116,6 @@ void inline CameraObject::SetGridLocation(void)
 	gridLocation[0] = pos[0] / blockSize;
 	gridLocation[1] = pos[1] / blockSize;
 	gridLocation[2] = pos[2] / blockSize;
-	playerBlock.y1 = pos[1] + camHeight + blockSize / 2;
 }
 
 void CameraObject::DrawCamera(void)
@@ -124,28 +123,19 @@ void CameraObject::DrawCamera(void)
 	// Draw Forward Vector
 	glColor3ub(0, 255, 0);
 	glBegin(GL_LINES);
-	glVertex3d(playerBlock.xM, playerBlock.yM, playerBlock.zM);
-	glVertex3d(playerBlock.xM + forwardVector[0] * 100.0,
-			   playerBlock.yM + forwardVector[1] * 100.0, 
-			   playerBlock.zM + forwardVector[2] * 100.0);
+	glVertex3d(playerBlock.pos[0] + playerBlock.blockSize / 2, playerBlock.pos[1] + playerBlock.blockSize / 2, playerBlock.pos[2] + playerBlock.blockSize / 2);
+	glVertex3d(playerBlock.pos[0] + forwardVector[0] * 100.0 + playerBlock.blockSize / 2, playerBlock.pos[1] + forwardVector[1] * 100.0 + playerBlock.blockSize / 2,
+		playerBlock.pos[2] + forwardVector[2] * 100.0 + playerBlock.blockSize / 2);
 	glEnd();
 
 	if (zoom > 5)
 	{
 		// Draw Camera Cube
 		glBegin(GL_QUADS);
+		// Left Side
 		playerBlock.DrawSolid();
 		glEnd();
-		glBegin(GL_QUADS);
-		playerBlock.DrawEdges();
-		glEnd();
 	}
-}
-
-void CameraObject::SetFrustrumCriteria(void)
-{
-	double fVLen = fabs(farZ - zoom);
-	coneAngle = fVLen / sqrt(pow(viewRadius, 2) + pow(fVLen, 2));
 }
 
 void CameraObject::Update(int &key)
@@ -277,29 +267,23 @@ void CameraObject::Update(int &key)
 		}
 		if (!stationary)
 		{
-			std::vector<double> curFV = { 0,0,0 };
-			SetVec(curFV, forwardVector);
-			if (gravityOn)
-			{
-				curFV[1] = 0;
-			}
 			if (FsGetKeyState(FSKEY_W))
 			{
-				VecPlus(pos, curFV);
+				VecPlus(pos, forwardVector[0], 0.0, forwardVector[2]);
 			}
 			if (FsGetKeyState(FSKEY_S))
 			{
-				VecMinus(pos, curFV);
+				VecMinus(pos, forwardVector[0] / 2.0, 0.0, forwardVector[2] / 2.0);
 			}
 			if (FsGetKeyState(FSKEY_D))
 			{
-				pos[0] -= curFV[2];
-				pos[2] += curFV[0];
+				pos[0] -= forwardVector[2];
+				pos[2] += forwardVector[0];
 			}
 			if (FsGetKeyState(FSKEY_A))
 			{
-				pos[0] += curFV[2];
-				pos[2] -= curFV[0];
+				pos[0] += forwardVector[2];
+				pos[2] -= forwardVector[0];
 			}
 
 			if (gravityOn)
@@ -351,7 +335,7 @@ void CameraObject::Update(int &key)
 			}
 			else
 			{
-				camHeight = 12.0;
+				camHeight = 16.0;
 			}
 			//printf("%lf\n\n", camHeight);
 			playerBlock.setPosition(pos[0] - playerBlock.blockSize / 2.0, pos[1], pos[2] - playerBlock.blockSize / 2.0);
@@ -374,5 +358,4 @@ void CameraObject::Update(int &key)
 		}
 		//printf("%lf %lf %lf\n", playerBlock.pos[0], playerBlock.pos[1], playerBlock.pos[2]);
 		DrawCamera();
-		SetFrustrumCriteria();
 	}
