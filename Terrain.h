@@ -2,15 +2,12 @@
 #define TERRAIN_CLASS_INCLUDED
 
 #include "CameraObject.h"
-#include "yspng.h"
 
 class Terrain
 {
 public:
 	int roomSize, blockNum, totalSpace, drawCount;
 	int indexCheck[6];
-	GLuint texId;
-	YsRawPngDecoder png;
 
 	std::map<int, std::unique_ptr<Block>> blockMap;
 	std::map<int, int> renderMap;
@@ -35,7 +32,5 @@ public:
 	void DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key);
 	void DrawOffsetMode(int &drawCount, CameraObject &camera);
 };
-
-
 
 #endif // !TERRAIN_CLASS_INCLUDED

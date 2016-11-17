@@ -13,7 +13,7 @@ class CameraObject
 public:
 	//double x, y, z;r
 	double h, p, b;
-	double vertVel, camHeight, zoom, viewRadius, sensitivity, fov, nearZ, farZ;
+	double vertVel, camHeight, zoom, viewRadius, sensitivity, fov, nearZ, farZ, coneAngle;
 	std::vector<double> forwardVector = { 0,0,0 };
 	std::vector<double> pos = { 0,0,0 };
 	std::vector<int> gridLocation = { 0,0,0 };
@@ -44,9 +44,8 @@ public:
 
 	void GetForwardVector(void);
 	void inline SetGridLocation(void);
+	void inline SetFrustrumCriteria(void);
 	void Update(int &key);
 };
-
-
 
 #endif // !CAMERA_CLASS_INCLUDED

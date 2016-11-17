@@ -1,21 +1,17 @@
 #include "Terrain.h"
-#include "Decoder.h"
-
-
 
 int main(void)
 {
-	FsOpenWindow(800, 100, WINWID, WINHEI, 1);
-
 	int terminate = 0;
 	int lb, mb, rb, mx, my, mouseEvent, key = 0;
 	int drawCount = 0;
 	CameraObject camera, camera2;
-	Terrain worldGrid(10, 0);
-	worldGrid.texId=decodePng();
+
+	Terrain worldGrid(128, 2);
 
 	camera.playerBlock.roomSize = worldGrid.roomSize;
 	camera2.playerBlock.roomSize = worldGrid.roomSize;
+	FsOpenWindow(800, 100, WINWID, WINHEI, 1);
 
 	camera.pos[2] = 100.0;
 	camera2.pos[0] += worldGrid.roomSize / 2 * camera2.blockSize;
@@ -121,26 +117,37 @@ int main(void)
 		// Set up 2D drawing
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		{ // draw crosshairs
-			glBegin(GL_LINES);
-			glLineWidth(5);
-			glColor3ub(0, 0, 0);
-			glVertex2i(wid / 2 - 10, hei / 2);
-			glVertex2i(wid / 2 + 10, hei / 2);
-			glVertex2i(wid / 2, hei / 2 - 10);
-			glVertex2i(wid / 2, hei / 2 + 10);
-			glEnd();
-		}
+
 		glOrtho(0, (float)wid - 1, (float)hei - 1, 0, -1, 1);
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 
+		{ // draw crosshairs
+			glLineWidth(1);
+			glBegin(GL_LINES);
+			glColor3ub(255, 255, 255);
+			glVertex2i(wid / 2 - 10, hei / 2);
+			glVertex2i(wid / 2 + 10, hei / 2);
+			glVertex2i(wid / 2, hei / 2 - 10);
+			glVertex2i(wid / 2, hei / 2 + 10);
+			glEnd();
+			glLineWidth(5);
+			glBegin(GL_LINES);
+			glColor3ub(0, 0, 0);
+			glVertex2i(wid / 2 - 12, hei / 2);
+			glVertex2i(wid / 2 + 12, hei / 2);
+			glVertex2i(wid / 2, hei / 2 - 12);
+			glVertex2i(wid / 2, hei / 2 + 12);
+			glEnd();
+			glLineWidth(1);
+		}
+
 		glDisable(GL_DEPTH_TEST);
 
 		// 2D drawing from here
 		FsSwapBuffers();
-		FsSleep(5);
+		FsSleep(20);
 	}
 
 	return 0;

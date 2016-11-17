@@ -1,9 +1,5 @@
 #include "Terrain.h"
 
-std::vector<double> dist = { 0,0,0 }, orthVec = { 0,0,0 }, fVec = { 0,0,0 };
-double coneDist, coneRad, orthDist;
-
-
 int BlockDist(const Block &block1, const Block &block2)
 {
 	return abs(block1.getX() - block2.getX()) + abs(block1.getY() - block2.getY()) + abs(block1.getZ() - block2.getZ());
@@ -46,7 +42,6 @@ void Terrain::Initialize(int randomVsOrdered) // 0 = random, 1 = linear
 		GenerateFunctionTerrain();
 	}
 	HideSides();
-
 }
 
 void Terrain::GenerateFunctionTerrain(void)
@@ -234,12 +229,8 @@ void Terrain::AddBlock(int x, int y, int z)
 	if (blockMap.find(newLocation) == blockMap.end()) // free spot
 	{
 		std::unique_ptr<Block> newPtr;
-		//printf("BEFORE x = %d, y = %d, z = %d\n", newPtr->getX(), newPtr->getY(), newPtr->getZ());
 		newPtr.reset(new Block(roomSize, x, y, z));
-		//printf("AFTER x = %d, y = %d, z = %d\n", newPtr->getX(), newPtr->getY(), newPtr->getZ());
 		blockMap[newLocation] = std::move(newPtr);
-		//printf("AFTER2 x = %d, y = %d, z = %d\n", blockMap[newLocation]->getX(), blockMap[newLocation]->getY(), blockMap[newLocation]->getZ());
-		//printf("Index = %d, BlockLocationIndex = %d\n", newLocation, blockMap[newLocation]->index);
 		blockNum++;
 
 		HideSingleBlockSides(newLocation);
@@ -254,11 +245,8 @@ void Terrain::AddBlock(int x, int y, int z)
 void Terrain::RemoveBlock(int x, int y, int z)
 {
 	int newLocation = x + z*roomSize + y*roomSize*roomSize;
-	//printf("newLocation = %d\n", newLocation);
-	//printf("BEFORE renderMap size = %d, blockMap size = %d\n", renderMap.size(), blockMap.size());
 	if (blockMap.find(newLocation) != blockMap.end()) // if the removed block is in the list of existing blocks
 	{
-		//printf("In here\n");
 		ShowSingleBlockSides(newLocation);
 		blockNum--;
 		if (renderMap.find(newLocation) != renderMap.end())
@@ -266,14 +254,7 @@ void Terrain::RemoveBlock(int x, int y, int z)
 			renderMap.erase(newLocation);
 		}
 		blockMap.erase(newLocation);
-		//printf("renderMap size = %d, blockMap size = %d\n", renderMap.size(), blockMap.size());
 	}
-	else
-	{
-		//blockMap.erase(blockMap[newLocation].index);
-		//printf("Out of Bounds \n");
-	}
-	//printf("AFTER renderMap size = %d, blockMap size = %d\n", renderMap.size(), blockMap.size());
 }
 
 double VecLen(std::vector<double> const &vec)
@@ -294,6 +275,9 @@ double Dot(std::vector<double> const &vec1, std::vector<double> const &vec2)
 
 void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera)
 {
+	std::vector<double> dist = { 0,0,0 };
+	double coneDist, lenObj;
+
 	if (FsGetKeyState(FSKEY_P) != 1)
 	{
 		glBegin(GL_QUADS);
@@ -303,25 +287,18 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera)
 			auto &b = blockMap[keyVal.second];
 			for (int i = 0; i < 3; i++)
 			{
-				dist[i] = b->pos[i] - camera.pos[i]; // camera.forwardVector[i];
+				dist[i] = b->centerPos[i] - camera.playerBlock.centerPos[i]; // get cam->object vector
 			}
-			//printf("\n");
-			coneDist = Dot(dist, camera.forwardVector);
-			//printf("coneDist = %lf\n", coneDist);
-			if (VecLen(dist) <= 50)
+			lenObj = VecLen(dist); // get cam->object scalar distance
+			if (lenObj <= 30)
 			{
 				b->DrawSolid();
 			}
-			else if (coneDist <= camera.farZ)
+			else
 			{
-				//coneRad = coneDist / abs(camera.farZ - camera.nearZ)*abs(camera.farZ);
-				coneRad = coneDist / abs(camera.farZ - camera.nearZ) * camera.viewRadius;
-				orthVec[0] = dist[0] - coneDist*camera.forwardVector[0];
-				orthVec[1] = dist[1] - coneDist*camera.forwardVector[1];
-				orthVec[2] = dist[2] - coneDist*camera.forwardVector[2];
-				orthDist = VecLen(orthVec);
-				//printf("OrthDist = %lf\n coneRad = %lf\n",orthDist, coneRad);
-				if (orthDist <= coneRad)
+				dist[0] /= lenObj; dist[1] /= lenObj; dist[2] /= lenObj; // unit-normalize
+				coneDist = Dot(dist, camera.forwardVector);
+				if (coneDist >= camera.coneAngle)
 				{
 					b->DrawSolid();
 				}
@@ -334,28 +311,20 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera)
 			auto &b = blockMap[keyVal.second];
 			for (int i = 0; i < 3; i++)
 			{
-				dist[i] = b->pos[i] - camera.pos[i];
+				dist[i] = b->centerPos[i] - camera.playerBlock.centerPos[i]; // get cam->object vector
 			}
-			//printf("\n");
-			coneDist = Dot(dist, camera.forwardVector);
-			//printf("coneDist = %lf\n", coneDist);
-			if (VecLen(dist) <= 50)
+			lenObj = VecLen(dist); // get cam->object scalar distance
+			if (lenObj <= 30)
 			{
 				b->DrawEdges();
 			}
-			else if (coneDist <= camera.farZ)
+			else
 			{
-				//coneRad = coneDist / abs(camera.farZ - camera.nearZ)*abs(camera.farZ);
-				coneRad = coneDist / abs(camera.farZ - camera.nearZ) * camera.viewRadius;
-				orthVec[0] = dist[0] - coneDist*camera.forwardVector[0];
-				orthVec[1] = dist[1] - coneDist*camera.forwardVector[1];
-				orthVec[2] = dist[2] - coneDist*camera.forwardVector[2];
-				orthDist = VecLen(orthVec);
-				//printf("OrthDist = %lf\n coneRad = %lf\n",orthDist, coneRad);
-				if (orthDist <= coneRad)
+				dist[0] /= lenObj; dist[1] /= lenObj; dist[2] /= lenObj; // unit-normalize
+				coneDist = Dot(dist, camera.forwardVector);
+				if (coneDist >= camera.coneAngle)
 				{
 					b->DrawEdges();
-					drawCount++;
 				}
 			}
 		}
@@ -370,25 +339,18 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera)
 			auto &b = keyVal.second;
 			for (int i = 0; i < 3; i++)
 			{
-				dist[i] = b->pos[i] - camera.pos[i];// camera.forwardVector[i];
+				dist[i] = b->centerPos[i] - camera.playerBlock.centerPos[i]; // get cam->object vector
 			}
-			//printf("\n");
-			coneDist = Dot(dist, camera.forwardVector);
-			//printf("coneDist = %lf\n", coneDist);
-			if (VecLen(dist) <= 50)
+			lenObj = VecLen(dist); // get cam->object scalar distance
+			if (lenObj <= 30)
 			{
 				b->DrawSolid();
 			}
-			else if (coneDist <= camera.farZ)
+			else
 			{
-				//coneRad = coneDist / abs(camera.farZ - camera.nearZ)*abs(camera.farZ);
-				coneRad = coneDist / abs(camera.farZ - camera.nearZ) * camera.viewRadius;
-				orthVec[0] = dist[0] - coneDist*camera.forwardVector[0];
-				orthVec[1] = dist[1] - coneDist*camera.forwardVector[1];
-				orthVec[2] = dist[2] - coneDist*camera.forwardVector[2];
-				orthDist = VecLen(orthVec);
-				//printf("OrthDist = %lf\n coneRad = %lf\n",orthDist, coneRad);
-				if (orthDist <= coneRad)
+				dist[0] /= lenObj; dist[1] /= lenObj; dist[2] /= lenObj; // unit-normalize
+				coneDist = Dot(dist, camera.forwardVector);
+				if (coneDist >= camera.coneAngle)
 				{
 					b->DrawSolid();
 				}
@@ -402,27 +364,20 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera)
 			auto &b = keyVal.second;
 			for (int i = 0; i < 3; i++)
 			{
-				dist[i] = b->pos[i] - camera.pos[i];
+				dist[i] = b->centerPos[i] - camera.playerBlock.centerPos[i]; // get cam->object vector
 			}
-			coneDist = Dot(dist, camera.forwardVector);
-			//printf("coneDist = %lf\n", coneDist);
-			if (VecLen(dist) <= 50)
+			lenObj = VecLen(dist); // get cam->object scalar distance
+			if (lenObj <= 30)
 			{
 				b->DrawEdges();
 			}
-			else if (coneDist <= camera.farZ)
+			else
 			{
-				//coneRad = coneDist / abs(camera.farZ - camera.nearZ)*abs(camera.farZ);
-				coneRad = coneDist / abs(camera.farZ - camera.nearZ) * camera.viewRadius;
-				orthVec[0] = dist[0] - coneDist*camera.forwardVector[0];
-				orthVec[1] = dist[1] - coneDist*camera.forwardVector[1];
-				orthVec[2] = dist[2] - coneDist*camera.forwardVector[2];
-				orthDist = VecLen(orthVec);
-				//printf("OrthDist = %lf\n coneRad = %lf\n",orthDist, coneRad);
-				if (orthDist <= coneRad)
+				dist[0] /= lenObj; dist[1] /= lenObj; dist[2] /= lenObj; // unit-normalize
+				coneDist = Dot(dist, camera.forwardVector);
+				if (coneDist >= camera.coneAngle)
 				{
 					b->DrawEdges();
-					drawCount++;
 				}
 			}
 		}
@@ -460,12 +415,13 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 	{
 		if (FsGetKeyState(FSKEY_P) == 0) // only render visible objects
 		{
+			glBegin(GL_QUADS);
 			for (auto &keyVal : renderMap)
 			{
-				//printf("TEX!!! %d \n", texId);
-				blockMap[keyVal.first]->DrawTexture(texId);
+				blockMap[keyVal.first]->DrawSolid();
 				drawCount++;
 			}
+			glEnd();
 
 			glBegin(GL_LINES);
 			glColor3ub(0, 0, 0);
@@ -481,7 +437,7 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 			glBegin(GL_QUADS);
 			for (auto &keyVal : blockMap)
 			{
-				keyVal.second->DrawTexture(texId);
+				keyVal.second->DrawSolid();
 			}
 			glEnd();
 
@@ -501,7 +457,7 @@ bool Terrain::FindBlock(CameraObject &camera, int &x, int &y, int &z, int ADDORR
 	int i = 0;
 	int blockSize = camera.blockSize;
 	int index;
-	std::vector<double> location = { camera.playerBlock.pos[0] + blockSize / 2, camera.playerBlock.pos[1] + camera.camHeight, camera.playerBlock.pos[2] + blockSize / 2 };
+	std::vector<double> location = { camera.playerBlock.xM, camera.playerBlock.pos[1] + camera.camHeight, camera.playerBlock.zM };
 	printf("Camera Position = %lf, %lf, %lf\n", location[0], location[1], location[2]);
 	printf("Forward Vector = %lf, %lf, %lf\n", camera.forwardVector[0], camera.forwardVector[1], camera.forwardVector[2]);
 	//SetVec(location, camera.pos);
