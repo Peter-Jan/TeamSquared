@@ -1,28 +1,68 @@
-#include "fssimplewindow.h"
 #include "Block.h"
-
-
 
 Block::Block()
 {
+	roomSize = 10;
 	blockSize = 8;
-	int xRand = rand() % roomSize;// -roomSize / 2;
-	int yRand = rand() % roomSize;// -roomSize / 2;
-	int zRand = rand() % roomSize;// -roomSize / 2;
-	setCoordinate(xRand - roomSize / 2, yRand - roomSize / 2, zRand - roomSize / 2);
+	int xRand = rand() % roomSize;
+	int yRand = rand() % roomSize;
+	int zRand = rand() % roomSize;
+	setCoordinate(xRand, yRand, zRand);
 	setColor(255, 0, 0);
 	setDimension(blockSize, blockSize, blockSize);
 	pos[0] = (double)getX()*blockSize; pos[1] = (double)getY()*blockSize; pos[2] = (double)getZ()*blockSize;
-	index = xRand + roomSize*zRand + roomSize*roomSize*yRand;
+	index = xRand + roomSize*zRand + pow(roomSize, 2)*yRand;
 }
 
-Block::Block(int x, int y, int z)
+void Block::copyFrom(const Block &fromBlock)
 {
+	roomSize = fromBlock.roomSize;
+	blockSize = 8;
+	setCoordinate(fromBlock.x, fromBlock.y, fromBlock.z);
+	setColor(255, 0, 0);
+	setDimension(blockSize, blockSize, blockSize);
+	pos[0] = (double)getX()*blockSize; pos[1] = (double)getY()*blockSize; pos[2] = (double)getZ()*blockSize;
+	index = getX() + roomSize*getZ() + pow(roomSize, 2)*getY();
+}
+
+Block::Block(const std::unique_ptr<Block> &fromPtr)
+{
+	copyFrom(*fromPtr);
+}
+
+Block &Block::operator=(const std::unique_ptr<Block> &fromPtr)
+{
+	copyFrom(*fromPtr);
+	return *this;
+}
+
+Block::Block(int roomSizeIn)
+{
+	roomSize = roomSizeIn;
+	blockSize = 8;
+	int xRand = rand() % roomSize;
+	int yRand = rand() % roomSize;
+	int zRand = rand() % roomSize;
+	setCoordinate(xRand, yRand, zRand);
+	setColor(255, 0, 0);
+	setDimension(blockSize, blockSize, blockSize);
+	pos[0] = (double)getX()*blockSize; pos[1] = (double)getY()*blockSize; pos[2] = (double)getZ()*blockSize;
+	index = xRand + roomSize*zRand + pow(roomSize, 2)*yRand;
+}
+
+Block::Block(int roomSizeIn, int x, int y, int z)
+{
+	Initialize(roomSizeIn, x, y, z);
+}
+
+void Block::Initialize(int roomSizeIn, int x, int y, int z)
+{
+	roomSize = roomSizeIn;
 	blockSize = 8;
 	setCoordinate(x, y, z);
 	setColor(255, 0, 0);
 	setDimension(blockSize, blockSize, blockSize);
-	index = x + roomSize*z + roomSize*roomSize*y;
+	index = x + roomSize*z + pow(roomSize, 2)*y;
 }
 
 Block::~Block()
@@ -56,9 +96,10 @@ void Block::setCoordinate(int xin, int yin, int zin)
 	x = xin;
 	y = yin;
 	z = zin;
-	pos[0] = (x - roomSize / 2)*blockSize;
-	pos[1] = (y - roomSize / 2)*blockSize;
-	pos[2] = (z - roomSize / 2)*blockSize;
+	pos[0] = (x)*blockSize;
+	pos[1] = (y)*blockSize;
+	pos[2] = (z)*blockSize;
+	index = x + roomSize*z + pow(roomSize, 2)*y;
 }
 
 void Block::setPosition(double xLoc, double yLoc, double zLoc)
@@ -66,9 +107,10 @@ void Block::setPosition(double xLoc, double yLoc, double zLoc)
 	pos[0] = xLoc;
 	pos[1] = yLoc;
 	pos[2] = zLoc;
-	x = (int)(xLoc / blockSize) + roomSize;
-	y = (int)(yLoc / blockSize) + roomSize;
-	z = (int)(zLoc / blockSize) + roomSize;
+	x = (int)(xLoc / blockSize);
+	y = (int)(yLoc / blockSize);
+	z = (int)(zLoc / blockSize);
+	index = x + roomSize*z + pow(roomSize, 2)*y;
 }
 
 void Block::setColor(const int rin, const int gin, const int bin)
@@ -130,6 +172,7 @@ void Block::DrawSolid(void)
 		glVertex3i(pos[0] + w, pos[1], pos[2] + l);
 		glVertex3i(pos[0], pos[1], pos[2] + l);
 	}
+
 	// Top Side
 	if (sideVisible[5])
 	{
