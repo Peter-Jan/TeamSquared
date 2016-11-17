@@ -3,6 +3,7 @@
 std::vector<double> dist = { 0,0,0 }, orthVec = { 0,0,0 }, fVec = { 0,0,0 };
 double coneDist, coneRad, orthDist;
 
+
 int BlockDist(const Block &block1, const Block &block2)
 {
 	return abs(block1.getX() - block2.getX()) + abs(block1.getY() - block2.getY()) + abs(block1.getZ() - block2.getZ());
@@ -45,6 +46,7 @@ void Terrain::Initialize(int randomVsOrdered) // 0 = random, 1 = linear
 		GenerateFunctionTerrain();
 	}
 	HideSides();
+
 }
 
 void Terrain::GenerateFunctionTerrain(void)
@@ -458,13 +460,12 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 	{
 		if (FsGetKeyState(FSKEY_P) == 0) // only render visible objects
 		{
-			glBegin(GL_QUADS);
 			for (auto &keyVal : renderMap)
 			{
-				blockMap[keyVal.first]->DrawSolid();
+				//printf("TEX!!! %d \n", texId);
+				blockMap[keyVal.first]->DrawTexture(texId);
 				drawCount++;
 			}
-			glEnd();
 
 			glBegin(GL_LINES);
 			glColor3ub(0, 0, 0);
@@ -480,7 +481,7 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 			glBegin(GL_QUADS);
 			for (auto &keyVal : blockMap)
 			{
-				keyVal.second->DrawSolid();
+				keyVal.second->DrawTexture(texId);
 			}
 			glEnd();
 

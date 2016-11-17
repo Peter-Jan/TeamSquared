@@ -1,7 +1,5 @@
 #include "CameraObject.h"
 
-//std::vector<double> dist = { 0,0,0 }, orthVec = { 0,0,0 }, fVec = { 0,0,0 };
-//double coneDist, coneRad, orthDist;
 
 CameraObject::CameraObject()
 {

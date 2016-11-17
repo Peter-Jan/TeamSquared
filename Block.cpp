@@ -1,5 +1,193 @@
 #include "Block.h"
 
+
+
+void Block::DrawTexture(GLuint texId)
+{
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);   // Texture value should be multiplied to the current color
+	glColor4d(1.0, 1.0, 1.0, 1.0);           	// Current color is solid white
+
+	glEnable(GL_TEXTURE_2D);		// Turn on the texture mapping 
+	glBindTexture(GL_TEXTURE_2D, texId);	// Select the current texture.
+
+	glBegin(GL_QUADS);
+
+	if (sideVisible[0])
+	{
+		glTexCoord2d(0.0, 0.0);
+		glVertex3i(pos[0], pos[1], pos[2]);
+		glTexCoord2d(1.0, 0.0);
+		glVertex3i(pos[0], pos[1], pos[2] + l);
+		glTexCoord2d(1.0, 1.0);
+		glVertex3i(pos[0], pos[1] + h, pos[2] + l);
+		glTexCoord2d(0.0, 1.0);
+		glVertex3i(pos[0], pos[1] + h, pos[2]);
+	}
+	// Right Side
+	if (sideVisible[1])
+	{
+		glTexCoord2d(0.0, 0.0);
+		glVertex3i(pos[0] + w, pos[1], pos[2]);
+		glTexCoord2d(1.0, 0.0);
+		glVertex3i(pos[0] + w, pos[1], pos[2] + l);
+		glTexCoord2d(1.0, 1.0);
+		glVertex3i(pos[0] + w, pos[1] + h, pos[2] + l);
+		glTexCoord2d(0.0, 1.0);
+		glVertex3i(pos[0] + w, pos[1] + h, pos[2]);
+	}
+	// Back Side
+	if (sideVisible[2])
+	{
+		glTexCoord2d(0.0, 0.0);
+		glVertex3i(pos[0], pos[1] + h, pos[2]);
+		glTexCoord2d(1.0, 0.0);
+		glVertex3i(pos[0] + w, pos[1] + h, pos[2]);
+		glTexCoord2d(1.0, 1.0);
+		glVertex3i(pos[0] + w, pos[1], pos[2]);
+		glTexCoord2d(0.0, 1.0);
+		glVertex3i(pos[0], pos[1], pos[2]);
+	}
+	// Front Side
+	if (sideVisible[3])
+	{
+		glTexCoord2d(0.0, 0.0);
+		glVertex3i(pos[0], pos[1] + h, pos[2] + l);
+		glTexCoord2d(1.0, 0.0);
+		glVertex3i(pos[0] + w, pos[1] + h, pos[2] + l);
+		glTexCoord2d(1.0, 1.0);
+		glVertex3i(pos[0] + w, pos[1], pos[2] + l);
+		glTexCoord2d(0.0, 1.0);
+		glVertex3i(pos[0], pos[1], pos[2] + l);
+	}
+
+	// Bottom Side
+	if (sideVisible[4])
+	{
+		glTexCoord2d(0.0, 0.0);
+		glVertex3i(pos[0], pos[1], pos[2]);
+		glTexCoord2d(1.0, 0.0);
+		glVertex3i(pos[0] + w, pos[1], pos[2]);
+		glTexCoord2d(1.0, 1.0);
+		glVertex3i(pos[0] + w, pos[1], pos[2] + l);
+		glTexCoord2d(0.0, 1.0);
+		glVertex3i(pos[0], pos[1], pos[2] + l);
+	}
+
+	// Top Side
+	if (sideVisible[5])
+	{
+		glTexCoord2d(0.0, 0.0);
+		glVertex3i(pos[0], pos[1] + h, pos[2]);
+		glTexCoord2d(1.0, 0.0);
+		glVertex3i(pos[0] + w, pos[1] + h, pos[2]);
+		glTexCoord2d(1.0, 1.0);
+		glVertex3i(pos[0] + w, pos[1] + h, pos[2] + l);
+		glTexCoord2d(0.0, 1.0);
+		glVertex3i(pos[0], pos[1] + h, pos[2] + l);
+	}
+
+	glEnd();
+}
+
+void Block::DrawEdges(void)
+{
+	//Draw edges
+	// Left Side
+	glColor3ub(0, 0, 0);
+	if (sideVisible[0])
+	{
+		glVertex3i(pos[0], pos[1], pos[2]);
+		glVertex3i(pos[0], pos[1], pos[2] + l);
+
+		glVertex3i(pos[0], pos[1], pos[2] + l);
+		glVertex3i(pos[0], pos[1] + h, pos[2] + l);
+
+		glVertex3i(pos[0], pos[1] + h, pos[2] + l);
+		glVertex3i(pos[0], pos[1] + h, pos[2]);
+
+		glVertex3i(pos[0], pos[1] + h, pos[2]);
+		glVertex3i(pos[0], pos[1], pos[2]);
+	}
+	// Right Side
+	if (sideVisible[1])
+	{
+		glVertex3i(pos[0] + w, pos[1], pos[2]);
+		glVertex3i(pos[0] + w, pos[1], pos[2] + l);
+
+		glVertex3i(pos[0] + w, pos[1], pos[2] + l);
+		glVertex3i(pos[0] + w, pos[1] + h, pos[2] + l);
+
+		glVertex3i(pos[0] + w, pos[1] + h, pos[2] + l);
+		glVertex3i(pos[0] + w, pos[1] + h, pos[2]);
+
+		glVertex3i(pos[0] + w, pos[1] + h, pos[2]);
+		glVertex3i(pos[0] + w, pos[1], pos[2]);
+	}
+	// Back Side
+	if (sideVisible[2])
+	{
+		glVertex3i(pos[0], pos[1] + h, pos[2]);
+		glVertex3i(pos[0] + w, pos[1] + h, pos[2]);
+
+		glVertex3i(pos[0] + w, pos[1] + h, pos[2]);
+		glVertex3i(pos[0] + w, pos[1], pos[2]);
+
+		glVertex3i(pos[0] + w, pos[1], pos[2]);
+		glVertex3i(pos[0], pos[1], pos[2]);
+
+		glVertex3i(pos[0], pos[1], pos[2]);
+		glVertex3i(pos[0], pos[1] + h, pos[2]);
+	}
+	// Front Side
+	if (sideVisible[3])
+	{
+		glVertex3i(pos[0], pos[1] + h, pos[2] + l);
+		glVertex3i(pos[0] + w, pos[1] + h, pos[2] + l);
+
+		glVertex3i(pos[0] + w, pos[1] + h, pos[2] + l);
+		glVertex3i(pos[0] + w, pos[1], pos[2] + l);
+
+		glVertex3i(pos[0] + w, pos[1], pos[2] + l);
+		glVertex3i(pos[0], pos[1], pos[2] + l);
+
+		glVertex3i(pos[0], pos[1], pos[2] + l);
+		glVertex3i(pos[0], pos[1] + h, pos[2] + l);
+	}
+
+	// Bottom Side
+	if (sideVisible[4])
+	{
+		glVertex3i(pos[0], pos[1], pos[2]);
+		glVertex3i(pos[0] + w, pos[1], pos[2]);
+
+		glVertex3i(pos[0] + w, pos[1], pos[2]);
+		glVertex3i(pos[0] + w, pos[1], pos[2] + l);
+
+		glVertex3i(pos[0] + w, pos[1], pos[2] + l);
+		glVertex3i(pos[0], pos[1], pos[2] + l);
+
+		glVertex3i(pos[0], pos[1], pos[2] + l);
+		glVertex3i(pos[0], pos[1], pos[2]);
+	}
+	// Top Side
+	if (sideVisible[5])
+	{
+		glVertex3i(pos[0], pos[1] + h, pos[2]);
+		glVertex3i(pos[0] + w, pos[1] + h, pos[2]);
+
+		glVertex3i(pos[0] + w, pos[1] + h, pos[2]);
+		glVertex3i(pos[0] + w, pos[1] + h, pos[2] + l);
+
+		glVertex3i(pos[0] + w, pos[1] + h, pos[2] + l);
+		glVertex3i(pos[0], pos[1] + h, pos[2] + l);
+
+		glVertex3i(pos[0], pos[1] + h, pos[2] + l);
+		glVertex3i(pos[0], pos[1] + h, pos[2]);
+	}
+
+
+}
+
 Block::Block()
 {
 	roomSize = 10;
@@ -57,6 +245,7 @@ Block::Block(int roomSizeIn, int x, int y, int z)
 
 void Block::Initialize(int roomSizeIn, int x, int y, int z)
 {
+
 	roomSize = roomSizeIn;
 	blockSize = 8;
 	setCoordinate(x, y, z);
@@ -181,102 +370,5 @@ void Block::DrawSolid(void)
 		glVertex3i(pos[0] + w, pos[1] + h, pos[2]);
 		glVertex3i(pos[0] + w, pos[1] + h, pos[2] + l);
 		glVertex3i(pos[0], pos[1] + h, pos[2] + l);
-	}
-}
-
-void Block::DrawEdges(void)
-{
-	//Draw edges
-	// Left Side
-	glColor3ub(0, 0, 0);
-	if (sideVisible[0])
-	{
-		glVertex3i(pos[0], pos[1], pos[2]);
-		glVertex3i(pos[0], pos[1], pos[2] + l);
-
-		glVertex3i(pos[0], pos[1], pos[2] + l);
-		glVertex3i(pos[0], pos[1] + h, pos[2] + l);
-
-		glVertex3i(pos[0], pos[1] + h, pos[2] + l);
-		glVertex3i(pos[0], pos[1] + h, pos[2]);
-
-		glVertex3i(pos[0], pos[1] + h, pos[2]);
-		glVertex3i(pos[0], pos[1], pos[2]);
-	}
-	// Right Side
-	if (sideVisible[1])
-	{
-		glVertex3i(pos[0] + w, pos[1], pos[2]);
-		glVertex3i(pos[0] + w, pos[1], pos[2] + l);
-
-		glVertex3i(pos[0] + w, pos[1], pos[2] + l);
-		glVertex3i(pos[0] + w, pos[1] + h, pos[2] + l);
-
-		glVertex3i(pos[0] + w, pos[1] + h, pos[2] + l);
-		glVertex3i(pos[0] + w, pos[1] + h, pos[2]);
-
-		glVertex3i(pos[0] + w, pos[1] + h, pos[2]);
-		glVertex3i(pos[0] + w, pos[1], pos[2]);
-	}
-	// Back Side
-	if (sideVisible[2])
-	{
-		glVertex3i(pos[0], pos[1] + h, pos[2]);
-		glVertex3i(pos[0] + w, pos[1] + h, pos[2]);
-
-		glVertex3i(pos[0] + w, pos[1] + h, pos[2]);
-		glVertex3i(pos[0] + w, pos[1], pos[2]);
-
-		glVertex3i(pos[0] + w, pos[1], pos[2]);
-		glVertex3i(pos[0], pos[1], pos[2]);
-
-		glVertex3i(pos[0], pos[1], pos[2]);
-		glVertex3i(pos[0], pos[1] + h, pos[2]);
-	}
-	// Front Side
-	if (sideVisible[3])
-	{
-		glVertex3i(pos[0], pos[1] + h, pos[2] + l);
-		glVertex3i(pos[0] + w, pos[1] + h, pos[2] + l);
-
-		glVertex3i(pos[0] + w, pos[1] + h, pos[2] + l);
-		glVertex3i(pos[0] + w, pos[1], pos[2] + l);
-
-		glVertex3i(pos[0] + w, pos[1], pos[2] + l);
-		glVertex3i(pos[0], pos[1], pos[2] + l);
-
-		glVertex3i(pos[0], pos[1], pos[2] + l);
-		glVertex3i(pos[0], pos[1] + h, pos[2] + l);
-	}
-
-	// Bottom Side
-	if (sideVisible[4])
-	{
-		glVertex3i(pos[0], pos[1], pos[2]);
-		glVertex3i(pos[0] + w, pos[1], pos[2]);
-
-		glVertex3i(pos[0] + w, pos[1], pos[2]);
-		glVertex3i(pos[0] + w, pos[1], pos[2] + l);
-
-		glVertex3i(pos[0] + w, pos[1], pos[2] + l);
-		glVertex3i(pos[0], pos[1], pos[2] + l);
-
-		glVertex3i(pos[0], pos[1], pos[2] + l);
-		glVertex3i(pos[0], pos[1], pos[2]);
-	}
-	// Top Side
-	if (sideVisible[5])
-	{
-		glVertex3i(pos[0], pos[1] + h, pos[2]);
-		glVertex3i(pos[0] + w, pos[1] + h, pos[2]);
-
-		glVertex3i(pos[0] + w, pos[1] + h, pos[2]);
-		glVertex3i(pos[0] + w, pos[1] + h, pos[2] + l);
-
-		glVertex3i(pos[0] + w, pos[1] + h, pos[2] + l);
-		glVertex3i(pos[0], pos[1] + h, pos[2] + l);
-
-		glVertex3i(pos[0], pos[1] + h, pos[2] + l);
-		glVertex3i(pos[0], pos[1] + h, pos[2]);
 	}
 }

@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include "fssimplewindow.h"
 #include <math.h>
+#include "yspng.h"
+
 
 #ifndef TRUE
 #define TRUE 1
@@ -33,6 +35,7 @@ public:
 	void setColor(const int rin, const int gin, const int bin);
 	void DrawSolid(void);
 	void DrawEdges(void);
+	void DrawTexture(GLuint texId);
 
 private:
 	int x, y, z;

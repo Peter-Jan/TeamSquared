@@ -48,4 +48,5 @@ public:
 };
 
 
+
 #endif // !CAMERA_CLASS_INCLUDED
