@@ -1,7 +1,5 @@
 #include "Terrain.h"
 
-std::vector<double> dist = { 0,0,0 }, orthVec = { 0,0,0 }, fVec = { 0,0,0 };
-double coneDist, coneRad, orthDist;
 
 
 int BlockDist(const Block &block1, const Block &block2)
@@ -294,6 +292,9 @@ double Dot(std::vector<double> const &vec1, std::vector<double> const &vec2)
 
 void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera)
 {
+	std::vector<double> dist = { 0,0,0 };
+	double coneDist, lenObj;
+
 	if (FsGetKeyState(FSKEY_P) != 1)
 	{
 		glBegin(GL_QUADS);
@@ -303,25 +304,22 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera)
 			auto &b = blockMap[keyVal.second];
 			for (int i = 0; i < 3; i++)
 			{
-				dist[i] = b->pos[i] - camera.pos[i]; // camera.forwardVector[i];
+				dist[i] = b->centerPos[i] - camera.playerBlock.centerPos[i]; // get cam->object vector
 			}
 			//printf("\n");
 			coneDist = Dot(dist, camera.forwardVector);
 			//printf("coneDist = %lf\n", coneDist);
 			if (VecLen(dist) <= 50)
+				lenObj = VecLen(dist); // get cam->object scalar distance
+			if (lenObj <= 30)
 			{
 				b->DrawSolid();
 			}
-			else if (coneDist <= camera.farZ)
+			else 
 			{
-				//coneRad = coneDist / abs(camera.farZ - camera.nearZ)*abs(camera.farZ);
-				coneRad = coneDist / abs(camera.farZ - camera.nearZ) * camera.viewRadius;
-				orthVec[0] = dist[0] - coneDist*camera.forwardVector[0];
-				orthVec[1] = dist[1] - coneDist*camera.forwardVector[1];
-				orthVec[2] = dist[2] - coneDist*camera.forwardVector[2];
-				orthDist = VecLen(orthVec);
-				//printf("OrthDist = %lf\n coneRad = %lf\n",orthDist, coneRad);
-				if (orthDist <= coneRad)
+				dist[0] /= lenObj; dist[1] /= lenObj; dist[2] /= lenObj; // unit-normalize
+				coneDist = Dot(dist, camera.forwardVector);
+				if (coneDist >= camera.coneAngle)
 				{
 					b->DrawSolid();
 				}
@@ -334,28 +332,21 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera)
 			auto &b = blockMap[keyVal.second];
 			for (int i = 0; i < 3; i++)
 			{
-				dist[i] = b->pos[i] - camera.pos[i];
+				dist[i] = b->centerPos[i] - camera.playerBlock.centerPos[i]; // get cam->object vector
 			}
-			//printf("\n");
-			coneDist = Dot(dist, camera.forwardVector);
-			//printf("coneDist = %lf\n", coneDist);
-			if (VecLen(dist) <= 50)
+			
+			lenObj = VecLen(dist); // get cam->object scalar distance
+			if (lenObj <= 30)
 			{
 				b->DrawEdges();
 			}
-			else if (coneDist <= camera.farZ)
+			else
 			{
-				//coneRad = coneDist / abs(camera.farZ - camera.nearZ)*abs(camera.farZ);
-				coneRad = coneDist / abs(camera.farZ - camera.nearZ) * camera.viewRadius;
-				orthVec[0] = dist[0] - coneDist*camera.forwardVector[0];
-				orthVec[1] = dist[1] - coneDist*camera.forwardVector[1];
-				orthVec[2] = dist[2] - coneDist*camera.forwardVector[2];
-				orthDist = VecLen(orthVec);
-				//printf("OrthDist = %lf\n coneRad = %lf\n",orthDist, coneRad);
-				if (orthDist <= coneRad)
+				dist[0] /= lenObj; dist[1] /= lenObj; dist[2] /= lenObj; // unit-normalize
+				coneDist = Dot(dist, camera.forwardVector);
+				if (coneDist >= camera.coneAngle)
 				{
 					b->DrawEdges();
-					drawCount++;
 				}
 			}
 		}
@@ -370,25 +361,19 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera)
 			auto &b = keyVal.second;
 			for (int i = 0; i < 3; i++)
 			{
-				dist[i] = b->pos[i] - camera.pos[i];// camera.forwardVector[i];
+				dist[i] = b->centerPos[i] - camera.playerBlock.centerPos[i]; // get cam->object vector
 			}
-			//printf("\n");
-			coneDist = Dot(dist, camera.forwardVector);
-			//printf("coneDist = %lf\n", coneDist);
-			if (VecLen(dist) <= 50)
+
+			lenObj = VecLen(dist); // get cam->object scalar distance
+			if (lenObj <= 30)
 			{
 				b->DrawSolid();
 			}
-			else if (coneDist <= camera.farZ)
+			else
 			{
-				//coneRad = coneDist / abs(camera.farZ - camera.nearZ)*abs(camera.farZ);
-				coneRad = coneDist / abs(camera.farZ - camera.nearZ) * camera.viewRadius;
-				orthVec[0] = dist[0] - coneDist*camera.forwardVector[0];
-				orthVec[1] = dist[1] - coneDist*camera.forwardVector[1];
-				orthVec[2] = dist[2] - coneDist*camera.forwardVector[2];
-				orthDist = VecLen(orthVec);
-				//printf("OrthDist = %lf\n coneRad = %lf\n",orthDist, coneRad);
-				if (orthDist <= coneRad)
+				dist[0] /= lenObj; dist[1] /= lenObj; dist[2] /= lenObj; // unit-normalize
+				coneDist = Dot(dist, camera.forwardVector);
+				if (coneDist >= camera.coneAngle)
 				{
 					b->DrawSolid();
 				}
@@ -402,27 +387,19 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera)
 			auto &b = keyVal.second;
 			for (int i = 0; i < 3; i++)
 			{
-				dist[i] = b->pos[i] - camera.pos[i];
+				dist[i] = b->centerPos[i] - camera.playerBlock.centerPos[i]; // get cam->object vector
 			}
-			coneDist = Dot(dist, camera.forwardVector);
-			//printf("coneDist = %lf\n", coneDist);
-			if (VecLen(dist) <= 50)
+			lenObj = VecLen(dist); // get cam->object scalar distance
+			if (lenObj <= 30)
 			{
 				b->DrawEdges();
 			}
-			else if (coneDist <= camera.farZ)
-			{
-				//coneRad = coneDist / abs(camera.farZ - camera.nearZ)*abs(camera.farZ);
-				coneRad = coneDist / abs(camera.farZ - camera.nearZ) * camera.viewRadius;
-				orthVec[0] = dist[0] - coneDist*camera.forwardVector[0];
-				orthVec[1] = dist[1] - coneDist*camera.forwardVector[1];
-				orthVec[2] = dist[2] - coneDist*camera.forwardVector[2];
-				orthDist = VecLen(orthVec);
-				//printf("OrthDist = %lf\n coneRad = %lf\n",orthDist, coneRad);
-				if (orthDist <= coneRad)
+			else 			{
+				dist[0] /= lenObj; dist[1] /= lenObj; dist[2] /= lenObj; // unit-normalize
+				coneDist = Dot(dist, camera.forwardVector);
+				if (coneDist >= camera.coneAngle)
 				{
 					b->DrawEdges();
-					drawCount++;
 				}
 			}
 		}
@@ -501,7 +478,7 @@ bool Terrain::FindBlock(CameraObject &camera, int &x, int &y, int &z, int ADDORR
 	int i = 0;
 	int blockSize = camera.blockSize;
 	int index;
-	std::vector<double> location = { camera.playerBlock.pos[0] + blockSize / 2, camera.playerBlock.pos[1] + camera.camHeight, camera.playerBlock.pos[2] + blockSize / 2 };
+	std::vector<double> location = { camera.playerBlock.xM, camera.playerBlock.pos[1] + camera.camHeight, camera.playerBlock.zM };
 	printf("Camera Position = %lf, %lf, %lf\n", location[0], location[1], location[2]);
 	printf("Forward Vector = %lf, %lf, %lf\n", camera.forwardVector[0], camera.forwardVector[1], camera.forwardVector[2]);
 	//SetVec(location, camera.pos);

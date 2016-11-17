@@ -42,11 +42,13 @@ private:
 	int r, g, b;
 	int w, h, l;
 public:
+	double x1, xM, y1, yM, z1, zM;
 	double blockSize = 8.0;
 	int index = 0;
 	int sideVisible[6] = { 1,1,1,1,1,1 };
 	int renderable = TRUE;
 	std::vector<double> pos = { 0,0,0 };
+	std::vector<double> centerPos = { 0,0,0 };
 };
 
 #endif // !BLOCK_CLASS_INCLUDED
