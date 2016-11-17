@@ -14,25 +14,30 @@ void Block::DrawTexture(GLuint texId)
 
 	if (sideVisible[0])
 	{
-		glTexCoord2d(0.0, 0.0);
-		glVertex3i(pos[0], pos[1], pos[2]);
-		glTexCoord2d(1.0, 0.0);
-		glVertex3i(pos[0], pos[1], pos[2] + l);
+		
+
 		glTexCoord2d(1.0, 1.0);
-		glVertex3i(pos[0], pos[1] + h, pos[2] + l);
+		glVertex3i(pos[0], pos[1], pos[2]);
 		glTexCoord2d(0.0, 1.0);
+		glVertex3i(pos[0], pos[1], pos[2] + l);
+		glTexCoord2d(0.0, 0.0);
+		glVertex3i(pos[0], pos[1] + h, pos[2] + l);
+
+		glTexCoord2d(1.0, 0.0);
 		glVertex3i(pos[0], pos[1] + h, pos[2]);
 	}
 	// Right Side
 	if (sideVisible[1])
 	{
-		glTexCoord2d(0.0, 0.0);
-		glVertex3i(pos[0] + w, pos[1], pos[2]);
-		glTexCoord2d(1.0, 0.0);
-		glVertex3i(pos[0] + w, pos[1], pos[2] + l);
 		glTexCoord2d(1.0, 1.0);
-		glVertex3i(pos[0] + w, pos[1] + h, pos[2] + l);
+		glVertex3i(pos[0] + w, pos[1], pos[2]);
 		glTexCoord2d(0.0, 1.0);
+		glVertex3i(pos[0] + w, pos[1], pos[2] + l);
+		
+
+		glTexCoord2d(0.0, 0.0);
+		glVertex3i(pos[0] + w, pos[1] + h, pos[2] + l);
+		glTexCoord2d(1.0, 0.0);
 		glVertex3i(pos[0] + w, pos[1] + h, pos[2]);
 	}
 	// Back Side
@@ -46,6 +51,7 @@ void Block::DrawTexture(GLuint texId)
 		glVertex3i(pos[0] + w, pos[1], pos[2]);
 		glTexCoord2d(0.0, 1.0);
 		glVertex3i(pos[0], pos[1], pos[2]);
+		
 	}
 	// Front Side
 	if (sideVisible[3])

@@ -21,12 +21,12 @@ GLuint decodePng()
 	(GL_TEXTURE_2D,
 		0,    	// Level of detail
 		GL_RGBA,  	// Internal data type.
-		png[0].wid,
-		png[0].hei,
+		png[1].wid,
+		png[1].hei,
 		0,    	// Border width, but not supported and needs to be 0.
 		GL_RGBA,  	// Source data type 
 		GL_UNSIGNED_BYTE,  	// Source component type
-		png[0].rgba);
+		png[1].rgba);
 
 	printf("TEX1: %d \n", texId);
 
