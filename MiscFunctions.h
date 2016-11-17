@@ -5,7 +5,6 @@
 #include <vector>
 #include <map>
 #include "Block.h"
-#include "fssimplewindow.h"
 
 #define NULLINT -1
 #define REMOVEDBLOCK -2
