@@ -1,60 +1,82 @@
-#include "Camera.h"
+#include "CameraObject.h"
 
+//std::vector<double> dist = { 0,0,0 }, orthVec = { 0,0,0 }, fVec = { 0,0,0 };
+//double coneDist, coneRad, orthDist;
 
 CameraObject::CameraObject()
 {
-	Initialize();
+	Initialize(0.0, 0.0, 0.0);
 }
 
-CameraObject::CameraObject(double xLoc, double yLoc, double zLoc)
+CameraObject::CameraObject(double startX, double startY, double startZ)
 {
-	x = 0;
-	y = 16;
-	z = 0;
+	Initialize(startX, startY, startZ);
+}
+
+double CameraObject::x(void)
+{
+	return pos[0];
+}
+
+double CameraObject::y(void)
+{
+	return pos[1];
+}
+
+double CameraObject::z(void)
+{
+	return pos[2];
+}
+
+double CameraObject::xF(void) const
+{
+	return forwardVector[0];
+}
+
+double CameraObject::yF(void) const
+{
+	return forwardVector[1];
+}
+
+double CameraObject::zF(void) const
+{
+	return forwardVector[2];
+}
+
+int CameraObject::xGrid(void) const
+{
+	return gridLocation[0];
+}
+
+int CameraObject::yGrid(void) const
+{
+	return gridLocation[1];
+}
+
+int CameraObject::zGrid(void) const
+{
+	return gridLocation[2];
+}
+
+void CameraObject::Initialize(double startX, double startY, double startZ)
+{
+	SetVec(pos, startX, startY, startZ);
 	h = 0;
 	p = 0;
 	b = 0;
-	camHeight = 16;
-	py = camHeight;
-	pvy = 0;
+	camHeight = 16.0;
+	vertVel = 0.0;
+	jumps = 5;
+	blockSize = 8;
 
-	vx = 0;
-	vy = 0;
-	vz = 0;
-
-	playerBlock.setPosition(x, y, z);
+	playerBlock.setCoordinate(startX, 0, startY);
+	playerBlock.blockSize = 8;
 
 	fov = YsPi / 6.0;  // 30 degree
 	nearZ = 0.5;
 	farZ = 1000.0;
-	zoom = 0;
-
-	sensitivity = 1.0 / 5.0;
-}
-
-void CameraObject::Initialize(void)
-{
-	x = 0;
-	y = 16;
-	z = 0;
-	h = 0;
-	p = 0;
-	b = 0;
-	camHeight = 16;
-	py = camHeight;
-	pvy = 0;
-
-	vx = 0;
-	vy = 0;
-	vz = 0;
-
-	//playerBlock.setPosition(x-playerBlock.blockSize/2, 0, (z + roomSize - 2)*playerBlock.blockSize);
-	playerBlock.setCoordinate(x, 0, z);
-
-	fov = YsPi / 6.0;  // 30 degree
-	nearZ = 0.5;
-	farZ = 1000.0;
-	zoom = 0;
+	viewRadius = 1000;
+	zoom = 0.0;
 
 	sensitivity = 1.0 / 5.0;
 }
@@ -79,29 +101,33 @@ void CameraObject::SetUpCameraTransformation(void)
 	glRotated(-b*180.0 / YsPi, 0.0, 0.0, 1.0);  // Rotation about Z axis
 	glRotated(-p*180.0 / YsPi, 1.0, 0.0, 0.0);  // Rotation about X axis
 	glRotated(-h*180.0 / YsPi, 0.0, 1.0, 0.0);  // Rotation about Y axis
-	glTranslated(-x, -y, -z);
-	glTranslated(vx*zoom, vy*zoom, vz*zoom);
+	glTranslated(-pos[0], -pos[1] - camHeight, -pos[2]);
+	glTranslated(forwardVector[0] * zoom, forwardVector[1] * zoom, forwardVector[2] * zoom);
 }
 
-std::vector<double> CameraObject::GetForwardVector(double &vx, double &vy, double &vz)
+void CameraObject::GetForwardVector(void)
 {
-	vx = -cos(p)*sin(h);
-	vy = sin(p);
-	vz = -cos(p)*cos(h);
-	forwardVector[0] = vx;
-	forwardVector[1] = vy;
-	forwardVector[2] = vz;
-	return forwardVector;
+	forwardVector[0] = -cos(p)*sin(h);
+	forwardVector[1] = sin(p);
+	forwardVector[2] = -cos(p)*cos(h);
+	//printf("%lf %lf %lf", forwardVector[0], forwardVector[1], forwardVector[2]);
+}
+
+void inline CameraObject::SetGridLocation(void)
+{
+	gridLocation[0] = pos[0] / blockSize;
+	gridLocation[1] = pos[1] / blockSize;
+	gridLocation[2] = pos[2] / blockSize;
 }
 
 void CameraObject::DrawCamera(void)
 {
 	// Draw Forward Vector
-	glColor3ub(0, 0, 0);
+	glColor3ub(0, 255, 0);
 	glBegin(GL_LINES);
 	glVertex3d(playerBlock.pos[0] + playerBlock.blockSize / 2, playerBlock.pos[1] + playerBlock.blockSize / 2, playerBlock.pos[2] + playerBlock.blockSize / 2);
-	glVertex3d(playerBlock.pos[0] + vx * 100 + playerBlock.blockSize / 2, playerBlock.pos[1] + vy * 100 + playerBlock.blockSize / 2,
-		playerBlock.pos[2] + vz * 100 + playerBlock.blockSize / 2);
+	glVertex3d(playerBlock.pos[0] + forwardVector[0] * 100.0 + playerBlock.blockSize / 2, playerBlock.pos[1] + forwardVector[1] * 100.0 + playerBlock.blockSize / 2,
+		playerBlock.pos[2] + forwardVector[2] * 100.0 + playerBlock.blockSize / 2);
 	glEnd();
 
 	if (zoom > 5)
@@ -114,21 +140,36 @@ void CameraObject::DrawCamera(void)
 	}
 }
 
-void CameraObject::Update(int key)
+void CameraObject::Update(int &key)
 {
 	FsPollDevice();
-
 	mouseEvent = FsGetMouseEvent(lb, mb, rb, mx, my);
 	FsGetWindowPosition(winx0, winy0);
 	FsGetWindowSize(wid, hei);
-	GetForwardVector(vx, vy, vz);
+	GetForwardVector();
 
-	//printf("key = %d", key);
+	if (key != 0)
+	{
+		//printf("%d\n", key);
+	}
+	if (key == FSKEY_WHEELDOWN)
+	{
+		//printf("Zoom in");
+		zoom += 5;
+		farZ += 5;
+	}
+	else if (key == FSKEY_WHEELUP)
+	{
+		//printf("Zoom out");
+		zoom = fmax(zoom - 5, 0);
+		farZ = fmax(farZ - 5, 1000.0);
+	}
 
+#if defined(_WIN32_WINNT) // Windows mouse movement routine
 	if (key == FSKEY_TAB)
 	{
-		cursorLock = (cursorLock++) % 2;
-		if (cursorLock == 1)
+		cursorLock = !cursorLock;
+		if (cursorLock)
 		{
 			ShowCursor(FALSE);
 			SetCursorPos(winx0 + wid / 2, winy0 + hei / 2);
@@ -162,116 +203,161 @@ void CameraObject::Update(int key)
 			//printf("mx = %d, my = %d\n", mx, my);
 		}
 	}
-	//key = FsInkey();
-	if (key != 0)
-	{
-		printf("%d\n", key);
-	}
-	if (key == FSKEY_WHEELDOWN)
-	{
-		printf("Zoom in");
-		zoom += 5;
-		farZ += 5;
-	}
-	else if (key == FSKEY_WHEELUP)
-	{
-		printf("Zoom out");
-		zoom = max(zoom - 5, 0);
-		farZ = min(farZ - 5, 1000.0);
-	}
+#else
+	CGDirectDisplayID ID = CGMainDisplayID();
+	CGRect CurRect;
+	CurRect = CGDisplayBounds(ID);
+	CGFloat monitorheight = CurRect.size.height;
+	CGPoint mouse;
 
-	if (cursorLock == 0) // arrowView-control
+	mouse.x = winx0 + wid / 2;
+	mouse.y = monitorheight - winy0 - hei / 2;
+	if (key == FSKEY_TAB)
 	{
-		if (0 != FsGetKeyState(FSKEY_LEFT))
+		cursorLock = !cursorLock;
+		if (cursorLock)
 		{
-			h += YsPi / 240.0;
+			CGDisplayHideCursor(ID);
+			CGDisplayMoveCursorToPoint(ID, mouse);
 		}
-		if (0 != FsGetKeyState(FSKEY_RIGHT))
+		else
 		{
-			h -= YsPi / 240.0;
-		}
-		if (0 != FsGetKeyState(FSKEY_UP))
-		{
-			p += YsPi / 240.0;
-		}
-		if (0 != FsGetKeyState(FSKEY_DOWN))
-		{
-			p -= YsPi / 240.0;
+			CGDisplayShowCursor(ID);
 		}
 	}
 
-	if (0 != FsGetKeyState(FSKEY_W))
+	if (cursorLock == 1)
 	{
-		x += vx / 1;
-		z += vz / 1;
-		playerBlock.setPosition(playerBlock.pos[0] + vx / 1, playerBlock.pos[1], playerBlock.pos[2] + vz / 1);
-	}
-	if (0 != FsGetKeyState(FSKEY_S))
-	{
-		x -= vx / 2.0;
-		z -= vz / 2.0;
-		playerBlock.setPosition(playerBlock.pos[0] - vx / 2, playerBlock.pos[1], playerBlock.pos[2] - vz / 2);
-	}
-	if (0 != FsGetKeyState(FSKEY_D))
-	{
-		x -= vz / 1;
-		z += vx / 1;
-		playerBlock.setPosition(playerBlock.pos[0] - vz / 1, playerBlock.pos[1], playerBlock.pos[2] + vx / 1);
-	}
-	if (0 != FsGetKeyState(FSKEY_A))
-	{
-		x += vz / 1;
-		z -= vx / 1;
-		playerBlock.setPosition(playerBlock.pos[0] + vz / 1, playerBlock.pos[1], playerBlock.pos[2] - vx / 1);
-	}
+		FsPollDevice();
+		FsGetMouseState(lb, mb, rb, mx, my);
+		double dx, dy, dh, dp;
+		int wid, hei;
+		FsGetWindowSize(wid, hei);
+		dx = wid / 2 - mx;
+		dy = hei / 2 - my - 1;
+		dh = dx / 240.0 * sensitivity;
+		dp = dy / 240.0 * sensitivity;
+		h += dh;
+		p += dp;
 
-	//{
-	//	if (pvy != 0)
-	//	{
-	//		py = py + pvy;
-	//		pvy += GRAV;
-	//	}
-	//	if (py == 16)
-	//	{
-	//		if (0 != FsGetKeyState(FSKEY_SPACE))
-	//		{
-	//			pvy = 2;
-	//		}
-	//	}
-	//} //GRAVITY ON
+		//printf("%d, %d, %d, %d\n", mx, my, pastmx, pastmy);
 
-	{
-		if (0 != FsGetKeyState(FSKEY_1))
+		CGDisplayMoveCursorToPoint(ID, mouse);
+		CGWarpMouseCursorPosition(mouse);
+		CGAssociateMouseAndMouseCursorPosition(true);
+		FsGetMouseState(lb, mb, rb, pastmx, pastmy);
+#endif
+
+		if (cursorLock == 0) // arrowView-control
 		{
-			y += 2;
-			py = y;
-			playerBlock.setPosition(playerBlock.pos[0], playerBlock.pos[1] + 2, playerBlock.pos[2]);
+			if (FsGetKeyState(FSKEY_LEFT))
+			{
+				h += YsPi / 240.0;
+			}
+			if (FsGetKeyState(FSKEY_RIGHT))
+			{
+				h -= YsPi / 240.0;
+			}
+			if (FsGetKeyState(FSKEY_UP))
+			{
+				p += YsPi / 240.0;
+			}
+			if (FsGetKeyState(FSKEY_DOWN))
+			{
+				p -= YsPi / 240.0;
+			}
 		}
-		if (0 != FsGetKeyState(FSKEY_2) && y >= 0)
+		if (!stationary)
 		{
-			y -= 2;
-			py = y;
-			playerBlock.setPosition(playerBlock.pos[0], playerBlock.pos[1] - 2, playerBlock.pos[2]);
+			if (FsGetKeyState(FSKEY_W))
+			{
+				VecPlus(pos, forwardVector[0], 0.0, forwardVector[2]);
+			}
+			if (FsGetKeyState(FSKEY_S))
+			{
+				VecMinus(pos, forwardVector[0] / 2.0, 0.0, forwardVector[2] / 2.0);
+			}
+			if (FsGetKeyState(FSKEY_D))
+			{
+				pos[0] -= forwardVector[2];
+				pos[2] += forwardVector[0];
+			}
+			if (FsGetKeyState(FSKEY_A))
+			{
+				pos[0] += forwardVector[2];
+				pos[2] -= forwardVector[0];
+			}
+
+			if (gravityOn)
+			{
+				//printf("Gravity On");
+				if (pos[1] > 0.0)
+				{
+					pos[1] += vertVel;
+					vertVel += GRAV;
+				}
+				else
+				{
+					if (pos[1] < 0.0)
+					{
+						pos[1] = 0.0;
+						vertVel = 0.0;
+						jumps = 5;
+					}
+				}
+				if (jumps != 0)
+				{
+					if (key == FSKEY_SPACE)
+					{
+						if (vertVel == 0.0)
+						{
+							pos[1] = .01;
+						}
+
+						vertVel += 4.0;
+						jumps--;
+					}
+				}
+			}
+			else // Gravity Off
+			{
+				if (FsGetKeyState(FSKEY_1))
+				{
+					pos[1] += 2.0;
+				}
+				if (FsGetKeyState(FSKEY_2) && pos[1] >= 0)
+				{
+					pos[1] -= 2.0;
+				}
+			}
+
+			if (FsGetKeyState(FSKEY_CTRL))
+			{
+				camHeight = playerBlock.blockSize / 2.0;
+			}
+			else
+			{
+				camHeight = 16.0;
+			}
+			//printf("%lf\n\n", camHeight);
+			playerBlock.setPosition(pos[0] - playerBlock.blockSize / 2.0, pos[1], pos[2] - playerBlock.blockSize / 2.0);
+			SetGridLocation();
 		}
-	} // GRAVITY OFF
 
-	if (py<camHeight)
-	{
-		py = camHeight;
-		y = py;
-		pvy = 0;
+		if (FsGetKeyState(FSKEY_PLUS))
+		{
+			if (viewRadius <= 1000)
+			{
+				viewRadius += 100;
+			}
+		}
+		if (FsGetKeyState(FSKEY_MINUS))
+		{
+			if (viewRadius > 0)
+			{
+				viewRadius -= 100;
+			}
+		}
+		//printf("%lf %lf %lf\n", playerBlock.pos[0], playerBlock.pos[1], playerBlock.pos[2]);
+		DrawCamera();
 	}
-
-	if (0 != FsGetKeyState(FSKEY_CTRL))
-	{
-		y = py - 12;
-	}
-	else
-	{
-		y = py;
-	}
-	playerBlock.setPosition(x - playerBlock.blockSize / 2, y - camHeight, z - playerBlock.blockSize / 2);
-	//printf("%lf %lf %lf\n", playerBlock.pos[0], playerBlock.pos[1], playerBlock.pos[2]);
-	DrawCamera();
-}
-
