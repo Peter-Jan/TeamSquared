@@ -9,7 +9,7 @@ int main(void)
 	int lb, mb, rb, mx, my, mouseEvent, key = 0;
 	int drawCount = 0;
 	CameraObject camera, camera2;
-	Terrain worldGrid(128, 2);
+	Terrain worldGrid(100, 2);
 	worldGrid.texId=decodePng();
 
 	camera.playerBlock.roomSize = worldGrid.roomSize;
@@ -26,6 +26,9 @@ int main(void)
 	bool reductionMode = false;
 	bool switchCamera = false;
 	bool texturesOn = false;
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CW); // vertices of any object's front face (aka outside face) should always be specified in CLOCKWISE order
+	glCullFace(GL_BACK); // back 3 sides of each block are automatically removed by this openGL culling function
 
 	while (0 == terminate)
 	{
@@ -51,6 +54,14 @@ int main(void)
 			break;
 		case FSKEY_T:
 			texturesOn = !texturesOn;
+			if (texturesOn)
+			{
+				glEnable(GL_TEXTURE_2D);		// Turn on the texture mapping 
+			}
+			else
+			{
+				glDisable(GL_TEXTURE_2D);
+			}
 			break;
 		case FSKEY_TAB:
 			camera.cursorLock = !camera.cursorLock;

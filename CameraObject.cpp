@@ -71,7 +71,7 @@ void CameraObject::Initialize(double startX, double startY, double startZ)
 	playerBlock.blockSize = 8;
 
 	fov = YsPi / 6.0;  // 30 degree
-	nearZ = 0.5;
+	nearZ = 2;
 	farZ = 1000.0;
 	viewRadius = 1000;
 	zoom = 0.0;

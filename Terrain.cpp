@@ -297,11 +297,11 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera, bool textures
 
 	if (FsGetKeyState(FSKEY_P) != 1)
 	{
-		if (!texturesOn)
+		if (texturesOn) // method only works if you have large group of objects with the same texture
 		{
-			glBegin(GL_QUADS);
+			glBindTexture(GL_TEXTURE_2D, texId);	// Select the current texture.
 		}
-		drawCount = 0;
+		glBegin(GL_QUADS);
 		for (auto &keyVal : renderMap)
 		{
 			auto &b = blockMap[keyVal.second];
@@ -343,46 +343,44 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera, bool textures
 				}
 			}
 		}
-		if (!texturesOn)
-		{
-			glEnd();
-		}
-		glBegin(GL_LINES);
-		for (auto &keyVal : renderMap)
-		{
-			auto &b = blockMap[keyVal.second];
-			for (int i = 0; i < 3; i++)
-			{
-				dist[i] = b->centerPos[i] - camera.playerBlock.centerPos[i]; // get cam->object vector
-			}
-			
-			lenObj = VecLen(dist); // get cam->object scalar distance
-			if (lenObj <= 30)
-			{
-				b->DrawEdges();
-			}
-			else if (lenObj > camera.farZ)
-			{
-				// don't render
-			}
-			else
-			{
-				dist[0] /= lenObj; dist[1] /= lenObj; dist[2] /= lenObj; // unit-normalize
-				coneDist = Dot(dist, camera.forwardVector);
-				if (coneDist >= camera.coneAngle)
-				{
-					b->DrawEdges();
-				}
-			}
-		}
 		glEnd();
+		//glBegin(GL_LINES);
+		//for (auto &keyVal : renderMap)
+		//{
+		//	auto &b = blockMap[keyVal.second];
+		//	for (int i = 0; i < 3; i++)
+		//	{
+		//		dist[i] = b->centerPos[i] - camera.playerBlock.centerPos[i]; // get cam->object vector
+		//	}
+		//	
+		//	lenObj = VecLen(dist); // get cam->object scalar distance
+		//	if (lenObj <= 30)
+		//	{
+		//		b->DrawEdges();
+		//	}
+		//	else if (lenObj > camera.farZ)
+		//	{
+		//		// don't render
+		//	}
+		//	else
+		//	{
+		//		dist[0] /= lenObj; dist[1] /= lenObj; dist[2] /= lenObj; // unit-normalize
+		//		coneDist = Dot(dist, camera.forwardVector);
+		//		if (coneDist >= camera.coneAngle)
+		//		{
+		//			b->DrawEdges();
+		//		}
+		//	}
+		//}
+		//glEnd();
 	}
 	else
 	{
-		if (!texturesOn)
+		if (texturesOn) // method only works if you have large group of objects with the same texture
 		{
-			glBegin(GL_QUADS);
+			glBindTexture(GL_TEXTURE_2D, texId);	// Select the current texture.
 		}
+		glBegin(GL_QUADS);
 		for (auto &keyVal : blockMap)
 		{
 			auto &b = keyVal.second;
@@ -424,38 +422,35 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera, bool textures
 				}
 			}
 		}
-		if (!texturesOn)
-		{
-			glEnd();
-		}
-
-		glBegin(GL_LINES);
-		for (auto &keyVal : blockMap)
-		{
-			auto &b = keyVal.second;
-			for (int i = 0; i < 3; i++)
-			{
-				dist[i] = b->centerPos[i] - camera.playerBlock.centerPos[i]; // get cam->object vector
-			}
-			lenObj = VecLen(dist); // get cam->object scalar distance
-			if (lenObj <= 30)
-			{
-				b->DrawEdges();
-			}
-			else if (lenObj > camera.farZ)
-			{
-				// don't render
-			}
-			else 			{
-				dist[0] /= lenObj; dist[1] /= lenObj; dist[2] /= lenObj; // unit-normalize
-				coneDist = Dot(dist, camera.forwardVector);
-				if (coneDist >= camera.coneAngle)
-				{
-					b->DrawEdges();
-				}
-			}
-		}
 		glEnd();
+
+		//glBegin(GL_LINES);
+		//for (auto &keyVal : blockMap)
+		//{
+		//	auto &b = keyVal.second;
+		//	for (int i = 0; i < 3; i++)
+		//	{
+		//		dist[i] = b->centerPos[i] - camera.playerBlock.centerPos[i]; // get cam->object vector
+		//	}
+		//	lenObj = VecLen(dist); // get cam->object scalar distance
+		//	if (lenObj <= 30)
+		//	{
+		//		b->DrawEdges();
+		//	}
+		//	else if (lenObj > camera.farZ)
+		//	{
+		//		// don't render
+		//	}
+		//	else 			{
+		//		dist[0] /= lenObj; dist[1] /= lenObj; dist[2] /= lenObj; // unit-normalize
+		//		coneDist = Dot(dist, camera.forwardVector);
+		//		if (coneDist >= camera.coneAngle)
+		//		{
+		//			b->DrawEdges();
+		//		}
+		//	}
+		//}
+		//glEnd();
 	}
 }
 
@@ -488,10 +483,11 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 	{
 		if (FsGetKeyState(FSKEY_P) != 1) // only render visible objects
 		{
-			if (!texturesOn)
+			if (texturesOn) // method only works if you have large group of objects with the same texture
 			{
-				glBegin(GL_QUADS);
+				glBindTexture(GL_TEXTURE_2D, texId);	// Select the current texture.
 			}
+			glBegin(GL_QUADS);
 			for (auto &keyVal : renderMap)
 			{
 				if (texturesOn)
@@ -503,25 +499,23 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 					blockMap[keyVal.first]->DrawSolid();
 				}
 			}
-			if (!texturesOn)
-			{
-				glEnd();
-			}
-			glBegin(GL_LINES);
+			glEnd();
+			/*glBegin(GL_LINES);
 			glColor3ub(0, 0, 0);
 			for (auto &keyVal : renderMap)
 			{
 				blockMap[keyVal.first]->DrawEdges();
 			}
-			glEnd();
+			glEnd();*/
 		}
 		else
 		{
 			cameraView.Update(key);
-			if (!texturesOn)
+			if (texturesOn) // method only works if you have large group of objects with the same texture
 			{
-				glBegin(GL_QUADS);
+				glBindTexture(GL_TEXTURE_2D, texId);	// Select the current texture.
 			}
+			glBegin(GL_QUADS);
 			for (auto &keyVal : blockMap)
 			{
 				if (texturesOn)
@@ -533,18 +527,15 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 					keyVal.second->DrawSolid();
 				}
 			}
-			if (!texturesOn)
-			{
-				glEnd();
-			}
+			glEnd();
 
-			glBegin(GL_LINES);
+			/*glBegin(GL_LINES);
 			glColor3ub(0, 0, 0);
 			for (auto &keyVal : blockMap)
 			{
 				keyVal.second->DrawEdges();
 			}
-			glEnd();
+			glEnd();*/
 		}
 	}
 }
