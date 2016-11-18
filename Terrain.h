@@ -32,10 +32,8 @@ public:
 	void AddBlock(int x, int y, int z);
 	void RemoveBlock(int x, int y, int z);
 
-	void DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key);
-	void DrawOffsetMode(int &drawCount, CameraObject &camera);
+	void DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key, bool texturesOn);
+	void DrawOffsetMode(int &drawCount, CameraObject &camera, bool texturesOn);
 };
-
-
 
 #endif // !TERRAIN_CLASS_INCLUDED

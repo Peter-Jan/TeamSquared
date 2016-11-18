@@ -290,14 +290,17 @@ double Dot(std::vector<double> const &vec1, std::vector<double> const &vec2)
 	return (vec1[0] * (vec2[0] / len) + vec1[1] * (vec2[1] / len) + vec1[2] * (vec2[2] / len));
 }
 
-void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera)
+void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera, bool texturesOn)
 {
 	std::vector<double> dist = { 0,0,0 };
 	double coneDist, lenObj;
 
 	if (FsGetKeyState(FSKEY_P) != 1)
 	{
-		glBegin(GL_QUADS);
+		if (!texturesOn)
+		{
+			glBegin(GL_QUADS);
+		}
 		drawCount = 0;
 		for (auto &keyVal : renderMap)
 		{
@@ -306,26 +309,44 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera)
 			{
 				dist[i] = b->centerPos[i] - camera.playerBlock.centerPos[i]; // get cam->object vector
 			}
-			//printf("\n");
-			coneDist = Dot(dist, camera.forwardVector);
-			//printf("coneDist = %lf\n", coneDist);
-			if (VecLen(dist) <= 50)
-				lenObj = VecLen(dist); // get cam->object scalar distance
+
+			lenObj = VecLen(dist); // get cam->object scalar distance
 			if (lenObj <= 30)
 			{
-				b->DrawSolid();
+				if (texturesOn)
+				{
+					b->DrawTexture(texId);
+				}
+				else
+				{
+					b->DrawSolid();
+				}
 			}
-			else 
+			else if (lenObj > camera.farZ)
+			{
+				// don't render
+			}
+			else
 			{
 				dist[0] /= lenObj; dist[1] /= lenObj; dist[2] /= lenObj; // unit-normalize
 				coneDist = Dot(dist, camera.forwardVector);
 				if (coneDist >= camera.coneAngle)
 				{
-					b->DrawSolid();
+					if (texturesOn)
+					{
+						b->DrawTexture(texId);
+					}
+					else
+					{
+						b->DrawSolid();
+					}
 				}
 			}
 		}
-		glEnd();
+		if (!texturesOn)
+		{
+			glEnd();
+		}
 		glBegin(GL_LINES);
 		for (auto &keyVal : renderMap)
 		{
@@ -339,6 +360,10 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera)
 			if (lenObj <= 30)
 			{
 				b->DrawEdges();
+			}
+			else if (lenObj > camera.farZ)
+			{
+				// don't render
 			}
 			else
 			{
@@ -354,8 +379,10 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera)
 	}
 	else
 	{
-		glBegin(GL_QUADS);
-		drawCount = 0;
+		if (!texturesOn)
+		{
+			glBegin(GL_QUADS);
+		}
 		for (auto &keyVal : blockMap)
 		{
 			auto &b = keyVal.second;
@@ -367,7 +394,18 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera)
 			lenObj = VecLen(dist); // get cam->object scalar distance
 			if (lenObj <= 30)
 			{
-				b->DrawSolid();
+				if (texturesOn)
+				{
+					b->DrawTexture(texId);
+				}
+				else
+				{
+					b->DrawSolid();
+				}
+			}
+			else if (lenObj > camera.farZ)
+			{
+				// don't render
 			}
 			else
 			{
@@ -375,11 +413,21 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera)
 				coneDist = Dot(dist, camera.forwardVector);
 				if (coneDist >= camera.coneAngle)
 				{
-					b->DrawSolid();
+					if (texturesOn)
+					{
+						b->DrawTexture(texId);
+					}
+					else
+					{
+						b->DrawSolid();
+					}
 				}
 			}
 		}
-		glEnd();
+		if (!texturesOn)
+		{
+			glEnd();
+		}
 
 		glBegin(GL_LINES);
 		for (auto &keyVal : blockMap)
@@ -394,6 +442,10 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera)
 			{
 				b->DrawEdges();
 			}
+			else if (lenObj > camera.farZ)
+			{
+				// don't render
+			}
 			else 			{
 				dist[0] /= lenObj; dist[1] /= lenObj; dist[2] /= lenObj; // unit-normalize
 				coneDist = Dot(dist, camera.forwardVector);
@@ -407,9 +459,8 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera)
 	}
 }
 
-void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key)
+void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key, bool texturesOn)
 {
-	drawCount = 0;
 	// Draw ground lattice
 	glColor3ub(0, 0, 255);
 	glBegin(GL_LINES);
@@ -431,19 +482,31 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 
 	if (reductionMode)
 	{
-		DrawOffsetMode(drawCount, cameraView);
+		DrawOffsetMode(drawCount, cameraView, texturesOn);
 	}
 	else
 	{
-		if (FsGetKeyState(FSKEY_P) == 0) // only render visible objects
+		if (FsGetKeyState(FSKEY_P) != 1) // only render visible objects
 		{
+			if (!texturesOn)
+			{
+				glBegin(GL_QUADS);
+			}
 			for (auto &keyVal : renderMap)
 			{
-				//printf("TEX!!! %d \n", texId);
-				blockMap[keyVal.first]->DrawTexture(texId);
-				drawCount++;
+				if (texturesOn)
+				{
+					blockMap[keyVal.first]->DrawTexture(texId);
+				}
+				else
+				{
+					blockMap[keyVal.first]->DrawSolid();
+				}
 			}
-
+			if (!texturesOn)
+			{
+				glEnd();
+			}
 			glBegin(GL_LINES);
 			glColor3ub(0, 0, 0);
 			for (auto &keyVal : renderMap)
@@ -455,12 +518,25 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 		else
 		{
 			cameraView.Update(key);
-			glBegin(GL_QUADS);
+			if (!texturesOn)
+			{
+				glBegin(GL_QUADS);
+			}
 			for (auto &keyVal : blockMap)
 			{
-				keyVal.second->DrawTexture(texId);
+				if (texturesOn)
+				{
+					keyVal.second->DrawTexture(texId);
+				}
+				else
+				{
+					keyVal.second->DrawSolid();
+				}
 			}
-			glEnd();
+			if (!texturesOn)
+			{
+				glEnd();
+			}
 
 			glBegin(GL_LINES);
 			glColor3ub(0, 0, 0);

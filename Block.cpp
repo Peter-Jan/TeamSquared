@@ -1,197 +1,5 @@
 #include "Block.h"
 
-
-
-void Block::DrawTexture(GLuint texId)
-{
-	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);   // Texture value should be multiplied to the current color
-	glColor4d(1.0, 1.0, 1.0, 1.0);           	// Current color is solid white
-
-	glEnable(GL_TEXTURE_2D);		// Turn on the texture mapping 
-	glBindTexture(GL_TEXTURE_2D, texId);	// Select the current texture.
-
-	glBegin(GL_QUADS);
-
-	if (sideVisible[0])
-	{
-		
-
-		glTexCoord2d(1.0, 1.0);
-		glVertex3i(pos[0], pos[1], pos[2]);
-		glTexCoord2d(0.0, 1.0);
-		glVertex3i(pos[0], pos[1], z1);
-		glTexCoord2d(0.0, 0.0);
-		glVertex3i(pos[0], y1, z1);
-
-		glTexCoord2d(1.0, 0.0);
-		glVertex3i(pos[0], y1, pos[2]);
-	}
-	// Right Side
-	if (sideVisible[1])
-	{
-		glTexCoord2d(1.0, 1.0);
-		glVertex3i(x1, pos[1], pos[2]);
-		glTexCoord2d(0.0, 1.0);
-		glVertex3i(x1, pos[1], z1);
-
-		glTexCoord2d(0.0, 0.0);
-		glVertex3i(x1, y1, z1);
-		glTexCoord2d(1.0, 0.0);
-		glVertex3i(x1, y1, pos[2]);
-	}
-	// Back Side
-	if (sideVisible[2])
-	{
-		glTexCoord2d(0.0, 0.0);
-		glVertex3i(pos[0], y1, pos[2]);
-		glTexCoord2d(1.0, 0.0);
-		glVertex3i(x1, y1, pos[2]);
-		glTexCoord2d(1.0, 1.0);
-		glVertex3i(x1, pos[1], pos[2]);
-		glTexCoord2d(0.0, 1.0);
-		glVertex3i(pos[0], pos[1], pos[2]);
-		
-	}
-	// Front Side
-	if (sideVisible[3])
-	{
-		glTexCoord2d(0.0, 0.0);
-		glVertex3i(pos[0],y1, pos[2] + l);
-		glTexCoord2d(1.0, 0.0);
-		glVertex3i(x1, y1, z1);
-		glTexCoord2d(1.0, 1.0);
-		glVertex3i(x1, pos[1], z1);
-		glTexCoord2d(0.0, 1.0);
-		glVertex3i(pos[0], pos[1], z1);
-	}
-
-	// Bottom Side
-	if (sideVisible[4])
-	{
-		glTexCoord2d(0.0, 0.0);
-		glVertex3i(pos[0], pos[1], pos[2]);
-		glTexCoord2d(1.0, 0.0);
-		glVertex3i(x1, pos[1], pos[2]);
-		glTexCoord2d(1.0, 1.0);
-		glVertex3i(x1, pos[1], z1);
-		glTexCoord2d(0.0, 1.0);
-		glVertex3i(pos[0], pos[1], z1);
-	}
-
-	// Top Side
-	if (sideVisible[5])
-	{
-		glTexCoord2d(0.0, 0.0);
-		glVertex3i(pos[0], y1, pos[2]);
-		glTexCoord2d(1.0, 0.0);
-		glVertex3i(x1, y1, pos[2]);
-		glTexCoord2d(1.0, 1.0);
-		glVertex3i(x1, y1, z1);
-		glTexCoord2d(0.0, 1.0);
-		glVertex3i(pos[0], y1, z1);
-	}
-
-	glEnd();
-}
-
-void Block::DrawEdges(void)
-{
-		//Draw edges
- 	// Left Side
- 	glColor3ub(0, 0, 0);
- 	if (sideVisible[0])
- 	{
- 		glVertex3i(pos[0], pos[1], pos[2]);
- 		glVertex3i(pos[0], pos[1], z1);
- 
- 		glVertex3i(pos[0], pos[1], z1);
- 		glVertex3i(pos[0], y1, z1);
- 
- 		glVertex3i(pos[0], y1, z1);
- 		glVertex3i(pos[0], y1, pos[2]);
- 
- 		glVertex3i(pos[0], y1, pos[2]);
- 		glVertex3i(pos[0], pos[1], pos[2]);
- 	}
- 	// Right Side
- 	if (sideVisible[1])
- 	{
- 		glVertex3i(x1, pos[1], pos[2]);
- 		glVertex3i(x1, pos[1], z1);
- 
- 		glVertex3i(x1, pos[1], z1);
- 		glVertex3i(x1, y1, z1);
- 
- 		glVertex3i(x1, y1, z1);
- 		glVertex3i(x1, y1, pos[2]);
- 
- 		glVertex3i(x1, y1, pos[2]);
- 		glVertex3i(x1, pos[1], pos[2]);
- 	}
- 	// Back Side
- 	if (sideVisible[2])
- 	{
- 		glVertex3i(pos[0], y1, pos[2]);
- 		glVertex3i(x1, y1, pos[2]);
- 
- 		glVertex3i(x1, y1, pos[2]);
- 		glVertex3i(x1, pos[1], pos[2]);
- 
- 		glVertex3i(x1, pos[1], pos[2]);
- 		glVertex3i(pos[0], pos[1], pos[2]);
- 
- 		glVertex3i(pos[0], pos[1], pos[2]);
- 		glVertex3i(pos[0], y1, pos[2]);
- 	}
- 	// Front Side
- 	if (sideVisible[3])
- 	{
- 		glVertex3i(pos[0], y1, z1);
- 		glVertex3i(x1, y1, z1);
- 
- 		glVertex3i(x1, y1, z1);
- 		glVertex3i(x1, pos[1], z1);
- 
- 		glVertex3i(x1, pos[1], z1);
- 		glVertex3i(pos[0], pos[1], z1);
- 
- 		glVertex3i(pos[0], pos[1], z1);
- 		glVertex3i(pos[0], y1, z1);
- 	}
- 
- 	// Bottom Side
- 	if (sideVisible[4])
- 	{
- 		glVertex3i(pos[0], pos[1], pos[2]);
- 		glVertex3i(x1, pos[1], pos[2]);
- 
- 		glVertex3i(x1, pos[1], pos[2]);
- 		glVertex3i(x1, pos[1], z1);
- 
- 		glVertex3i(x1, pos[1], z1);
- 		glVertex3i(pos[0], pos[1], z1);
- 
- 		glVertex3i(pos[0], pos[1], z1);
- 		glVertex3i(pos[0], pos[1], pos[2]);
- 	}
- 	// Top Side
-	if (sideVisible[5])
-	{
-		glVertex3i(pos[0], y1, pos[2]);
-		glVertex3i(x1, y1, pos[2]);
-
-		glVertex3i(x1, y1, pos[2]);
-		glVertex3i(x1, y1, z1);
-
-		glVertex3i(x1, y1, z1);
-		glVertex3i(pos[0], y1, z1);
-
-		glVertex3i(pos[0], y1, z1);
-		glVertex3i(pos[0], y1, pos[2]);
-
-	}
-}
-
 Block::Block()
 {
 	roomSize = 10;
@@ -317,63 +125,245 @@ void Block::setColor(const int rin, const int gin, const int bin)
 
 void Block::DrawSolid(void)
 {
-	// Draw Cube
-
-	glColor3ub(r, g, b);
-
 	// Left Side
 	if (sideVisible[0])
 	{
 		glColor3ub(255, 0, 0);
-		glVertex3i(pos[0], pos[1], z1);
- 		glVertex3i(pos[0], y1, z1);
- 		glVertex3i(pos[0], y1, pos[2]);
+		glVertex3d(pos[0], pos[1], pos[2]);
+		glVertex3d(pos[0], pos[1], z1);
+		glVertex3d(pos[0], y1, z1);
+		glVertex3d(pos[0], y1, pos[2]);
 	}
 	// Right Side
 	if (sideVisible[1])
 	{
 		glColor3ub(100, 0, 0);
-		glVertex3i(x1, pos[1], pos[2]);
- 		glVertex3i(x1, pos[1], z1);
- 		glVertex3i(x1, y1, z1);
- 		glVertex3i(x1, y1, pos[2]);
+		glVertex3d(x1, pos[1], pos[2]);
+		glVertex3d(x1, pos[1], z1);
+		glVertex3d(x1, y1, z1);
+		glVertex3d(x1, y1, pos[2]);
 	}
 	// Back Side
 	if (sideVisible[2])
 	{
 		glColor3ub(0, 255, 0);
-		glVertex3i(pos[0], y1, pos[2]);
- 		glVertex3i(x1, y1, pos[2]);
- 		glVertex3i(x1, pos[1], pos[2]);
-		glVertex3i(pos[0], pos[1], pos[2]);
+		glVertex3d(pos[0], y1, pos[2]);
+		glVertex3d(x1, y1, pos[2]);
+		glVertex3d(x1, pos[1], pos[2]);
+		glVertex3d(pos[0], pos[1], pos[2]);
 	}
 	// Front Side
 	if (sideVisible[3])
 	{
 		glColor3ub(0, 100, 0);
-		glVertex3i(pos[0], y1, z1);
- 		glVertex3i(x1, y1, z1);
- 		glVertex3i(x1, pos[1], z1);
- 		glVertex3i(pos[0], pos[1], z1);
+		glVertex3d(pos[0], y1, z1);
+		glVertex3d(x1, y1, z1);
+		glVertex3d(x1, pos[1], z1);
+		glVertex3d(pos[0], pos[1], z1);
 	}
 
 	// Bottom Side
 	if (sideVisible[4])
 	{
 		glColor3ub(0, 0, 255);
-		glVertex3i(pos[0], pos[1], pos[2]);
-		glVertex3i(x1, pos[1], pos[2]);
- 		glVertex3i(x1, pos[1], z1);
- 		glVertex3i(pos[0], pos[1], z1);
+		glVertex3d(pos[0], pos[1], pos[2]);
+		glVertex3d(x1, pos[1], pos[2]);
+		glVertex3d(x1, pos[1], z1);
+		glVertex3d(pos[0], pos[1], z1);
 	}
 
 	// Top Side
 	if (sideVisible[5])
 	{
 		glColor3ub(0, 0, 100);
-		glVertex3i(pos[0], y1, pos[2]);
- 		glVertex3i(x1, y1, pos[2]);
- 		glVertex3i(x1, y1, z1);
- 		glVertex3i(pos[0], y1, z1);
+		glVertex3d(pos[0], y1, pos[2]);
+		glVertex3d(x1, y1, pos[2]);
+		glVertex3d(x1, y1, z1);
+		glVertex3d(pos[0], y1, z1);
+	}
+}
+
+void Block::DrawTexture(GLuint texId)
+{
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);   // Texture value should be multiplied to the current color
+	glColor4d(1.0, 1.0, 1.0, 1.0);           	// Current color is solid white
+
+	glEnable(GL_TEXTURE_2D);		// Turn on the texture mapping 
+	glBindTexture(GL_TEXTURE_2D, texId);	// Select the current texture.
+
+	glBegin(GL_QUADS);
+
+	//Left side
+	if (sideVisible[0])
+	{
+		glTexCoord2d(0.0, 1.0);
+		glVertex3d(pos[0], pos[1], pos[2]);
+		glTexCoord2d(1.0, 1.0);
+		glVertex3d(pos[0], pos[1], z1);
+		glTexCoord2d(1.0, 0.0);
+		glVertex3d(pos[0], y1, z1);
+		glTexCoord2d(0.0, 0.0);
+		glVertex3d(pos[0], y1, pos[2]);
+	}
+	// Right Side
+	if (sideVisible[1])
+	{
+		glTexCoord2d(0.0, 1.0);
+		glVertex3d(x1, pos[1], pos[2]);
+		glTexCoord2d(1.0, 1.0);
+		glVertex3d(x1, pos[1], z1);
+		glTexCoord2d(1.0, 0.0);
+		glVertex3d(x1, y1, z1);
+		glTexCoord2d(0.0, 0.0);
+		glVertex3d(x1, y1, pos[2]);
+	}
+	// Back Side
+	if (sideVisible[2])
+	{
+		glTexCoord2d(0.0, 0.0);
+		glVertex3d(pos[0], y1, pos[2]);
+		glTexCoord2d(1.0, 0.0);
+		glVertex3d(x1, y1, pos[2]);
+		glTexCoord2d(1.0, 1.0);
+		glVertex3d(x1, pos[1], pos[2]);
+		glTexCoord2d(0.0, 1.0);
+		glVertex3d(pos[0], pos[1], pos[2]);
+
+	}
+	// Front Side
+	if (sideVisible[3])
+	{
+		glTexCoord2d(0.0, 0.0);
+		glVertex3d(pos[0], y1, z1);
+		glTexCoord2d(1.0, 0.0);
+		glVertex3d(x1, y1, z1);
+		glTexCoord2d(1.0, 1.0);
+		glVertex3d(x1, pos[1], z1);
+		glTexCoord2d(0.0, 1.0);
+		glVertex3d(pos[0], pos[1], z1);
+	}
+
+	// Bottom Side
+	if (sideVisible[4])
+	{
+		glTexCoord2d(0.0, 0.0);
+		glVertex3d(pos[0], pos[1], pos[2]);
+		glTexCoord2d(1.0, 0.0);
+		glVertex3d(x1, pos[1], pos[2]);
+		glTexCoord2d(1.0, 1.0);
+		glVertex3d(x1, pos[1], z1);
+		glTexCoord2d(0.0, 1.0);
+		glVertex3d(pos[0], pos[1], z1);
+	}
+
+	// Top Side
+	if (sideVisible[5])
+	{
+		glTexCoord2d(0.0, 0.0);
+		glVertex3d(pos[0], y1, pos[2]);
+		glTexCoord2d(1.0, 0.0);
+		glVertex3d(x1, y1, pos[2]);
+		glTexCoord2d(1.0, 1.0);
+		glVertex3d(x1, y1, z1);
+		glTexCoord2d(0.0, 1.0);
+		glVertex3d(pos[0], y1, z1);
+	}
+	glEnd();
+}
+
+void Block::DrawEdges(void)
+{
+	//Draw edges
+	// Left Side
+	glColor3ub(0, 0, 0);
+	if (sideVisible[0])
+	{
+		glVertex3d(pos[0], pos[1], pos[2]);
+		glVertex3d(pos[0], pos[1], z1);
+
+		glVertex3d(pos[0], pos[1], z1);
+		glVertex3d(pos[0], y1, z1);
+
+		glVertex3d(pos[0], y1, z1);
+		glVertex3d(pos[0], y1, pos[2]);
+
+		glVertex3d(pos[0], y1, pos[2]);
+		glVertex3d(pos[0], pos[1], pos[2]);
+	}
+	// Right Side
+	if (sideVisible[1])
+	{
+		glVertex3d(x1, pos[1], pos[2]);
+		glVertex3d(x1, pos[1], z1);
+
+		glVertex3d(x1, pos[1], z1);
+		glVertex3d(x1, y1, z1);
+
+		glVertex3d(x1, y1, z1);
+		glVertex3d(x1, y1, pos[2]);
+
+		glVertex3d(x1, y1, pos[2]);
+		glVertex3d(x1, pos[1], pos[2]);
+	}
+	// Back Side
+	if (sideVisible[2])
+	{
+		glVertex3d(pos[0], y1, pos[2]);
+		glVertex3d(x1, y1, pos[2]);
+
+		glVertex3d(x1, y1, pos[2]);
+		glVertex3d(x1, pos[1], pos[2]);
+
+		glVertex3d(x1, pos[1], pos[2]);
+		glVertex3d(pos[0], pos[1], pos[2]);
+
+		glVertex3d(pos[0], pos[1], pos[2]);
+		glVertex3d(pos[0], y1, pos[2]);
+	}
+	// Front Side
+	if (sideVisible[3])
+	{
+		glVertex3d(pos[0], y1, z1);
+		glVertex3d(x1, y1, z1);
+
+		glVertex3d(x1, y1, z1);
+		glVertex3d(x1, pos[1], z1);
+
+		glVertex3d(x1, pos[1], z1);
+		glVertex3d(pos[0], pos[1], z1);
+
+		glVertex3d(pos[0], pos[1], z1);
+		glVertex3d(pos[0], y1, z1);
+	}
+
+	// Bottom Side
+	if (sideVisible[4])
+	{
+		glVertex3d(pos[0], pos[1], pos[2]);
+		glVertex3d(x1, pos[1], pos[2]);
+
+		glVertex3d(x1, pos[1], pos[2]);
+		glVertex3d(x1, pos[1], z1);
+
+		glVertex3d(x1, pos[1], z1);
+		glVertex3d(pos[0], pos[1], z1);
+
+		glVertex3d(pos[0], pos[1], z1);
+		glVertex3d(pos[0], pos[1], pos[2]);
+	}
+	// Top Side
+	if (sideVisible[5])
+	{
+		glVertex3d(pos[0], y1, pos[2]);
+		glVertex3d(x1, y1, pos[2]);
+
+		glVertex3d(x1, y1, pos[2]);
+		glVertex3d(x1, y1, z1);
+
+		glVertex3d(x1, y1, z1);
+		glVertex3d(pos[0], y1, z1);
+
+		glVertex3d(pos[0], y1, z1);
+		glVertex3d(pos[0], y1, pos[2]);
 	}
 }

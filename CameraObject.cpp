@@ -127,8 +127,8 @@ void CameraObject::DrawCamera(void)
 	glBegin(GL_LINES);
 	glVertex3d(playerBlock.xM, playerBlock.yM, playerBlock.zM);
 	glVertex3d(playerBlock.xM + forwardVector[0] * 100.0,
-		playerBlock.yM + forwardVector[1] * 100.0,
-		playerBlock.zM + forwardVector[2] * 100.0);
+			   playerBlock.yM + forwardVector[1] * 100.0,
+			   playerBlock.zM + forwardVector[2] * 100.0);
 	glEnd();
 
 	if (zoom > 5)
@@ -174,18 +174,14 @@ void CameraObject::Update(int &key)
 	}
 
 #if defined(_WIN32_WINNT) // Windows mouse movement routine
-	if (key == FSKEY_TAB)
+	if (cursorLock)
 	{
-		cursorLock = !cursorLock;
-		if (cursorLock)
-		{
-			ShowCursor(FALSE);
-			SetCursorPos(winx0 + wid / 2, winy0 + hei / 2);
-		}
-		else
-		{
-			ShowCursor(TRUE);
-		}
+		ShowCursor(FALSE);
+		SetCursorPos(winx0 + wid / 2, winy0 + hei / 2);
+	}
+	else
+	{
+		ShowCursor(TRUE);
 	}
 
 	if (mouseEvent == FSMOUSEEVENT_MOVE) // mouseView-control
@@ -294,7 +290,7 @@ void CameraObject::Update(int &key)
 			}
 			if (FsGetKeyState(FSKEY_D))
 			{
-				pos[0] += curFV[2];
+				pos[0] -= curFV[2];
 				pos[2] += curFV[0];
 			}
 			if (FsGetKeyState(FSKEY_A))

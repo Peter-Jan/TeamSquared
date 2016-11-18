@@ -4,8 +4,8 @@ GLuint decodePng()
 {
 
 	YsRawPngDecoder png[2];
-	png[0].Decode("poo.png");
-	png[1].Decode("emoji.png");
+	png[0].Decode("emoji.png");
+	png[1].Decode("poo.png");
 
 	GLuint texId;             	// Two unsigned integers for reserving texture identifiers
 

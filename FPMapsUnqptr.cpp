@@ -1,8 +1,6 @@
 #include "Terrain.h"
 #include "Decoder.h"
 
-
-
 int main(void)
 {
 	FsOpenWindow(800, 100, WINWID, WINHEI, 1);
@@ -27,6 +25,7 @@ int main(void)
 
 	bool reductionMode = false;
 	bool switchCamera = false;
+	bool texturesOn = false;
 
 	while (0 == terminate)
 	{
@@ -43,10 +42,20 @@ int main(void)
 			break;
 		case FSKEY_SHIFT:
 			reductionMode = !reductionMode;
+			break;
 		case FSKEY_C:
 			switchCamera = !switchCamera;
+			break;
 		case FSKEY_3:
 			camera.gravityOn = !camera.gravityOn;
+			break;
+		case FSKEY_T:
+			texturesOn = !texturesOn;
+			break;
+		case FSKEY_TAB:
+			camera.cursorLock = !camera.cursorLock;
+			camera2.cursorLock = camera.cursorLock;
+			break;
 		}
 
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -65,19 +74,13 @@ int main(void)
 		//DrawGroundLattice();
 		drawCount = 0;
 
-		if (!camera.cursorLock)
-		{
-			camera.cursorLock != camera.cursorLock;
-		}
-		camera2.cursorLock = camera.cursorLock; // set both camera's to mouse mode
-
 		if (switchCamera)
 		{
-			worldGrid.DrawTerrain(camera2, reductionMode, key);
+			worldGrid.DrawTerrain(camera2, reductionMode, key, texturesOn);
 		}
 		else
 		{
-			worldGrid.DrawTerrain(camera, reductionMode, key);
+			worldGrid.DrawTerrain(camera, reductionMode, key, texturesOn);
 		}
 
 		switch (FsGetMouseEvent(lb, mb, rb, mx, my))
@@ -97,7 +100,6 @@ int main(void)
 			{
 				printf("Did Not Find");
 			}
-
 			break;
 		case FSMOUSEEVENT_RBUTTONDOWN:
 			printf("IN RIGHT BUTTON\n");
