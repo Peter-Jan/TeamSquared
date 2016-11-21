@@ -61,7 +61,7 @@ void Block::Initialize(int roomSizeIn, int x, int y, int z)
 	roomSize = roomSizeIn;
 	blockSize = 8;
 	setCoordinate(x, y, z);
-	setColor(255, 0, 0);
+	r = 255; g = 255; b = 255;
 	setDimension(blockSize, blockSize, blockSize);
 	index = x + roomSize*z + pow(roomSize, 2)*y;
 }
@@ -102,6 +102,11 @@ void Block::setCoordinate(int xin, int yin, int zin)
 	index = x + roomSize*z + pow(roomSize, 2)*y;
 }
 
+void Block::setTexture(int x,int y)
+{
+	textMapX = x;
+	textMapY = y;
+}
 void Block::setPosition(double xLoc, double yLoc, double zLoc)
 {
 	pos[0] = xLoc;
@@ -185,7 +190,7 @@ void Block::DrawSolid(void)
 
 void Block::DrawTexture(GLuint texId,double imageX,double imageY)
 {
-	glColor4d(1.0,1.0,1.0, 1.0);           	// Current color is solid white
+	glColor3ub(r, g, b);           	// Current color is solid white
 
 	//glBindTexture(GL_TEXTURE_2D, texId);	// Select the current texture.
 
@@ -193,13 +198,13 @@ void Block::DrawTexture(GLuint texId,double imageX,double imageY)
 
 	if (sideVisible[0])
 	{
-		glTexCoord2d((imageX+1)/6, (imageY+1)/2);
+		glTexCoord2d((imageX)/6, (imageY+1)/2);
 		glVertex3d(pos[0], pos[1], pos[2]);
-		glTexCoord2d((imageX+1)/6, (imageY ) / 2);
+		glTexCoord2d((imageX)/6, (imageY ) / 2);
 		glVertex3d(pos[0], y1, pos[2]);
-		glTexCoord2d(imageX/5, (imageY ) / 2);
+		glTexCoord2d((imageX+1)/6, (imageY ) / 2);
 		glVertex3d(pos[0], y1, z1);
-		glTexCoord2d(imageX/5, (imageY + 1)/2);
+		glTexCoord2d((imageX+1)/6, (imageY + 1)/2);
 		glVertex3d(pos[0], pos[1], z1);
 	}
 
@@ -256,14 +261,31 @@ void Block::DrawTexture(GLuint texId,double imageX,double imageY)
 	// Top Side
 	if (sideVisible[5])
 	{
-		glTexCoord2d(imageX/6, 1.0);
-		glVertex3d(pos[0], y1, z1);
-		glTexCoord2d(imageX/6, 0.5);
-		glVertex3d(pos[0], y1, pos[2]);
-		glTexCoord2d((imageX+1)/6, 0.5);
-		glVertex3d(x1, y1, pos[2]);
-		glTexCoord2d((imageX+1)/6, 1.0);
-		glVertex3d(x1, y1, z1);
+		if (textMapX == 0 && textMapY == 0)
+		{
+			glTexCoord2d(imageX / 6, 1.0);
+			glVertex3d(pos[0], y1, z1);
+			glTexCoord2d(imageX / 6, 0.5);
+			glVertex3d(pos[0], y1, pos[2]);
+			glTexCoord2d((imageX + 1) / 6, 0.5);
+			glVertex3d(x1, y1, pos[2]);
+			glTexCoord2d((imageX + 1) / 6, 1.0);
+			glVertex3d(x1, y1, z1);
+		}
+		else
+		{
+			glTexCoord2d(imageX/6, (imageY+1) / 2);
+			glVertex3d(pos[0], y1, z1);
+			glTexCoord2d(imageX/6, (imageY) / 2);
+			glVertex3d(pos[0], y1, pos[2]);
+			glTexCoord2d((imageX+1)/6, (imageY) / 2);
+			glVertex3d(x1, y1, pos[2]);
+			glTexCoord2d((imageX+1)/6, (imageY+1) / 2);
+			glVertex3d(x1, y1, z1);
+
+		}
+
+
 	}
 	//glEnd();
 }

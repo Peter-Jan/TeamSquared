@@ -83,6 +83,12 @@ void Terrain::GenerateFunctionTerrain(void)
 	printf("World Initialized\n");
 }
 
+void Terrain::GenerateMaterial(materialBlock matBlock)
+{
+	AddBlock(matBlock.getX(),matBlock.getY(),matBlock.getY(),matBlock.textMapX,matBlock.textMapY);
+	//printf("X: %d,Y: %d ", matBlock.textMapX, matBlock.textMapY);
+}
+
 Terrain::~Terrain()
 {
 }
@@ -225,7 +231,7 @@ void Terrain::ShowSingleBlockSides(int i) // for block i in the block-Vector, ch
 	}
 }
 
-void Terrain::AddBlock(int x, int y, int z)
+void Terrain::AddBlock(int x, int y, int z,int imX,int imY)
 {
 	int newLocation = x + z*roomSize + y*roomSize*roomSize;
 
@@ -238,6 +244,8 @@ void Terrain::AddBlock(int x, int y, int z)
 		blockMap[newLocation] = std::move(newPtr);
 		//printf("AFTER2 x = %d, y = %d, z = %d\n", blockMap[newLocation]->getX(), blockMap[newLocation]->getY(), blockMap[newLocation]->getZ());
 		//printf("Index = %d, BlockLocationIndex = %d\n", newLocation, blockMap[newLocation]->index);
+		blockMap[newLocation]->textMapX = imX;
+		blockMap[newLocation]->textMapY = imY;
 		blockNum++;
 
 		HideSingleBlockSides(newLocation);
@@ -315,7 +323,7 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera, bool textures
 			{
 				if (texturesOn)
 				{
-					b->DrawTexture(texId,0,0);
+					b->DrawTexture(texId,b->textMapX,b->textMapY);
 				}
 				else
 				{
@@ -334,7 +342,7 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera, bool textures
 				{
 					if (texturesOn)
 					{
-						b->DrawTexture(texId,0,0);
+						b->DrawTexture(texId,b->textMapX,b->textMapY);
 					}
 					else
 					{
@@ -394,7 +402,7 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera, bool textures
 			{
 				if (texturesOn)
 				{
-					b->DrawTexture(texId,0,0);
+					b->DrawTexture(texId,b->textMapX,b->textMapY);
 				}
 				else
 				{
@@ -413,7 +421,7 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera, bool textures
 				{
 					if (texturesOn)
 					{
-						b->DrawTexture(texId,0,0);
+						b->DrawTexture(texId,b->textMapX,b->textMapY);
 					}
 					else
 					{
@@ -492,7 +500,7 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 			{
 				if (texturesOn)
 				{
-					blockMap[keyVal.first]->DrawTexture(texId,0,0);
+					blockMap[keyVal.first]->DrawTexture(texId, blockMap[keyVal.first]->textMapX, blockMap[keyVal.first]->textMapY);
 				}
 				else
 				{
@@ -520,7 +528,7 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 			{
 				if (texturesOn)
 				{
-					keyVal.second->DrawTexture(texId,0,1);
+					keyVal.second->DrawTexture(texId, keyVal.second->textMapX, keyVal.second->textMapY);
 				}
 				else
 				{

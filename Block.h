@@ -36,12 +36,14 @@ public:
 	void DrawSolid(void);
 	void DrawEdges(void);
 	void DrawTexture(GLuint texId, double imageX, double imageY);
+	void setTexture(int x,int y);
 
 private:
 	int x, y, z;
 	int r, g, b;
 	int w, h, l;
 public:
+	int textMapX=0, textMapY=0;
 	double x1, xM, y1, yM, z1, zM;
 	double blockSize = 8.0;
 	int index = 0;

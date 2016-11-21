@@ -10,7 +10,17 @@ int main(void)
 	int drawCount = 0;
 	CameraObject camera, camera2;
 	Terrain worldGrid(100, 2);
+	materialBlock matBlock;
 	worldGrid.texId=decodePng();
+
+	//Generate Materials
+	matBlock.setImage(4, 0);
+	matBlock.setParam(1, 1);
+	matBlock.setColor(255, 0, 0);
+	matBlock.setXYZ(17, 16, 15);
+	worldGrid.GenerateMaterial(matBlock);
+
+
 
 	camera.playerBlock.roomSize = worldGrid.roomSize;
 	camera2.playerBlock.roomSize = worldGrid.roomSize;
@@ -104,7 +114,7 @@ int main(void)
 				if (xGrid != camera.xGrid() || (yGrid != camera.yGrid() && yGrid != camera.yGrid() + 1) || zGrid != camera.zGrid())
 				{
 					printf("Found one at %d %d %d\n", xGrid, yGrid, zGrid);
-					worldGrid.AddBlock(xGrid, yGrid, zGrid);
+					worldGrid.AddBlock(xGrid, yGrid, zGrid,0,0);
 				}
 			}
 			else

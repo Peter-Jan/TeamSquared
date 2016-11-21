@@ -3,6 +3,7 @@
 
 #include "CameraObject.h"
 #include "yspng.h"
+#include "materialBlock.h"
 
 class Terrain
 {
@@ -25,11 +26,13 @@ public:
 	void inline GenerateOrdered(void);
 	void GenerateFunctionTerrain(void);
 
+	void GenerateMaterial(materialBlock matBlock);
+
 	void HideSides(void);
 	void HideSingleBlockSides(int i);
 	void ShowSingleBlockSides(int i);
 	bool FindBlock(CameraObject &camera, int &x, int &y, int &z, int ADDORREMOVE);
-	void AddBlock(int x, int y, int z);
+	void AddBlock(int x, int y, int z,int imX,int imY);
 	void RemoveBlock(int x, int y, int z);
 
 	void DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key, bool texturesOn);
