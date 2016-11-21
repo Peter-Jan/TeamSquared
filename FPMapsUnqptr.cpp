@@ -14,7 +14,8 @@ int main(void)
 	worldGrid.texId=decodePng();
 
 	//Generate Materials
-	matBlock.setImage(4, 0);
+	//Sample code to just generate 1 material block
+	matBlock.setImage(5, 0);
 	matBlock.setParam(1, 1);
 	matBlock.setColor(255, 0, 0);
 	matBlock.setXYZ(17, 16, 15);
@@ -114,7 +115,7 @@ int main(void)
 				if (xGrid != camera.xGrid() || (yGrid != camera.yGrid() && yGrid != camera.yGrid() + 1) || zGrid != camera.zGrid())
 				{
 					printf("Found one at %d %d %d\n", xGrid, yGrid, zGrid);
-					worldGrid.AddBlock(xGrid, yGrid, zGrid,0,0);
+					worldGrid.AddBlock(xGrid, yGrid, zGrid,0,0,0,0,0);		//right now default add dirt blocks
 				}
 			}
 			else

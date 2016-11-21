@@ -29,6 +29,9 @@ public:
 	int getX() const;
 	int getY() const;
 	int getZ() const;
+	int getR() const;
+	int getG() const;
+	int getB() const;
 	void setCoordinate(int xin, int yin, int zin);
 	void setPosition(double xLoc, double yLoc, double zLoc);
 	void setDimension(const int win, const int hin, const int lin);

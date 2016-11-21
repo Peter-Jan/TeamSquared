@@ -36,6 +36,8 @@ Block &Block::operator=(const std::unique_ptr<Block> &fromPtr)
 	return *this;
 }
 
+
+
 Block::Block(int roomSizeIn)
 {
 	roomSize = roomSizeIn;
@@ -90,6 +92,19 @@ int Block::getY() const
 int Block::getZ() const
 {
 	return z;
+}
+
+int Block::getR() const
+{
+	return r;
+}
+int Block::getG() const
+{
+	return g;
+}
+int Block::getB() const
+{
+	return b;
 }
 
 void Block::setCoordinate(int xin, int yin, int zin)

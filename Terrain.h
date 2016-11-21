@@ -32,7 +32,7 @@ public:
 	void HideSingleBlockSides(int i);
 	void ShowSingleBlockSides(int i);
 	bool FindBlock(CameraObject &camera, int &x, int &y, int &z, int ADDORREMOVE);
-	void AddBlock(int x, int y, int z,int imX,int imY);
+	void AddBlock(int x, int y, int z, int imX, int imY, int r, int g, int b);
 	void RemoveBlock(int x, int y, int z);
 
 	void DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key, bool texturesOn);

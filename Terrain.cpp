@@ -85,7 +85,8 @@ void Terrain::GenerateFunctionTerrain(void)
 
 void Terrain::GenerateMaterial(materialBlock matBlock)
 {
-	AddBlock(matBlock.getX(),matBlock.getY(),matBlock.getY(),matBlock.textMapX,matBlock.textMapY);
+	int matR, matG, matB;
+	AddBlock(matBlock.getX(),matBlock.getY(),matBlock.getY(),matBlock.textMapX,matBlock.textMapY,matBlock.getR(),matBlock.getG(),matBlock.getB());
 	//printf("X: %d,Y: %d ", matBlock.textMapX, matBlock.textMapY);
 }
 
@@ -231,7 +232,7 @@ void Terrain::ShowSingleBlockSides(int i) // for block i in the block-Vector, ch
 	}
 }
 
-void Terrain::AddBlock(int x, int y, int z,int imX,int imY)
+void Terrain::AddBlock(int x, int y, int z,int imX,int imY,int r,int g,int b)
 {
 	int newLocation = x + z*roomSize + y*roomSize*roomSize;
 
@@ -246,6 +247,7 @@ void Terrain::AddBlock(int x, int y, int z,int imX,int imY)
 		//printf("Index = %d, BlockLocationIndex = %d\n", newLocation, blockMap[newLocation]->index);
 		blockMap[newLocation]->textMapX = imX;
 		blockMap[newLocation]->textMapY = imY;
+		blockMap[newLocation]->setColor(r, g, b);
 		blockNum++;
 
 		HideSingleBlockSides(newLocation);
