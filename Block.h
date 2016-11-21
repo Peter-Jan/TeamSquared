@@ -35,7 +35,7 @@ public:
 	void setColor(const int rin, const int gin, const int bin);
 	void DrawSolid(void);
 	void DrawEdges(void);
-	void DrawTexture(GLuint texId);
+	void DrawTexture(GLuint texId, double imageX, double imageY);
 
 private:
 	int x, y, z;

@@ -5,13 +5,13 @@ GLuint decodePng()
 
 	YsRawPngDecoder png[2];
 	png[0].Decode("emoji.png");
-	png[1].Decode("poo.png");
+	png[1].Decode("texture.png");
 
 	GLuint texId;             	// Two unsigned integers for reserving texture identifiers
 
 	glGenTextures(1, &texId);  	// Reserve one texture identifier
 	glBindTexture(GL_TEXTURE_2D, texId);	// Making the texture identifier current 2D texture (or bring it to the deck)
-	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, png[0].wid, png[0].hei, GL_RGBA, GL_UNSIGNED_BYTE, png[0].rgba);
+	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, png[1].wid, png[1].hei, GL_RGBA, GL_UNSIGNED_BYTE, png[1].rgba);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);  // Specifying parameters
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);

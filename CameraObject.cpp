@@ -191,8 +191,8 @@ void CameraObject::Update(int &key)
 			double dx, dy, dh, dp;
 			int wid, hei;
 			FsGetWindowSize(wid, hei);
-			dx = (double)(wid / 2 - mx) - 9;
-			dy = (double)(hei / 2 - my) - 38;
+			dx = (double)(wid / 2 - mx) - 8;
+			dy = (double)(hei / 2 - my) - 31;
 			//printf("dx = %lf, dy = %lf\n", dx, dy);
 			dh = dx / 240 * sensitivity;
 			dp = dy / 240 * sensitivity;

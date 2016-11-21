@@ -315,7 +315,7 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera, bool textures
 			{
 				if (texturesOn)
 				{
-					b->DrawTexture(texId);
+					b->DrawTexture(texId,0,0);
 				}
 				else
 				{
@@ -334,7 +334,7 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera, bool textures
 				{
 					if (texturesOn)
 					{
-						b->DrawTexture(texId);
+						b->DrawTexture(texId,0,0);
 					}
 					else
 					{
@@ -394,7 +394,7 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera, bool textures
 			{
 				if (texturesOn)
 				{
-					b->DrawTexture(texId);
+					b->DrawTexture(texId,0,0);
 				}
 				else
 				{
@@ -413,7 +413,7 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera, bool textures
 				{
 					if (texturesOn)
 					{
-						b->DrawTexture(texId);
+						b->DrawTexture(texId,0,0);
 					}
 					else
 					{
@@ -492,7 +492,7 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 			{
 				if (texturesOn)
 				{
-					blockMap[keyVal.first]->DrawTexture(texId);
+					blockMap[keyVal.first]->DrawTexture(texId,0,0);
 				}
 				else
 				{
@@ -520,7 +520,7 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 			{
 				if (texturesOn)
 				{
-					keyVal.second->DrawTexture(texId);
+					keyVal.second->DrawTexture(texId,0,1);
 				}
 				else
 				{
