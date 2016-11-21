@@ -152,8 +152,11 @@ void CameraObject::Update(int &key)
 {
 	FsPollDevice();
 	mouseEvent = FsGetMouseEvent(lb, mb, rb, mx, my);
-	FsGetWindowPosition(winx0, winy0);
+	FsGetWindowPosition(winx0, winy0, winx1, winy1);
 	FsGetWindowSize(wid, hei);
+	mouseOffsetX = (winx1 - winx0 - wid) / 2;
+	mouseOffsetY = (winy1 - winy0 - hei) - mouseOffsetX;
+	printf("MouseOffX = %d, MouseOffY = %d\n", mouseOffsetX, mouseOffsetY);
 	GetForwardVector();
 
 	if (key != 0)
@@ -178,6 +181,9 @@ void CameraObject::Update(int &key)
 	{
 		ShowCursor(FALSE);
 		SetCursorPos(winx0 + wid / 2, winy0 + hei / 2);
+		//FsGetMouseEvent(lb, mb, rb, mx, my);
+		//mouseOffsetX = (mx - wid / 2);
+		//mouseOffsetY = (my - hei / 2);
 	}
 	else
 	{
@@ -189,17 +195,17 @@ void CameraObject::Update(int &key)
 		if (cursorLock == 1)
 		{
 			double dx, dy, dh, dp;
-			int wid, hei;
+			int wid, hei, offX, offY;
 			FsGetWindowSize(wid, hei);
-			dx = (double)(wid / 2 - mx) - 8;
-			dy = (double)(hei / 2 - my) - 31;
+			dx = (double)((wid / 2 - mouseOffsetX) - mx);
+			dy = (double)((hei / 2 - mouseOffsetY) - my);
 			//printf("dx = %lf, dy = %lf\n", dx, dy);
 			dh = dx / 240 * sensitivity;
 			dp = dy / 240 * sensitivity;
 			//printf("dh = %lf, dp = %lf\n", dh, dp);
 			h += dh;
 			p += dp;
-			//printf("cameraH = %lf, cameraP = %lf\n", h, p);
+			printf("cameraH = %lf, cameraP = %lf\n", h, p);
 			SetCursorPos(winx0 + wid / 2, winy0 + hei / 2);
 		}
 		else

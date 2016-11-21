@@ -326,10 +326,9 @@ void FsRegisterWindowResizeCallBack(void (*callback)(void *,int wid,int hei),voi
 /*! This function registers a function that is called when FsPollDevice is called. */
 void FsRegisterPollDeviceCallBack(void (*callback)(void *),void *param);
 
-
-
 void FsGetWindowSize(int &wid,int &hei);
 void FsGetWindowPosition(int &x0,int &y0);
+void FsGetWindowPosition(int &x0, int &y0, int &x1, int &y1); // added by Cameron
 void FsSetWindowTitle(const char windowTitle[]);
 void FsPollDevice(void);
 void FsSleep(int ms);

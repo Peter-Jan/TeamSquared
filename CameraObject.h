@@ -18,7 +18,8 @@ public:
 	std::vector<double> pos = { 0,0,0 };
 	std::vector<int> gridLocation = { 0,0,0 };
 	int blockSize, jumps = 5;
-	int lb, mb, rb, mx, my, mouseEvent, key, wid, hei, winx0, winy0;
+	int lb, mb, rb, mx, my, mouseEvent, key, wid, hei, winx0, winy0, winx1, winy1;
+	int mouseOffsetX = 0, mouseOffsetY = 0;
 	bool cursorLock = FALSE;
 	bool stationary = FALSE;
 	bool gravityOn = FALSE;

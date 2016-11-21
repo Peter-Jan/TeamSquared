@@ -369,6 +369,25 @@ void FsGetWindowPosition(int &x0,int &y0)
 	y0=rect.top;
 }
 
+void FsGetWindowPosition(int &x0, int &y0, int &x1, int &y1)
+{
+	POINT pnt = { 0,0 };
+	ClientToScreen(fsWin32Internal.hWnd, &pnt);
+
+	RECT rect;
+	GetClientRect(fsWin32Internal.hWnd, &rect);
+	rect.left += pnt.x;
+	rect.top += pnt.y;
+	rect.right += pnt.x;
+	rect.bottom += pnt.y;
+	AdjustWindowRect(&rect, WINSTYLE, FALSE);
+
+	x0 = rect.left;
+	y0 = rect.top;
+	x1 = rect.right;
+	y1 = rect.bottom;
+}
+
 void FsSetWindowTitle(const char windowTitle[])
 {
 	SetWindowTextA(fsWin32Internal.hWnd,windowTitle);
