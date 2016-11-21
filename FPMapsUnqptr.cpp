@@ -15,9 +15,9 @@ int main(void)
 
 	//Generate Materials
 	//Sample code to just generate 1 material block
-	matBlock.setImage(5, 0);
+	matBlock.setImage(4, 0);
 	matBlock.setParam(1, 1);
-	matBlock.setColor(255, 0, 0);
+	matBlock.setColor(255, 255, 255);
 	matBlock.setXYZ(17, 16, 15);
 	worldGrid.GenerateMaterial(matBlock);
 
