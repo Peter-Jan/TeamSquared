@@ -2,6 +2,7 @@
 
 
 
+
 int BlockDist(const Block &block1, const Block &block2)
 {
 	return abs(block1.getX() - block2.getX()) + abs(block1.getY() - block2.getY()) + abs(block1.getZ() - block2.getZ());
@@ -86,7 +87,7 @@ void Terrain::GenerateFunctionTerrain(void)
 void Terrain::GenerateMaterial(materialBlock matBlock)
 {
 	int matR, matG, matB;
-	AddBlock(matBlock.getX(),matBlock.getY(),matBlock.getY(),matBlock.textMapX,matBlock.textMapY,matBlock.getR(),matBlock.getG(),matBlock.getB());
+	//AddBlock(matBlock.getX(),matBlock.getY(),matBlock.getY(),matBlock.textMapX,matBlock.textMapY,matBlock.getR(),matBlock.getG(),matBlock.getB());
 	//printf("X: %d,Y: %d ", matBlock.textMapX, matBlock.textMapY);
 }
 
@@ -232,8 +233,9 @@ void Terrain::ShowSingleBlockSides(int i) // for block i in the block-Vector, ch
 	}
 }
 
-void Terrain::AddBlock(int x, int y, int z,int imX,int imY,int r,int g,int b)
+void Terrain::AddBlock(int x, int y, int z,int matVec[])
 {
+	
 	int newLocation = x + z*roomSize + y*roomSize*roomSize;
 
 	if (blockMap.find(newLocation) == blockMap.end()) // free spot
@@ -245,9 +247,9 @@ void Terrain::AddBlock(int x, int y, int z,int imX,int imY,int r,int g,int b)
 		blockMap[newLocation] = std::move(newPtr);
 		//printf("AFTER2 x = %d, y = %d, z = %d\n", blockMap[newLocation]->getX(), blockMap[newLocation]->getY(), blockMap[newLocation]->getZ());
 		//printf("Index = %d, BlockLocationIndex = %d\n", newLocation, blockMap[newLocation]->index);
-		blockMap[newLocation]->textMapX = imX;
-		blockMap[newLocation]->textMapY = imY;
-		blockMap[newLocation]->setColor(r, g, b);
+		blockMap[newLocation]->textMapX =  matVec[0];
+		blockMap[newLocation]->textMapY =  matVec[1];
+		blockMap[newLocation]->setColor(matVec[2], matVec[3], matVec[4]);
 		blockNum++;
 
 		HideSingleBlockSides(newLocation);

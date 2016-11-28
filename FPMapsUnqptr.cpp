@@ -1,3 +1,4 @@
+#include "mat.h"
 #include "Terrain.h"
 #include "Decoder.h"
 
@@ -10,16 +11,19 @@ int main(void)
 	int drawCount = 0;
 	CameraObject camera, camera2;
 	Terrain worldGrid(100, 2);
-	materialBlock matBlock;
 	worldGrid.texId=decodePng();
 
-	//Generate Materials
-	//Sample code to just generate 1 material block
-	matBlock.setImage(4, 0);
-	matBlock.setParam(1, 1);
-	matBlock.setColor(255, 255, 255);
-	matBlock.setXYZ(17, 16, 15);
-	worldGrid.GenerateMaterial(matBlock);
+
+	int ruby[7] = { 4,0,255,255,255,1,1 };
+	int dirt[7] = { 0,0,255,255,255,1,1 };
+	int steel[7] = { 2,0,255,255,255,1,1 };
+	int orange[7] = { 3,0,255,255,255,1,1 };
+	int emerald[7] = { 1,0,255,255,255,1,1 };
+	int stone[7] = { 5,0,255,255,255,1,1 };
+	int bark[7] = { 1,1,255,255,255,1,1 };
+
+	worldGrid.AddBlock(20, 20, 20, orange);
+
 
 
 
@@ -115,7 +119,7 @@ int main(void)
 				if (xGrid != camera.xGrid() || (yGrid != camera.yGrid() && yGrid != camera.yGrid() + 1) || zGrid != camera.zGrid())
 				{
 					printf("Found one at %d %d %d\n", xGrid, yGrid, zGrid);
-					worldGrid.AddBlock(xGrid, yGrid, zGrid,0,0,0,0,0);		//right now default add dirt blocks
+					worldGrid.AddBlock(xGrid, yGrid, zGrid,dirt);		//right now default add dirt blocks
 				}
 			}
 			else

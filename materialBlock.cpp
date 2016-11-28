@@ -5,19 +5,36 @@ materialBlock::materialBlock()
 	initialize();
 }
 
+materialBlock::materialBlock(int roomsize, int x, int y, int z)
+{
+	Block::Block(roomsize, x, y, z);
+}
+
 materialBlock::~materialBlock()
 {
 
 }
+int materialBlock::getImx() const
+{
+	return imageX;
+}
 
+int materialBlock::getImy() const
+{
+	return imageY;
+}
 void materialBlock::initialize()
 {
-	setImage(4, 0);
+	setImage(0, 0);
 	health = 0;
 	healthParam = 0;
 	quantParam = 0;
 	name = "unassigned";
 	//printf("X: %d, Y: %d ", textMapX, textMapY);
+}
+std::string materialBlock::getName() const
+{
+	return name;
 }
 
 void materialBlock::setImage(int inX,int inY)
