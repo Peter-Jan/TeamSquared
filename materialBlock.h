@@ -4,11 +4,11 @@
 #include "Block.h"
 #include <string>
 
-class materialBlock:public Block
+class materialBlock: public Block
 {
 public:
 	materialBlock();
-	materialBlock(int roomsize, int x, int y, int z);
+	materialBlock(int roomsize, int x, int y, int z, std::vector<int> matVec);
 	~materialBlock();
 	void initialize();
 	void setImage(int imageX,int imageY);

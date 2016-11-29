@@ -9,22 +9,29 @@ int main(void)
 	int lb, mb, rb, mx, my, mouseEvent, key = 0;
 	int drawCount = 0;
 	CameraObject camera, camera2;
-	Terrain worldGrid(100, 2);
+	Terrain worldGrid(30, 2);
 	worldGrid.texId=decodePng();
 
+	// texX, texY, bgColor[3], health, quantity
 
-	int ruby[7] = { 4,0,255,255,255,1,1 };
-	int dirt[7] = { 0,0,255,255,255,1,1 };
-	int steel[7] = { 2,0,255,255,255,1,1 };
-	int orange[7] = { 3,0,255,255,255,1,1 };
-	int emerald[7] = { 1,0,255,255,255,1,1 };
-	int stone[7] = { 5,0,255,255,255,1,1 };
-	int bark[7] = { 1,1,255,255,255,1,1 };
+	std::vector<int> dirt = { 0,0,255,255,255,1,1 };
+	std::vector<int> stone = { 5,0,255,255,255,1,1 };
+	std::vector<int> steel = { 2,0,255,255,255,1,1 };
+	std::vector<int> bark = { 1,1,255,255,255,1,1 };
+	std::vector<int> ruby = { 4,0,255,255,255,1,1 };
+	std::vector<int> emerald = { 1,0,255,255,255,1,1 };
+	std::vector<int> orange = { 3,0,255,255,255,1,1 };
+
+	std::vector<std::vector<int>> materials;
+	materials.push_back(dirt);
+	materials.push_back(stone);
+	materials.push_back(steel);
+	materials.push_back(bark);
+	materials.push_back(ruby);
+	materials.push_back(emerald);
+	materials.push_back(orange);
 
 	worldGrid.AddBlock(20, 20, 20, orange);
-
-
-
 
 	camera.playerBlock.roomSize = worldGrid.roomSize;
 	camera2.playerBlock.roomSize = worldGrid.roomSize;
@@ -118,7 +125,8 @@ int main(void)
 				if (xGrid != camera.xGrid() || (yGrid != camera.yGrid() && yGrid != camera.yGrid() + 1) || zGrid != camera.zGrid())
 				{
 					printf("Found one at %d %d %d\n", xGrid, yGrid, zGrid);
-					worldGrid.AddBlock(xGrid, yGrid, zGrid,dirt);		//right now default add dirt blocks
+					int blockType = rand() % 7; // select random block
+					worldGrid.AddBlock(xGrid, yGrid, zGrid,materials[blockType]);		//right now default add dirt blocks
 				}
 			}
 			else

@@ -233,23 +233,22 @@ void Terrain::ShowSingleBlockSides(int i) // for block i in the block-Vector, ch
 	}
 }
 
-void Terrain::AddBlock(int x, int y, int z,int matVec[])
+void Terrain::AddBlock(int x, int y, int z, std::vector<int> matVec)
 {
-	
 	int newLocation = x + z*roomSize + y*roomSize*roomSize;
 
 	if (blockMap.find(newLocation) == blockMap.end()) // free spot
 	{
-		std::unique_ptr<Block> newPtr;
+		std::unique_ptr<materialBlock> newPtr;
+		//printf("BEFORE %d %d %d\n", x, y, z);
+
 		//printf("BEFORE x = %d, y = %d, z = %d\n", newPtr->getX(), newPtr->getY(), newPtr->getZ());
-		newPtr.reset(new Block(roomSize, x, y, z));
+		newPtr.reset(new materialBlock(roomSize, x, y, z, matVec));
+
 		//printf("AFTER x = %d, y = %d, z = %d\n", newPtr->getX(), newPtr->getY(), newPtr->getZ());
 		blockMap[newLocation] = std::move(newPtr);
 		//printf("AFTER2 x = %d, y = %d, z = %d\n", blockMap[newLocation]->getX(), blockMap[newLocation]->getY(), blockMap[newLocation]->getZ());
 		//printf("Index = %d, BlockLocationIndex = %d\n", newLocation, blockMap[newLocation]->index);
-		blockMap[newLocation]->textMapX =  matVec[0];
-		blockMap[newLocation]->textMapY =  matVec[1];
-		blockMap[newLocation]->setColor(matVec[2], matVec[3], matVec[4]);
 		blockNum++;
 
 		HideSingleBlockSides(newLocation);

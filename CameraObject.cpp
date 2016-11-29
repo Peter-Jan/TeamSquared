@@ -156,7 +156,7 @@ void CameraObject::Update(int &key)
 	FsGetWindowSize(wid, hei);
 	mouseOffsetX = (winx1 - winx0 - wid) / 2;
 	mouseOffsetY = (winy1 - winy0 - hei) - mouseOffsetX;
-	printf("MouseOffX = %d, MouseOffY = %d\n", mouseOffsetX, mouseOffsetY);
+	//printf("MouseOffX = %d, MouseOffY = %d\n", mouseOffsetX, mouseOffsetY);
 	GetForwardVector();
 
 	if (key != 0)
@@ -205,7 +205,7 @@ void CameraObject::Update(int &key)
 			//printf("dh = %lf, dp = %lf\n", dh, dp);
 			h += dh;
 			p += dp;
-			printf("cameraH = %lf, cameraP = %lf\n", h, p);
+			//printf("cameraH = %lf, cameraP = %lf\n", h, p);
 			SetCursorPos(winx0 + wid / 2, winy0 + hei / 2);
 		}
 		else

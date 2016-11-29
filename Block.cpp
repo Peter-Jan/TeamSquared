@@ -36,8 +36,6 @@ Block &Block::operator=(const std::unique_ptr<Block> &fromPtr)
 	return *this;
 }
 
-
-
 Block::Block(int roomSizeIn)
 {
 	roomSize = roomSizeIn;
@@ -54,12 +52,12 @@ Block::Block(int roomSizeIn)
 
 Block::Block(int roomSizeIn, int x, int y, int z)
 {
+	printf("Location = %d %d %d\n", x, y, z);
 	Initialize(roomSizeIn, x, y, z);
 }
 
 void Block::Initialize(int roomSizeIn, int x, int y, int z)
 {
-
 	roomSize = roomSizeIn;
 	blockSize = 8;
 	setCoordinate(x, y, z);
