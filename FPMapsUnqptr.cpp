@@ -29,12 +29,15 @@ int main(void)
 	camera.playerBlock.roomSize = worldGrid.roomSize;
 	camera2.playerBlock.roomSize = worldGrid.roomSize;
 
-	camera.pos[2] = 100.0;
+
+	camera.pos[0] = 20.0;
+	camera.pos[1] = 200.0;
+	camera.pos[2] =  20.0;
 	camera2.pos[0] += worldGrid.roomSize / 2 * camera2.blockSize;
 	camera2.pos[1] += worldGrid.roomSize / 2 * camera2.blockSize;
 	camera2.pos[2] += worldGrid.roomSize / 2 * camera2.blockSize;
-	camera.Update(key);
-	camera2.Update(key);
+	camera.Update(key, worldGrid.blockMap);
+	camera2.Update(key, worldGrid.blockMap);
 	camera2.stationary = TRUE;
 
 	bool reductionMode = false;
@@ -90,6 +93,8 @@ int main(void)
 		// Set up 3D drawing
 		camera.SetUpCameraProjection();
 		camera.SetUpCameraTransformation();
+		printf("x: %lf, y: %lf, z: %lf \n", camera.x(), camera.y(), camera.z());
+		printf("xgrid: %d, ygrid: %d, zgrid: %d \n", camera.xGrid(), camera.yGrid(), camera.zGrid());
 
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_POLYGON_OFFSET_FILL);

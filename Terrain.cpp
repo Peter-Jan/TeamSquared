@@ -485,7 +485,7 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 	glVertex3i(0, 100, 0);
 
 	glEnd();
-	cameraView.Update(key);
+	cameraView.Update(key, blockMap);
 
 	if (reductionMode)
 	{
@@ -522,7 +522,7 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 		}
 		else
 		{
-			cameraView.Update(key);
+			cameraView.Update(key, blockMap);
 			if (texturesOn) // method only works if you have large group of objects with the same texture
 			{
 				glBindTexture(GL_TEXTURE_2D, texId);	// Select the current texture.

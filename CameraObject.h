@@ -11,7 +11,10 @@
 class CameraObject
 {
 public:
-	//double x, y, z;r
+	//double x, y, z;
+	double grav = 0;
+	int roomSize=100;
+	int index = 0;
 	double h, p, b;
 	double vertVel, camHeight, zoom, viewRadius, sensitivity, fov, nearZ, farZ, coneAngle;
 	std::vector<double> forwardVector = { 0,0,0 };
@@ -41,12 +44,13 @@ public:
 	void SetUpCameraProjection(void);
 	void SetUpCameraTransformation(void);
 	void DrawCamera(void);
+	void hitCheck(std::map<int, std::unique_ptr<Block>> &blockMap, std::vector<double> &curFV);
 	Block playerBlock;
 
 	void GetForwardVector(void);
 	void inline SetGridLocation(void);
 	void inline SetFrustrumCriteria(void);
-	void Update(int &key);
+	void Update(int &key,std::map<int, std::unique_ptr<Block>> &blockMap );
 };
 
 
