@@ -484,11 +484,8 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 	glVertex3i(0, 100, 0);
 
 	glEnd();
-<<<<<<< HEAD
 	cameraView.Update(key, blockMap);
-=======
 	//cameraView.Update(key);
->>>>>>> origin/master
 
 	if (reductionMode)
 	{
