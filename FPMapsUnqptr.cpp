@@ -1,5 +1,6 @@
 #include "Terrain.h"
 #include "Decoder.h"
+#include "ObjectGridClasses.h"
 
 int main(void)
 {
@@ -51,6 +52,14 @@ int main(void)
 	glFrontFace(GL_CW); // vertices of any object's front face (aka outside face) should always be specified in CLOCKWISE order
 	glCullFace(GL_BACK); // back 3 sides of each block are automatically removed by this openGL culling function
 
+	Grid rectGrid(20, 20, 350, 500, 20);
+	Grid toolbar(100, 500, 700, 600, 10);
+
+	Grid crafting(400, 20, 700, 240, 10);
+	Grid ReqChart(400, 260, 700, 500, 10);
+
+	crafting.AddPermElement();
+
 	while (0 == terminate)
 	{
 		FsPollDevice();
@@ -87,6 +96,8 @@ int main(void)
 		case FSKEY_TAB:
 			camera.cursorLock = !camera.cursorLock;
 			camera2.cursorLock = camera.cursorLock;
+			camera.Update(key);
+			camera2.Update(key);
 			break;
 		}
 
@@ -108,10 +119,18 @@ int main(void)
 
 		if (switchCamera)
 		{
+			if (camera2.cursorLock)
+			{
+				camera2.Update(key);
+			}
 			worldGrid.DrawTerrain(camera2, reductionMode, key, texturesOn);
 		}
 		else
 		{
+			if (camera.cursorLock)
+			{
+				camera.Update(key);
+			}
 			worldGrid.DrawTerrain(camera, reductionMode, key, texturesOn);
 		}
 
@@ -119,37 +138,104 @@ int main(void)
 		{
 			int xGrid, yGrid, zGrid;
 		case FSMOUSEEVENT_LBUTTONDOWN:
-			printf("IN LEFT BUTTON\n");
-			if (worldGrid.FindBlock(camera, xGrid, yGrid, zGrid, ADD))
+			printf("USER CLICKED\n");
+			if (!camera.cursorLock)
 			{
-				if (xGrid != camera.xGrid() || (yGrid != camera.yGrid() && yGrid != camera.yGrid() + 1) || zGrid != camera.zGrid())
+				//FsGetMouseState(lb, mb, rb, mx, my);
+				if (toolbar.activeCell == NULLINT && rectGrid.CheckClick(mx, my) == -2) // close
 				{
-					printf("Found one at %d %d %d\n", xGrid, yGrid, zGrid);
-					int blockType = rand() % 7; // select random block
-					worldGrid.AddBlock(xGrid, yGrid, zGrid,materials[blockType]);		//right now default add dirt blocks
+					rectGrid.TryTransfer(mx, my, toolbar);
 				}
+				else if (rectGrid.activeCell == NULLINT && toolbar.CheckClick(mx, my) == -2)
+				{
+					toolbar.TryTransfer(mx, my, rectGrid);
+				}
+				else if (crafting.CheckClick(mx, my) == -1)
+				{
+					crafting.Tellinfo(mx, my, ReqChart);
+					crafting.activeCell = NULLINT;
+				}
+
+				printf("Trying next");
+				break;
 			}
 			else
 			{
-				printf("Did Not Find");
+				printf("IN LEFT BUTTON\n");
+				if (worldGrid.FindBlock(camera, xGrid, yGrid, zGrid, ADD))
+				{
+					if (xGrid != camera.xGrid() || (yGrid != camera.yGrid() && yGrid != camera.yGrid() + 1) || zGrid != camera.zGrid())
+					{
+						printf("Found one at %d %d %d\n", xGrid, yGrid, zGrid);
+						int blockType = rand() % 7; // select random block
+						worldGrid.AddBlock(xGrid, yGrid, zGrid, materials[blockType]);		//right now default add dirt blocks
+					}
+				}
+				else
+				{
+					printf("Did Not Find");
+				}
+				break;
 			}
-			break;
 		case FSMOUSEEVENT_RBUTTONDOWN:
-			printf("IN RIGHT BUTTON\n");
-			if (worldGrid.FindBlock(camera, xGrid, yGrid, zGrid, REMOVE))
+			if (camera.cursorLock)
 			{
-				if (xGrid != camera.xGrid() || (yGrid != camera.yGrid() && yGrid != camera.yGrid() + 1) || zGrid != camera.zGrid())
+				printf("IN RIGHT BUTTON\n");
+				if (worldGrid.FindBlock(camera, xGrid, yGrid, zGrid, REMOVE))
 				{
-					printf("Found one at %d %d %d\n", xGrid, yGrid, zGrid);
-					worldGrid.RemoveBlock(xGrid, yGrid, zGrid);
+					if (xGrid != camera.xGrid() || (yGrid != camera.yGrid() && yGrid != camera.yGrid() + 1) || zGrid != camera.zGrid())
+					{
+						printf("Found one at %d %d %d\n", xGrid, yGrid, zGrid);
+						worldGrid.RemoveBlock(xGrid, yGrid, zGrid);
+					}
 				}
-			}
-			else
-			{
-				printf("Did Not Find");
+				else
+				{
+					printf("Did Not Find");
+				}
 			}
 			break;
 		}
+			
+
+		//if (camera.cursorLock)
+		//{
+		//	switch (FsGetMouseEvent(lb, mb, rb, mx, my))
+		//	{
+		//		int xGrid, yGrid, zGrid;
+		//	case FSMOUSEEVENT_LBUTTONDOWN:
+		//		printf("IN LEFT BUTTON\n");
+		//		if (worldGrid.FindBlock(camera, xGrid, yGrid, zGrid, ADD))
+		//		{
+		//			if (xGrid != camera.xGrid() || (yGrid != camera.yGrid() && yGrid != camera.yGrid() + 1) || zGrid != camera.zGrid())
+		//			{
+		//				printf("Found one at %d %d %d\n", xGrid, yGrid, zGrid);
+		//				int blockType = rand() % 7; // select random block
+		//				worldGrid.AddBlock(xGrid, yGrid, zGrid, materials[blockType]);		//right now default add dirt blocks
+		//			}
+		//		}
+		//		else
+		//		{
+		//			printf("Did Not Find");
+		//		}
+		//		break;
+		//	case FSMOUSEEVENT_RBUTTONDOWN:
+		//		printf("IN RIGHT BUTTON\n");
+		//		if (worldGrid.FindBlock(camera, xGrid, yGrid, zGrid, REMOVE))
+		//		{
+		//			if (xGrid != camera.xGrid() || (yGrid != camera.yGrid() && yGrid != camera.yGrid() + 1) || zGrid != camera.zGrid())
+		//			{
+		//				printf("Found one at %d %d %d\n", xGrid, yGrid, zGrid);
+		//				worldGrid.RemoveBlock(xGrid, yGrid, zGrid);
+		//			}
+		//		}
+		//		else
+		//		{
+		//			printf("Did Not Find");
+		//		}
+		//		break;
+		//	}
+		//}
 
 		//printf("Draw Count = %d\n", drawCount);
 
@@ -160,6 +246,16 @@ int main(void)
 		
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
+
+		if (!camera.cursorLock)
+		{
+			rectGrid.Draw();
+			toolbar.Draw();
+
+			crafting.Draw();
+			ReqChart.Draw();
+		}
+
 		{ // draw crosshairs
 			glLineWidth(1);
 			glBegin(GL_LINES);
