@@ -179,7 +179,16 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 #if defined(_WIN32_WINNT) // Windows mouse movement routine
 	if (cursorLock)
 	{
-		ShowCursor(FALSE);
+		if (ShowCursor(TRUE) > -1)
+		{
+			ShowCursor(FALSE);
+			ShowCursor(FALSE);
+		}
+		else
+		{
+			ShowCursor(FALSE);
+		}
+
 		SetCursorPos(winx0 + wid / 2, winy0 + hei / 2);
 		//FsGetMouseEvent(lb, mb, rb, mx, my);
 		//mouseOffsetX = (mx - wid / 2);
@@ -187,12 +196,20 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 	}
 	else
 	{
-		ShowCursor(TRUE);
+		if (ShowCursor(FALSE) < 1)
+		{
+			ShowCursor(TRUE);
+			ShowCursor(TRUE);
+		}
+		else
+		{
+			ShowCursor(TRUE);
+		}
 	}
 
 	if (mouseEvent == FSMOUSEEVENT_MOVE) // mouseView-control
 	{
-		if (cursorLock == 1)
+		if (cursorLock)
 		{
 			double dx, dy, dh, dp;
 			int wid, hei, offX, offY;
@@ -205,7 +222,7 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 			//printf("dh = %lf, dp = %lf\n", dh, dp);
 			h += dh;
 			p += dp;
-			printf("cameraH = %lf, cameraP = %lf\n", h, p);
+			//printf("cameraH = %lf, cameraP = %lf\n", h, p);
 			SetCursorPos(winx0 + wid / 2, winy0 + hei / 2);
 		}
 		else

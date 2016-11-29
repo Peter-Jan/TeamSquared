@@ -5,15 +5,21 @@ materialBlock::materialBlock()
 	initialize();
 }
 
-materialBlock::materialBlock(int roomsize, int x, int y, int z)
+materialBlock::materialBlock(int roomsize, int xIn, int yIn, int zIn, std::vector<int> matVec) : Block(roomsize, xIn, yIn, zIn)
 {
-	Block::Block(roomsize, x, y, z);
+	//printf("calling parent constructor\n");
+	textMapX = matVec[0];
+	textMapY = matVec[1];
+	setColor(matVec[2], matVec[3], matVec[4]);
+	setParam(matVec[5], matVec[6]);
+	//printf("Success\n");
 }
 
 materialBlock::~materialBlock()
 {
 
 }
+
 int materialBlock::getImx() const
 {
 	return imageX;
