@@ -1,6 +1,6 @@
 #include "Terrain.h"
 #include "Decoder.h"
-#include "ObjectGridClasses.h"
+#include "ObjectGridClass.h"
 
 int main(void)
 {
