@@ -299,30 +299,35 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 			std::vector<double> delta = { 0,0,0 };
 			std::vector<double> curFV = { 0,0,0 };
 			SetVec(curFV, forwardVector);
-			hitCheck(blockMap, curFV);
 			if (gravityOn)
 				{
 					curFV[1] = 0;
 				}
 			if (FsGetKeyState(FSKEY_W))
 			{
-
-				VecPlus(pos, curFV);
+				dx += curFV[0];
+				dy += curFV[1];
+				dz += curFV[2];
+				//VecPlus(pos, curFV);
 			}
 			if (FsGetKeyState(FSKEY_S))
 			{
-				VecMinus(pos, curFV);
+				dx -= curFV[0];
+				dy -= curFV[1];
+				dz -= curFV[2];
+				//VecMinus(pos, curFV);
 			}
 			if (FsGetKeyState(FSKEY_D))
 			{
-				pos[0] -= curFV[2];
-				pos[2] += curFV[0];
+				dx -= curFV[2];
+				dz += curFV[0];
 			}
 			if (FsGetKeyState(FSKEY_A))
 			{
-				pos[0] += curFV[2];
-				pos[2] -= curFV[0];
+				dz += curFV[2];
+				dx -= curFV[0];
 			}
+			hitCheck(blockMap, curFV);
 
 			if (gravityOn)
 			{
@@ -431,51 +436,39 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 			if (px1 == 0)
 			{
 				index = (xGrid() - 1) + (zGrid()*roomSize) + (yGrid()*pow(roomSize, 2));
-				if (blockMap.find(index) != blockMap.end())
+				if (blockMap.find(index) == blockMap.end())
 				{
-					if (curFV[0] < 0)
-					{
-						curFV[0] = 0;
-					}
+					pos[0] += dx;
 				}
 			}
 
 			if (px1 == 3)
 			{
 				index = (xGrid() + 1) + (zGrid()*roomSize) + (yGrid()*pow(roomSize, 2));
-				if (blockMap.find(index) != blockMap.end())
+				if (blockMap.find(index) == blockMap.end())
 				{
-					
-					if (curFV[0] > 0)
-					{
-						curFV[0] = 0;
-					}
+					pos[0] += dx;
 				}
 			}
 
 			if (pz1 == 0)
 			{
 				index = xGrid() + ((zGrid() - 1)*roomSize) + (yGrid()*pow(roomSize, 2));
-				if (blockMap.find(index) != blockMap.end())
+				if (blockMap.find(index) == blockMap.end())
 				{
-					if (curFV[2] < 0)
-					{
-						curFV[2] = 0;
-					}
+					pos[2] += dz;
 				}
 			}
 
 			if (pz1 == 3)
 			{
 				index = (xGrid() ) + ((zGrid() + 1)*roomSize) + (yGrid()*pow(roomSize, 2));
-				if (blockMap.find(index) != blockMap.end())
+				if (blockMap.find(index) == blockMap.end())
 				{
-					if (curFV[2] > 0)
-					{
-						curFV[2] = 0;
-					}
+					pos[2] += dz;
 				}
 			}
+
 
 			//index = (xGrid()) + (zGrid() *roomSize) + ((yGrid()-1)*pow(roomSize, 2));
 			//if (blockMap.find(index) == blockMap.end())
