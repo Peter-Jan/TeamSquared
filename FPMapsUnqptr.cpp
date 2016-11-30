@@ -99,8 +99,8 @@ int main(void)
 		case FSKEY_TAB:
 			camera.cursorLock = !camera.cursorLock;
 			camera2.cursorLock = camera.cursorLock;
-			camera.Update(key);
-			camera2.Update(key);
+			camera.Update(key, worldGrid.blockMap);
+			camera2.Update(key, worldGrid.blockMap);
 			break;
 		}
 
@@ -126,7 +126,7 @@ int main(void)
 		{
 			if (camera2.cursorLock)
 			{
-				camera2.Update(key);
+				camera2.Update(key, worldGrid.blockMap);
 			}
 			worldGrid.DrawTerrain(camera2, reductionMode, key, texturesOn);
 		}
@@ -134,7 +134,7 @@ int main(void)
 		{
 			if (camera.cursorLock)
 			{
-				camera.Update(key);
+				camera.Update(key, worldGrid.blockMap);
 			}
 			worldGrid.DrawTerrain(camera, reductionMode, key, texturesOn);
 		}

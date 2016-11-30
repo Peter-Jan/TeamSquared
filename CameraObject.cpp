@@ -296,15 +296,17 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 		}
 		if (!stationary)
 		{
+			std::vector<double> delta = { 0,0,0 };
 			std::vector<double> curFV = { 0,0,0 };
 			SetVec(curFV, forwardVector);
 			hitCheck(blockMap, curFV);
 			if (gravityOn)
 				{
-				curFV[1] = 0;
+					curFV[1] = 0;
 				}
 			if (FsGetKeyState(FSKEY_W))
 			{
+
 				VecPlus(pos, curFV);
 			}
 			if (FsGetKeyState(FSKEY_S))
