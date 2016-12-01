@@ -1,6 +1,6 @@
 #include "ObjectGridClass.h"
 
-const int WINWID = 800, WINHEI = 600;
+//const int WINWID = 800, WINHEI = 600;
 #define NULLINT -1
 
 void glColor3ubArray(int colorArray[3])
@@ -81,7 +81,8 @@ Material::~Material()
 
 Material::Material(char perm[],int q)
 {
-	strcpy(name, perm);
+	//strcpy(name, perm);
+	sprintf(name, perm);
 	color[rand() % 3] = (strlen(name) * 10) % 255;
 	quantity = q;
 	stackable = TRUE;
@@ -91,47 +92,48 @@ void Material::CleanUp(void)
 {
 }
 
-Recipe::Recipe()
+Axe::Axe()
 {
-
+	damage = 3;
+	strength = 1;
+	speed = 0.5; //attack per sec
+	hitscan = true;
+	range = 3 * blockSize;
+	sprintf(name, "Axe");
+	quantity = 1;
 }
 
-Axe::Axe()
+AxeRecipe::AxeRecipe()
 {
 	color[rand() % 3] = (strlen(name) * 10) % 255;
 	quantity = 1;
-	char nameStart[255] = "Axe";
-	strcpy(name, nameStart);
-	std::unique_ptr<Item> randomItem(new Material("Wood",2));
-	materialList.push_back(nullptr);
-	materialList[0].swap(randomItem);
-	randomItem.reset(new Material("Stone", 2));
-	materialList.push_back(nullptr);
-	materialList[1].swap(randomItem);
-	randomItem.release();
-}
-
-Axe::~Axe()
-{
+	sprintf(name, "Axe");
+	materialList.resize(2);
+	materialList[0].reset(new Material("Wood", 2));
+	materialList[1].reset(new Material("Stone", 3));
+	craftedItem.reset(new Axe);
 }
 
 Hammer::Hammer()
 {
-	color[rand() % 3] = (strlen(name) * 10) % 255;
+	damage = 2;
+	strength = 2;
+	speed = 1.0;
+	hitscan = true;
+	range = 8 * blockSize;
+	sprintf(name, "Hammer");
 	quantity = 1;
-	char nameStart[255] = "Hammer";
-	strcpy(name, nameStart);
-	std::unique_ptr<Item> randomItem(new Material("Wood", 10));
-	materialList.push_back(nullptr);
-	materialList[0].swap(randomItem);
-	randomItem.reset(new Material("Stone", 3));
-	materialList.push_back(nullptr);
-	materialList[1].swap(randomItem);
-	randomItem.release();
 }
 
-Hammer::~Hammer()
+HammerRecipe::HammerRecipe()
 {
+	color[rand() % 3] = (strlen(name) * 10) % 255;
+	quantity = 1;
+	sprintf(name, "Hammer");
+	materialList.resize(2);
+	materialList[0].reset(new Material("Wood", 4));
+	materialList[1].reset(new Material("Stone", 10));
+	craftedItem.reset(new Axe);
 }
 
 Grid::Grid()
@@ -145,11 +147,8 @@ Grid::~Grid()
 
 void Grid::CleanUp(void)
 {
-
 	printf("Cleaning");
 	gridVec.clear();
-	
-
 }
 
 bool Grid::AddElement(std::unique_ptr<Item> &item)
@@ -361,7 +360,7 @@ int Grid::CheckClick(int &mx, int &my)
 void Grid::AddPermElement()
 {
 	printf("Made it\n");
-	std::unique_ptr<Item> recipe(new Axe);
+	std::unique_ptr<Item> recipe(new AxeRecipe);
 	for (auto &elem : gridVec)
 	{
 		if (elem == nullptr)
@@ -369,7 +368,7 @@ void Grid::AddPermElement()
 			elem.swap(recipe);
 		}
 	}
-	recipe.reset(new Hammer);
+	recipe.reset(new HammerRecipe);
 	for (auto &elem : gridVec)
 	{
 		if (elem == nullptr)
@@ -383,14 +382,17 @@ void Grid::AddPermElement()
 
 void Grid::Tellinfo(int &mx, int &my,Grid &other)
 {
-	printf("Showing Info");
+	printf("Telling Info");
 	gridVec[activeCell]->highlight = FALSE;
+	printf("%d Active Cell\n");
 	int i = 0;
 	for (auto &item : gridVec[activeCell]->materialList)
 	{
+		printf("New Item\n");
 		other.gridVec[i].reset(new Material(item->name, item->quantity));
 		i++;
 	}
+	printf("Done with Items\n");
 }
 
 int Grid::InfoCell(std::unique_ptr<Item> &origin)
@@ -400,10 +402,10 @@ int Grid::InfoCell(std::unique_ptr<Item> &origin)
 	printf("Showing Info %s\n",orig.name);
 	
 	orig.highlight = FALSE;
-	
 
 	if (strcmp(orig.name, "Axe") == 0)
 	{
+		printf("In here");
 		return 1;
 	}
 	else if (strcmp(orig.name, "Plank") == 0)
@@ -414,58 +416,3 @@ int Grid::InfoCell(std::unique_ptr<Item> &origin)
 		return 0;
 	activeCell = NULLINT;
 }
-  
-//int main(void)
-//{
-//	FsOpenWindow(800, 100, WINWID, WINHEI, 1);
-//
-//	Grid rectGrid(20, 20, 350, 500, 20);
-//	Grid toolbar(100, 500, 700, 600, 10);
-//
-//	Grid crafting(400, 20, 700, 240, 10);
-//	Grid ReqChart(400, 260, 700, 500, 10);
-//
-//	crafting.AddPermElement();
-//	
-//	int lb, mb, rb, mx, my, eventType;
-//	while (FsInkey() != FSKEY_ESC)
-//	{
-//		FsPollDevice();
-//
-//		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//
-//		eventType = FsGetMouseEvent(lb, mb, rb, mx, my);
-//		if (eventType == FSMOUSEEVENT_LBUTTONDOWN)
-//		{
-//			if (toolbar.activeCell == NULLINT && rectGrid.CheckClick(mx, my) == -2) // close
-//			{
-//				rectGrid.TryTransfer(mx, my, toolbar);
-//			}
-//			else if (rectGrid.activeCell == NULLINT && toolbar.CheckClick(mx, my) == -2)
-//			{
-//				toolbar.TryTransfer(mx, my, rectGrid);
-//			}
-//			else if (crafting.CheckClick(mx, my) == -1)
-//			{
-//				crafting.Tellinfo(mx, my, ReqChart);
-//				crafting.activeCell = NULLINT;
-//			}
-//			
-//			printf("Trying next");
-//		}
-//
-//		rectGrid.Draw();
-//		toolbar.Draw();
-//
-//		crafting.Draw();
-//		ReqChart.Draw();
-//		//Table.Draw();
-//
-//		FsSwapBuffers();
-//		FsSleep(50);
-//	}
-//	FsCloseWindow();
-//	getchar();
-//	return 0;
-//}
-//// No newline at end of file

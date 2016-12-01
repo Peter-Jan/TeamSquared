@@ -402,7 +402,6 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 
 void CameraObject::hitCheck(std::map<int, std::unique_ptr<Block>> &blockMap, std::vector<double> &curFV)
 {
-	printf("roomSize = %d\n", roomSize);
 	double px0, px1, pz0, pz1, py0, py1;
 	int cx0, cy0, cz0, checkX, checkY, checkZ;
 
@@ -449,7 +448,6 @@ void CameraObject::hitCheck(std::map<int, std::unique_ptr<Block>> &blockMap, std
 		index = xGrid() + zIdx*roomSize + yGrid()*pow(roomSize, 2);
 		if (zIdx >= 0 && zIdx < roomSize && blockMap.find(index) == blockMap.end())
 		{
-			printf("CamHeight = %d", camHeight);
 			if (camHeight == (playerBlock.blockSize / 2.0) || blockMap.find(index + pow(roomSize, 2)) == blockMap.end()) // crouch check needs to be added
 			{
 				pos[2] += dzMove;

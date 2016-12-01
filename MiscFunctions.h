@@ -6,6 +6,14 @@
 #include <map>
 #include "Block.h"
 
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+
 #define NULLINT -1
 #define REMOVEDBLOCK -2
 const double YsPi = 3.1415927;
@@ -16,6 +24,7 @@ const double YsPi = 3.1415927;
 const int WINWID = 800, WINHEI = 600;
 const int dt = 5;
 const double GRAV = -1*(double)dt/1000.0;
+const int blockSize = 8;
 
 template <class NumType>
 void VecPlus(std::vector<NumType> &first, std::vector<NumType> &second) // add second vec to first

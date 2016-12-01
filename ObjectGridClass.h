@@ -5,6 +5,14 @@
 #define NULLINT -1
 #endif
 
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -15,6 +23,7 @@
 #include "yspng.h"
 #include "yspngenc.h"
 #include "ysglfontdata.h"
+#include "MiscFunctions.h"
 
 //const int WINWID = 800, WINHEI = 600;
 
@@ -25,6 +34,12 @@ public:
 	~Item();
 	int color[3] = { 0,0,0 };
 	int quantity = 1;
+	double range;
+	int damage; // health dmg dealt
+	int health; // restorative hp amount
+	int strength; // durability vs another object
+	double speed; // cooldown timer, in seconds
+	bool hitscan; // true = instant, false = projectile
 	char name[256];
 	bool stackable = FALSE;
 	bool highlight = FALSE;
@@ -36,6 +51,7 @@ public:
 	void Draw(int x0, int y0, int x1, int y1);
 	//void virtual Use();
 	std::vector<std::unique_ptr<Item>> materialList;
+	std::unique_ptr<Item> craftedItem;
 };
 
 class Material : public Item
@@ -49,25 +65,46 @@ public:
 	void CleanUp(void);
 };
 
+class Useable : public Item
+{
+public:
+	Useable() {}
+};
+
+class Weapon : public Item
+{
+public:
+	Weapon() {}
+};
 
 class Recipe : public Item
 {
 public:
-	Recipe();
+	Recipe() {}
 };
 
-class Axe : public Recipe
+class Axe : public Weapon
 {
 public:
 	Axe();
-	~Axe();
 };
 
-class Hammer : public Recipe
+class AxeRecipe : public Recipe
+{
+public:
+	AxeRecipe();
+};
+
+class Hammer : public Weapon
 {
 public:
 	Hammer();
-	~Hammer();
+};
+
+class HammerRecipe : public Recipe
+{
+public:
+	HammerRecipe();
 };
 
 class Grid
