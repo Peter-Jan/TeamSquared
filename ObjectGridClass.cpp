@@ -69,6 +69,13 @@ void Item::Draw(int x0, int y0, int x1, int y1)
 Material::Material()
 {
 	fgets(name, 255, stdin);
+	for (auto &c : name)
+	{
+		if (c == '\n')
+		{
+			c = 0;
+		}
+	}
 	color[rand() % 3] = (strlen(name) * 10) % 255;
 	quantity = 1;
 	stackable = TRUE;
@@ -283,10 +290,56 @@ void Grid::MoveCell(std::unique_ptr<Item> &origin, std::unique_ptr<Item> &destin
 	activeCell = NULLINT;
 }
 
+int Grid::MoveCell(std::unique_ptr<Item> &origin, std::unique_ptr<Item> &destination, int number)
+{
+	auto &orig = *origin, &dest = *destination;
+	orig.highlight = FALSE;
+	if (destination == nullptr)// if dest. is empty 
+	{
+		printf("nullprt?\n");
+		return 0;
+	}
+	printf("\n %s | %s | %d\n", orig.name, dest.name, strcmp(orig.name, dest.name));
+	if (orig.quantity <= dest.quantity && (strcmp(orig.name, dest.name) == 0))    //if inv has less quantity than req
+	{
+		dest.Decrease(orig.quantity);
+		origin.release();		//    remove values of curent cell
+		printf("In here\n");
+	}
+	else if (orig.quantity > dest.quantity && (strcmp(orig.name, dest.name) == 0))  //if inv has more quantity than req
+	{
+		int temp = dest.quantity;
+		dest.Decrease(dest.quantity);
+		orig.Decrease(temp);
+		//return 0;
+	}
+	activeCell = NULLINT;    //    cell in grid that calls movecell is empty
+}
+
 bool Grid::InsideBounds(int &mx, int &my)
 {
 	return xLeft + xBorder < mx && xRight - xBorder > mx && yTop + yBorder < my && yBottom - yBorder > my;
 }
+
+//void Grid::TryTransfer(int &mx, int &my, Grid &other)
+//{
+//	printf("Try transferring");
+//	other.transfer = TRUE;
+//	gridVec[activeCell]->highlight = FALSE;
+//	int destIndex = other.CheckClick(mx, my);
+//	printf("dest index = %d\n", destIndex);
+//	if (destIndex >= 0 && destIndex < other.rows*other.cols)
+//	{
+//		printf("Before Transfer");
+//		MoveCell(gridVec[activeCell], other.gridVec[destIndex]);
+//		printf("After Transfer");
+//	}
+//	printf("Past");
+//	activeCell = NULLINT;
+//	other.activeCell = NULLINT;
+//	transfer = FALSE;
+//	other.transfer = FALSE;
+//}
 
 void Grid::TryTransfer(int &mx, int &my, Grid &other)
 {
@@ -294,17 +347,38 @@ void Grid::TryTransfer(int &mx, int &my, Grid &other)
 	other.transfer = TRUE;
 	gridVec[activeCell]->highlight = FALSE;
 	int destIndex = other.CheckClick(mx, my);
+	if (destIndex >= 0 && destIndex < other.rows*other.cols)
+	{
+		MoveCell(gridVec[activeCell], other.gridVec[destIndex]);
+		activeCell = NULLINT;
+		transfer = FALSE;
+	}
+	//activeCell = NULLINT;
+	other.activeCell = NULLINT;
+	//transfer = FALSE;
+	other.transfer = FALSE;
+}
+
+void Grid::TryTransfer(int &mx, int &my, Grid &other, int number)
+{
+	printf("Try transferring");
+	other.transfer = TRUE;
+	gridVec[activeCell]->highlight = FALSE;
+	int destIndex = other.CheckClick(mx, my);
 	printf("dest index = %d\n", destIndex);
+	printf("ACTIVE CELL = %d, name = %s \n", activeCell, gridVec[activeCell]->name);
 	if (destIndex >= 0 && destIndex < other.rows*other.cols)
 	{
 		printf("Before Transfer");
-		MoveCell(gridVec[activeCell], other.gridVec[destIndex]);
+		MoveCell(gridVec[activeCell], other.gridVec[destIndex], 1);
 		printf("After Transfer");
+		activeCell = NULLINT;
+		transfer = FALSE;
 	}
 	printf("Past");
-	activeCell = NULLINT;
+	//activeCell = NULLINT;
 	other.activeCell = NULLINT;
-	transfer = FALSE;
+	//transfer = FALSE;
 	other.transfer = FALSE;
 }
 
@@ -334,6 +408,7 @@ int Grid::CheckClick(int &mx, int &my)
 				printf("Enter new item name >\n");
 				std::unique_ptr<Item> tempP(new Material);
 				AddElement(index, tempP);
+				//return -2;     ------> Will replace above 3 lines in actual game
 			}
 			else // if the cell is occupied and there is currently no active cell, highlight it
 			{
@@ -347,7 +422,7 @@ int Grid::CheckClick(int &mx, int &my)
 			MoveCell(gridVec[activeCell], gridVec[index]); // pass Item obj pointers to MoveCell func
 			printf("Swap cell %d with cell %d\n", activeCell, index);
 		}
-		return -1;
+		return NULLINT;
 	}
 	else if (activeCell != NULLINT)
 	{
@@ -395,24 +470,73 @@ void Grid::Tellinfo(int &mx, int &my,Grid &other)
 	printf("Done with Items\n");
 }
 
-int Grid::InfoCell(std::unique_ptr<Item> &origin)
+//int Grid::InfoCell(std::unique_ptr<Item> &origin)
+//{
+//	auto &orig = *origin;
+//
+//	printf("Showing Info %s\n",orig.name);
+//	
+//	orig.highlight = FALSE;
+//
+//	if (strcmp(orig.name, "Axe") == 0)
+//	{
+//		printf("In here");
+//		return 1;
+//	}
+//	else if (strcmp(orig.name, "Plank") == 0)
+//	{
+//		return 2;
+//	}
+//	else
+//		return 0;
+//	activeCell = NULLINT;
+//}
+
+Button::Button()
 {
-	auto &orig = *origin;
+	x = 550, y = 250;
+}
 
-	printf("Showing Info %s\n",orig.name);
-	
-	orig.highlight = FALSE;
+void Button::Draw(int x, int y)
+{
+	glColor3ub(255, 0, 0);
+	glBegin(GL_LINE_LOOP);
+	glVertex2i(x - 40, y - 20);
+	glVertex2i(x + 40, y - 20);
+	glVertex2i(x + 40, y + 20);
+	glVertex2i(x - 40, y + 20);
+	glEnd();
+	glColor3ub(0, 0, 0);
+	glRasterPos2d(x - 20, y + 5);
+	YsGlDrawFontBitmap10x14("CRAFT");
+}
 
-	if (strcmp(orig.name, "Axe") == 0)
+bool Button::CheckCrafting(Grid &ReqChart)
+{
+	int count = 0;
+	for (auto &elem : ReqChart.gridVec)
 	{
-		printf("In here");
+		if (elem == nullptr && count == 0)
+		{
+			return FALSE;
+		}
+		else if (elem == nullptr)
+		{
+			return TRUE;
+		}
+		else if (elem->quantity != 0)
+		{
+			return FALSE;
+		}
+		count++;
+	}
+}
+
+int Button::ClickCheck(int &mx, int &my)
+{
+
+	if ((mx>(x - 40)) && (mx<(x + 40)) && (my>(y - 20)) && (my<(y + 20)))
 		return 1;
-	}
-	else if (strcmp(orig.name, "Plank") == 0)
-	{
-		return 2;
-	}
 	else
 		return 0;
-	activeCell = NULLINT;
 }

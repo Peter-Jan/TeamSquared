@@ -126,14 +126,25 @@ public:
 	void Draw(void);
 	bool AddElement(std::unique_ptr<Item> &item);
 	bool AddElement(int elemIndex, std::unique_ptr<Item> &item);
-	//void MoveCell(int origin, int destination);
 	void MoveCell(std::unique_ptr<Item> &origin, std::unique_ptr<Item> &destination);
-	//void IncrementElement(int elemIndex, int quant);
+	int MoveCell(std::unique_ptr<Item> &origin, std::unique_ptr<Item> &destination, int number);
 	int CheckClick(int &mx, int &my);
 	bool InsideBounds(int &mx, int &my);
 	void TryTransfer(int &mx, int &my, Grid &other);
+	void TryTransfer(int &mx, int &my, Grid &other, int number);
 	void AddPermElement(void);
 	void Tellinfo(int &mx, int &my, Grid &other);
 	int InfoCell(std::unique_ptr<Item> &origin);
 };
+
+class Button
+{
+public:
+	int x, y;
+	Button();
+	void Draw(int x, int y);
+	bool CheckCrafting(Grid &ReqChart);
+	int ClickCheck(int &mx, int &my);
+};
+
 #endif // !OBJECT_GRID_CLASSES_INCLUDED

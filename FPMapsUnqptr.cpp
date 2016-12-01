@@ -54,11 +54,11 @@ int main(void)
 	glFrontFace(GL_CW); // vertices of any object's front face (aka outside face) should always be specified in CLOCKWISE order
 	glCullFace(GL_BACK); // back 3 sides of each block are automatically removed by this openGL culling function
 
-	Grid rectGrid(20, 20, 350, 500, 20);
+	Grid inventory(20, 20, 350, 500, 20);
 	Grid toolbar(100, 500, 700, 600, 10);
-
 	Grid crafting(400, 20, 700, 240, 10);
 	Grid ReqChart(400, 260, 700, 500, 10);
+	Button but;
 
 	crafting.AddPermElement();
 
@@ -139,25 +139,100 @@ int main(void)
 			int xGrid, yGrid, zGrid;
 		case FSMOUSEEVENT_LBUTTONDOWN:
 			printf("USER CLICKED\n");
+
 			if (!camera.cursorLock)
 			{
-				//FsGetMouseState(lb, mb, rb, mx, my);
-				if (toolbar.activeCell == NULLINT && rectGrid.CheckClick(mx, my) == -2) // close
+				if (but.ClickCheck(mx, my) == 1)
 				{
-					rectGrid.TryTransfer(mx, my, toolbar);
-				}
-				else if (rectGrid.activeCell == NULLINT && toolbar.CheckClick(mx, my) == -2)
-				{
-					toolbar.TryTransfer(mx, my, rectGrid);
-				}
-				else if (crafting.CheckClick(mx, my) == -1)
-				{
-					printf("Inside crafting table, activeCell == %d", crafting.activeCell);
-					crafting.Tellinfo(mx, my, ReqChart);
-					crafting.activeCell = NULLINT;
+					printf("\nInside the Button!");
+					if (but.CheckCrafting(ReqChart))
+					{
+						printf("\nReady to craft!");//then call crafting implementation function
+						crafting.activeCell = NULLINT;
+					}
+					else
+					{
+						printf("\nNot enough ingredients!");
+					}
 				}
 
-				printf("Trying next");
+				if (inventory.activeCell == NULLINT && toolbar.activeCell == NULLINT) // if no cells are highlighted
+				{
+					if (inventory.CheckClick(mx, my) == -2)
+					{
+						printf("Inside Inventory\n");
+						inventory.transfer = FALSE;
+						// do nothing
+					}
+					else if (toolbar.CheckClick(mx, my) == -2)
+					{
+						printf("Inside Toolbar\n");
+						toolbar.transfer = FALSE;
+						// do nothing
+					}
+					else if (crafting.activeCell != NULLINT) // There's an active recipe
+					{
+						int tempCell = crafting.activeCell;
+						crafting.activeCell = NULLINT;
+						if (crafting.CheckClick(mx, my) == NULLINT && crafting.gridVec[crafting.activeCell] != nullptr) // if clicked cell has a recipe
+						{
+							// ReturnPartialItems(tempCell)
+							printf("Inside crafting table, activeCell == %d", crafting.activeCell);
+							crafting.Tellinfo(mx, my, ReqChart);
+						}
+						else
+						{
+							crafting.activeCell = tempCell;
+						}
+					}
+					else if (crafting.CheckClick(mx, my) == NULLINT) // if click inside crafting area
+					{
+						if (crafting.gridVec[crafting.activeCell] != nullptr) // if clicked cell has a recipe
+						{
+							printf("Inside crafting table, activeCell == %d", crafting.activeCell);
+							crafting.Tellinfo(mx, my, ReqChart);
+							//crafting.activeCell = NULLINT;
+						}
+						else
+						{
+							crafting.activeCell = NULLINT;
+						}
+					}
+					else
+					{
+					}
+				}
+				else if (toolbar.activeCell == NULLINT && inventory.CheckClick(mx, my) == -2) // if inventory highlighted
+				{
+					inventory.TryTransfer(mx, my, toolbar);
+					if (inventory.activeCell == NULLINT) // if item transferred to toolbar
+					{
+						// do nothing
+					}
+					else
+					{
+						inventory.TryTransfer(mx, my, ReqChart, 1);
+					}
+					inventory.activeCell = NULLINT;
+					inventory.transfer = FALSE;
+				}
+				else if (inventory.activeCell == NULLINT && toolbar.CheckClick(mx, my) == -2) // if toolbar highlighted
+				{
+					toolbar.TryTransfer(mx, my, inventory);
+					if (toolbar.activeCell == NULLINT)
+					{
+						// do nothing
+					}
+					else
+					{
+						toolbar.TryTransfer(mx, my, ReqChart, 1);
+					}
+					toolbar.activeCell = NULLINT;
+					toolbar.transfer = FALSE;
+				}
+				else
+				{
+				}
 				break;
 			}
 			else
@@ -208,12 +283,13 @@ int main(void)
 
 		if (!camera.cursorLock)
 		{
-			rectGrid.Draw();
-			toolbar.Draw();
-
+			inventory.Draw();
 			crafting.Draw();
 			ReqChart.Draw();
+			but.Draw(but.x, but.y);
 		}
+
+		toolbar.Draw(); // always draw the toolbar
 
 		{ // draw crosshairs
 			glLineWidth(1);
