@@ -31,9 +31,13 @@ class Item
 {
 public:
 	Item();
+	void copyFrom(const Item &fromItem);
+	Item(const std::unique_ptr<Item> &fromPtr);
+	Item &operator=(const std::unique_ptr<Item> &fromPtr);
 	~Item();
 	int color[3] = { 0,0,0 };
 	int quantity = 1;
+	int weight = 0;
 	double range;
 	int damage; // health dmg dealt
 	int health; // restorative hp amount
@@ -57,7 +61,6 @@ public:
 class Material : public Item
 {
 public:
-	int weight = 0;
 	Material();
 	~Material();
 	Material(char perm[], int q);
@@ -69,18 +72,21 @@ class Useable : public Item
 {
 public:
 	Useable() {}
+	~Useable() {}
 };
 
 class Weapon : public Item
 {
 public:
 	Weapon() {}
+	~Weapon() {}
 };
 
 class Recipe : public Item
 {
 public:
 	Recipe() {}
+	~Recipe() {}
 };
 
 class Axe : public Weapon
@@ -134,7 +140,6 @@ public:
 	void TryTransfer(int &mx, int &my, Grid &other, int number);
 	void AddPermElement(void);
 	void Tellinfo(int &mx, int &my, Grid &other);
-	int InfoCell(std::unique_ptr<Item> &origin);
 };
 
 class Button
@@ -142,6 +147,7 @@ class Button
 public:
 	int x, y;
 	Button();
+	~Button() {}
 	void Draw(int x, int y);
 	bool CheckCrafting(Grid &ReqChart);
 	int ClickCheck(int &mx, int &my);

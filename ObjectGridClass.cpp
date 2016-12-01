@@ -12,6 +12,33 @@ Item::Item()
 {
 }
 
+void Item::copyFrom(const Item &fromItem)
+{
+	quantity = fromItem.quantity;
+	weight = fromItem.weight;
+	range = fromItem.range;
+	damage = fromItem.damage; // health dmg dealt
+	health = fromItem.health; // restorative hp amount
+	strength = fromItem.strength; // durability vs another object
+	speed = fromItem.speed; // cooldown timer, in seconds
+	hitscan = fromItem.hitscan; // true = instant, false = projectile
+	strcpy(name, fromItem.name);
+	stackable = fromItem.stackable;
+	highlight = fromItem.highlight;
+	outline = fromItem.outline;
+}
+
+Item &Item::operator=(const std::unique_ptr<Item> &fromPtr)
+{
+	copyFrom(*fromPtr);
+	return *this;
+}
+
+Item::Item(const std::unique_ptr<Item> &fromPtr)
+{
+	copyFrom(*fromPtr);
+}
+
 Item::~Item()
 {
 }
@@ -166,8 +193,9 @@ bool Grid::AddElement(std::unique_ptr<Item> &item)
 		i++;
 		if (elem == nullptr)
 		{
-			elem = std::move(item);
-			printf("New item added to cell %d\n", i);
+			elem = std::move(item->craftedItem); // removes crafted item from recipe -> not good
+			//elem.reset(item->craftedItem);
+			//*elem = item;
 			return TRUE;
 		}
 	}
@@ -321,26 +349,6 @@ bool Grid::InsideBounds(int &mx, int &my)
 	return xLeft + xBorder < mx && xRight - xBorder > mx && yTop + yBorder < my && yBottom - yBorder > my;
 }
 
-//void Grid::TryTransfer(int &mx, int &my, Grid &other)
-//{
-//	printf("Try transferring");
-//	other.transfer = TRUE;
-//	gridVec[activeCell]->highlight = FALSE;
-//	int destIndex = other.CheckClick(mx, my);
-//	printf("dest index = %d\n", destIndex);
-//	if (destIndex >= 0 && destIndex < other.rows*other.cols)
-//	{
-//		printf("Before Transfer");
-//		MoveCell(gridVec[activeCell], other.gridVec[destIndex]);
-//		printf("After Transfer");
-//	}
-//	printf("Past");
-//	activeCell = NULLINT;
-//	other.activeCell = NULLINT;
-//	transfer = FALSE;
-//	other.transfer = FALSE;
-//}
-
 void Grid::TryTransfer(int &mx, int &my, Grid &other)
 {
 	printf("Try transferring");
@@ -469,28 +477,6 @@ void Grid::Tellinfo(int &mx, int &my,Grid &other)
 	}
 	printf("Done with Items\n");
 }
-
-//int Grid::InfoCell(std::unique_ptr<Item> &origin)
-//{
-//	auto &orig = *origin;
-//
-//	printf("Showing Info %s\n",orig.name);
-//	
-//	orig.highlight = FALSE;
-//
-//	if (strcmp(orig.name, "Axe") == 0)
-//	{
-//		printf("In here");
-//		return 1;
-//	}
-//	else if (strcmp(orig.name, "Plank") == 0)
-//	{
-//		return 2;
-//	}
-//	else
-//		return 0;
-//	activeCell = NULLINT;
-//}
 
 Button::Button()
 {

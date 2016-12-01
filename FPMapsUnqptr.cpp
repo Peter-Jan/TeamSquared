@@ -148,6 +148,9 @@ int main(void)
 					if (but.CheckCrafting(ReqChart))
 					{
 						printf("\nReady to craft!");//then call crafting implementation function
+
+						inventory.AddElement(crafting.gridVec[crafting.activeCell]);
+
 						crafting.activeCell = NULLINT;
 					}
 					else
@@ -177,7 +180,7 @@ int main(void)
 						if (crafting.CheckClick(mx, my) == NULLINT && crafting.gridVec[crafting.activeCell] != nullptr) // if clicked cell has a recipe
 						{
 							// ReturnPartialItems(tempCell)
-							printf("Inside crafting table, activeCell == %d", crafting.activeCell);
+							printf("Inside crafting table, activeCell = %d", crafting.activeCell);
 							crafting.Tellinfo(mx, my, ReqChart);
 						}
 						else

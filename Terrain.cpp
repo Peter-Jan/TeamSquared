@@ -1,8 +1,5 @@
 #include "Terrain.h"
 
-
-
-
 int BlockDist(const Block &block1, const Block &block2)
 {
 	return abs(block1.getX() - block2.getX()) + abs(block1.getY() - block2.getY()) + abs(block1.getZ() - block2.getZ());
@@ -355,35 +352,6 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera, bool textures
 			}
 		}
 		glEnd();
-		//glBegin(GL_LINES);
-		//for (auto &keyVal : renderMap)
-		//{
-		//	auto &b = blockMap[keyVal.second];
-		//	for (int i = 0; i < 3; i++)
-		//	{
-		//		dist[i] = b->centerPos[i] - camera.playerBlock.centerPos[i]; // get cam->object vector
-		//	}
-		//	
-		//	lenObj = VecLen(dist); // get cam->object scalar distance
-		//	if (lenObj <= 30)
-		//	{
-		//		b->DrawEdges();
-		//	}
-		//	else if (lenObj > camera.farZ)
-		//	{
-		//		// don't render
-		//	}
-		//	else
-		//	{
-		//		dist[0] /= lenObj; dist[1] /= lenObj; dist[2] /= lenObj; // unit-normalize
-		//		coneDist = Dot(dist, camera.forwardVector);
-		//		if (coneDist >= camera.coneAngle)
-		//		{
-		//			b->DrawEdges();
-		//		}
-		//	}
-		//}
-		//glEnd();
 	}
 	else
 	{
@@ -435,33 +403,6 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera, bool textures
 		}
 		glEnd();
 
-		//glBegin(GL_LINES);
-		//for (auto &keyVal : blockMap)
-		//{
-		//	auto &b = keyVal.second;
-		//	for (int i = 0; i < 3; i++)
-		//	{
-		//		dist[i] = b->centerPos[i] - camera.playerBlock.centerPos[i]; // get cam->object vector
-		//	}
-		//	lenObj = VecLen(dist); // get cam->object scalar distance
-		//	if (lenObj <= 30)
-		//	{
-		//		b->DrawEdges();
-		//	}
-		//	else if (lenObj > camera.farZ)
-		//	{
-		//		// don't render
-		//	}
-		//	else 			{
-		//		dist[0] /= lenObj; dist[1] /= lenObj; dist[2] /= lenObj; // unit-normalize
-		//		coneDist = Dot(dist, camera.forwardVector);
-		//		if (coneDist >= camera.coneAngle)
-		//		{
-		//			b->DrawEdges();
-		//		}
-		//	}
-		//}
-		//glEnd();
 	}
 }
 
@@ -510,13 +451,6 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 				}
 			}
 			glEnd();
-			/*glBegin(GL_LINES);
-			glColor3ub(0, 0, 0);
-			for (auto &keyVal : renderMap)
-			{
-				blockMap[keyVal.first]->DrawEdges();
-			}
-			glEnd();*/
 		}
 		else
 		{
@@ -538,14 +472,6 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 				}
 			}
 			glEnd();
-
-			/*glBegin(GL_LINES);
-			glColor3ub(0, 0, 0);
-			for (auto &keyVal : blockMap)
-			{
-				keyVal.second->DrawEdges();
-			}
-			glEnd();*/
 		}
 	}
 }
