@@ -64,8 +64,6 @@ void Item::Draw(int x0, int y0, int x1, int y1)
 	glVertex2i(x1, y1);
 	glVertex2i(x0, y1);
 	glEnd();
-
-
 }
 
 Material::Material()
@@ -359,14 +357,6 @@ int Grid::CheckClick(int &mx, int &my)
 		return -2;
 	}
 }
-
-//void Grid::AddPermElement()
-//{
-//	std::unique_ptr<Item> Axe(new Material("Axe",1));
-//	this->AddElement(Axe);
-//	std::unique_ptr<Item> Plank(new Material("Plank",1));
-//	this->AddElement(Plank);
-//}
 
 void Grid::AddPermElement()
 {

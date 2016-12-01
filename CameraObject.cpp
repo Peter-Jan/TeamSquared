@@ -275,205 +275,200 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 		FsGetMouseState(lb, mb, rb, pastmx, pastmy);
 #endif
 
-		if (cursorLock == 0) // arrowView-control
-		{
-			if (FsGetKeyState(FSKEY_LEFT))
-			{
-				h += YsPi / 240.0;
-			}
-			if (FsGetKeyState(FSKEY_RIGHT))
-			{
-				h -= YsPi / 240.0;
-			}
-			if (FsGetKeyState(FSKEY_UP))
-			{
-				p += YsPi / 240.0;
-			}
-			if (FsGetKeyState(FSKEY_DOWN))
-			{
-				p -= YsPi / 240.0;
-			}
-		}
-		if (!stationary)
-		{
-			std::vector<double> delta = { 0,0,0 };
-			std::vector<double> curFV = { 0,0,0 };
-			SetVec(curFV, forwardVector);
-			if (gravityOn)
-				{
-					curFV[1] = 0;
-				}
-			if (FsGetKeyState(FSKEY_W))
-			{
-				dx += curFV[0];
-				dy += curFV[1];
-				dz += curFV[2];
-				//VecPlus(pos, curFV);
-			}
-			if (FsGetKeyState(FSKEY_S))
-			{
-				dx -= curFV[0];
-				dy -= curFV[1];
-				dz -= curFV[2];
-				//VecMinus(pos, curFV);
-			}
-			if (FsGetKeyState(FSKEY_D))
-			{
-				dx -= curFV[2];
-				dz += curFV[0];
-			}
-			if (FsGetKeyState(FSKEY_A))
-			{
-				dz += curFV[2];
-				dx -= curFV[0];
-			}
-			hitCheck(blockMap, curFV);
-
-			if (gravityOn)
-			{
-				//printf("Gravity On");
-				index = (xGrid()) + (zGrid()*roomSize) + ((yGrid()-1)*pow(roomSize, 2));
-				int index1 = (xGrid()) + (zGrid()*roomSize) + (yGrid()*pow(roomSize, 2));
-
-				if (blockMap.find(index) != blockMap.end())
-				{
-					printf("GROUNDED");
-					pos[1] = yGrid() * 8 ;
-					vertVel = 0.0;
-				}
-				if (key == FSKEY_SPACE)
-				{
-					printf("JUMPING");
-					vertVel += 4.0;
-					pos[1] += vertVel;
-					//jumps--;
-				}
-
-
-				if (blockMap.find(index) == blockMap.end())
-				{
-
-					printf("vertVel: %lf \n",vertVel);
-
-					vertVel += GRAV;
-					pos[1] += vertVel;
-
-					printf("FALLING");
-				}
-
-
-
-			}
-			else // Gravity Off
-			{
-				if (FsGetKeyState(FSKEY_1))
-				{
-					pos[1] += 2.0;
-				}
-				if (FsGetKeyState(FSKEY_2) && pos[1] >= 0)
-				{
-					pos[1] -= 2.0;
-				}
-			}
-
-			if (FsGetKeyState(FSKEY_CTRL))
-			{
-				camHeight = playerBlock.blockSize / 2.0;
-			}
-			else
-			{
-				camHeight = 12.0;
-			}
-			//printf("%lf\n\n", camHeight);
-			playerBlock.setPosition(pos[0] - playerBlock.blockSize / 2.0, pos[1], pos[2] - playerBlock.blockSize / 2.0);
-			SetGridLocation();
-		}
-
-		if (FsGetKeyState(FSKEY_PLUS))
-		{
-			if (viewRadius <= 1000)
-			{
-				viewRadius += 100;
-			}
-		}
-		if (FsGetKeyState(FSKEY_MINUS))
-		{
-			if (viewRadius > 0)
-			{
-				viewRadius -= 100;
-			}
-		}
-		//printf("%lf %lf %lf\n", playerBlock.pos[0], playerBlock.pos[1], playerBlock.pos[2]);
-		DrawCamera();
-		SetFrustrumCriteria();
-	}
-
-	void CameraObject::hitCheck(std::map<int, std::unique_ptr<Block>> &blockMap, std::vector<double> &curFV)
+	if (cursorLock == 0) // arrowView-control
 	{
-		double xmid, zmid,x1mid,z1mid,ymid,y1mid;
-		double px0, px1, pz0,pz1,py0,py1;
-		int xleft = 0; 
-		int xright = 0;
-		int yleft = 0;
-		int yright = 0;
-		int zleft = 0;
-		int zright = 0;
-
-
-		x1mid = pos[0] + curFV[0] ;
-		z1mid = pos[2] + curFV[2] ;
-
-		px0 = ((int)pos[0]%blockSize) / (blockSize / 4);
-		pz0 = ((int)pos[2]%blockSize) / (blockSize / 4);
-		px1 = ((int)x1mid%blockSize) / (blockSize / 4);
-		pz1 = ((int)z1mid%blockSize) / (blockSize / 4);
-
-		
-		//printf("px0: %lf pz0: %lf, px1: %lf, pz1: %lf \n", px0,pz0,px1,pz1);
-		//printf("x: %lf, z: %lf \n", x1mid,z1mid);
-		if (px1 != px0 || pz1 != pz0 )
+		if (FsGetKeyState(FSKEY_LEFT))
 		{
-			if (px1 == 0)
-			{
-				index = (xGrid() - 1) + (zGrid()*roomSize) + (yGrid()*pow(roomSize, 2));
-				if (blockMap.find(index) == blockMap.end())
-				{
-					pos[0] += dx;
-				}
-			}
-
-			if (px1 == 3)
-			{
-				index = (xGrid() + 1) + (zGrid()*roomSize) + (yGrid()*pow(roomSize, 2));
-				if (blockMap.find(index) == blockMap.end())
-				{
-					pos[0] += dx;
-				}
-			}
-
-			if (pz1 == 0)
-			{
-				index = xGrid() + ((zGrid() - 1)*roomSize) + (yGrid()*pow(roomSize, 2));
-				if (blockMap.find(index) == blockMap.end())
-				{
-					pos[2] += dz;
-				}
-			}
-
-			if (pz1 == 3)
-			{
-				index = (xGrid() ) + ((zGrid() + 1)*roomSize) + (yGrid()*pow(roomSize, 2));
-				if (blockMap.find(index) == blockMap.end())
-				{
-					pos[2] += dz;
-				}
-			}
-
-
-			//index = (xGrid()) + (zGrid() *roomSize) + ((yGrid()-1)*pow(roomSize, 2));
-			//if (blockMap.find(index) == blockMap.end())
-			//{
-			//	gravityOn = TRUE;
-			//}
+			h += YsPi / 240.0;
+		}
+		if (FsGetKeyState(FSKEY_RIGHT))
+		{
+			h -= YsPi / 240.0;
+		}
+		if (FsGetKeyState(FSKEY_UP))
+		{
+			p += YsPi / 240.0;
+		}
+		if (FsGetKeyState(FSKEY_DOWN))
+		{
+			p -= YsPi / 240.0;
 		}
 	}
+	if (!stationary)
+	{
+		std::vector<double> delta = { 0,0,0 };
+		std::vector<double> curFV = { 0,0,0 };
+		SetVec(curFV, forwardVector);
+		if (gravityOn)
+		{
+			curFV[1] = 0;
+		}
+		if (FsGetKeyState(FSKEY_W))
+		{
+			dx += curFV[0];
+			dy += curFV[1];
+			dz += curFV[2];
+			//VecPlus(pos, curFV);
+		}
+		if (FsGetKeyState(FSKEY_S))
+		{
+			dx -= curFV[0];
+			dy -= curFV[1];
+			dz -= curFV[2];
+			//VecMinus(pos, curFV);
+		}
+		if (FsGetKeyState(FSKEY_D))
+		{
+			dx -= curFV[2];
+			dz += curFV[0];
+		}
+		if (FsGetKeyState(FSKEY_A))
+		{
+			dz += curFV[2];
+			dx -= curFV[0];
+		}
+		hitCheck(blockMap, curFV);
+
+		if (gravityOn)
+		{
+			//printf("Gravity On");
+			index = (xGrid()) + (zGrid()*roomSize) + ((yGrid() - 1)*pow(roomSize, 2));
+			int index1 = (xGrid()) + (zGrid()*roomSize) + (yGrid()*pow(roomSize, 2));
+
+			if (blockMap.find(index) != blockMap.end())
+			{
+				printf("GROUNDED");
+				pos[1] = yGrid() * 8;
+				vertVel = 0.0;
+			}
+			if (key == FSKEY_SPACE)
+			{
+				printf("JUMPING");
+				vertVel += 4.0;
+				pos[1] += vertVel;
+				//jumps--;
+			}
+
+			if (blockMap.find(index) == blockMap.end())
+			{
+
+				printf("vertVel: %lf \n", vertVel);
+
+				vertVel += GRAV;
+				pos[1] += vertVel;
+
+				printf("FALLING");
+			}
+		}
+		else // Gravity Off
+		{
+			if (FsGetKeyState(FSKEY_1))
+			{
+				pos[1] += 2.0;
+			}
+			if (FsGetKeyState(FSKEY_2) && pos[1] >= 0)
+			{
+				pos[1] -= 2.0;
+			}
+		}
+
+		if (FsGetKeyState(FSKEY_CTRL))
+		{
+			camHeight = playerBlock.blockSize / 2.0;
+		}
+		else
+		{
+			camHeight = 12.0;
+		}
+		//printf("%lf\n\n", camHeight);
+		playerBlock.setPosition(pos[0] - playerBlock.blockSize / 2.0, pos[1], pos[2] - playerBlock.blockSize / 2.0);
+		SetGridLocation();
+	}
+
+	if (FsGetKeyState(FSKEY_PLUS))
+	{
+		if (viewRadius <= 1000)
+		{
+			viewRadius += 100;
+		}
+	}
+	if (FsGetKeyState(FSKEY_MINUS))
+	{
+		if (viewRadius > 0)
+		{
+			viewRadius -= 100;
+		}
+	}
+	//printf("%lf %lf %lf\n", playerBlock.pos[0], playerBlock.pos[1], playerBlock.pos[2]);
+	DrawCamera();
+	SetFrustrumCriteria();
+}
+
+void CameraObject::hitCheck(std::map<int, std::unique_ptr<Block>> &blockMap, std::vector<double> &curFV)
+{
+	double xmid, zmid, x1mid, z1mid, ymid, y1mid;
+	double px0, px1, pz0, pz1, py0, py1;
+	int xleft = 0;
+	int xright = 0;
+	int yleft = 0;
+	int yright = 0;
+	int zleft = 0;
+	int zright = 0;
+
+	x1mid = pos[0] + curFV[0];
+	z1mid = pos[2] + curFV[2];
+
+	px0 = ((int)pos[0] % blockSize) / (blockSize / 4);
+	pz0 = ((int)pos[2] % blockSize) / (blockSize / 4);
+	px1 = ((int)x1mid%blockSize) / (blockSize / 4);
+	pz1 = ((int)z1mid%blockSize) / (blockSize / 4);
+
+
+	//printf("px0: %lf pz0: %lf, px1: %lf, pz1: %lf \n", px0,pz0,px1,pz1);
+	//printf("x: %lf, z: %lf \n", x1mid,z1mid);
+	if (px1 != px0 || pz1 != pz0)
+	{
+		if (px1 == 0)
+		{
+			index = (xGrid() - 1) + (zGrid()*roomSize) + (yGrid()*pow(roomSize, 2));
+			if (blockMap.find(index) == blockMap.end())
+			{
+				pos[0] += dx;
+			}
+		}
+
+		if (px1 == 3)
+		{
+			index = (xGrid() + 1) + (zGrid()*roomSize) + (yGrid()*pow(roomSize, 2));
+			if (blockMap.find(index) == blockMap.end())
+			{
+				pos[0] += dx;
+			}
+		}
+
+		if (pz1 == 0)
+		{
+			index = xGrid() + ((zGrid() - 1)*roomSize) + (yGrid()*pow(roomSize, 2));
+			if (blockMap.find(index) == blockMap.end())
+			{
+				pos[2] += dz;
+			}
+		}
+
+		if (pz1 == 3)
+		{
+			index = (xGrid()) + ((zGrid() + 1)*roomSize) + (yGrid()*pow(roomSize, 2));
+			if (blockMap.find(index) == blockMap.end())
+			{
+				pos[2] += dz;
+			}
+		}
+
+
+		//index = (xGrid()) + (zGrid() *roomSize) + ((yGrid()-1)*pow(roomSize, 2));
+		//if (blockMap.find(index) == blockMap.end())
+		//{
+		//	gravityOn = TRUE;
+		//}
+	}
+}

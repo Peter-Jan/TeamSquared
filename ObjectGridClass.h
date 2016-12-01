@@ -34,6 +34,7 @@ public:
 	void Increase(int quant);
 	void Decrease(int quant);
 	void Draw(int x0, int y0, int x1, int y1);
+	void virtual Use();
 	std::vector<std::unique_ptr<Item>> materialList;
 };
 
