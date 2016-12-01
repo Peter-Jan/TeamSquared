@@ -14,7 +14,8 @@ const double YsPi = 3.1415927;
 #define ADD 1
 #define REMOVE 0
 const int WINWID = 800, WINHEI = 600;
-const double GRAV = -.09;
+const int dt = 5;
+const double GRAV = -1*(double)dt/1000.0;
 
 template <class NumType>
 void VecPlus(std::vector<NumType> &first, std::vector<NumType> &second) // add second vec to first

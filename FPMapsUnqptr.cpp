@@ -9,8 +9,8 @@ int main(void)
 	int terminate = 0;
 	int lb, mb, rb, mx, my, mouseEvent, key = 0;
 	int drawCount = 0;
-	CameraObject camera, camera2;
 	Terrain worldGrid(30, 2);
+	CameraObject camera(worldGrid.roomSize), camera2(worldGrid.roomSize);
 	worldGrid.texId=decodePng();
 
 	// texX, texY, bgColor[3], health, quantity
@@ -188,7 +188,7 @@ int main(void)
 				printf("IN RIGHT BUTTON\n");
 				if (worldGrid.FindBlock(camera, xGrid, yGrid, zGrid, REMOVE))
 				{
-					if (xGrid != camera.xGrid() || (yGrid != camera.yGrid() && yGrid != camera.yGrid() + 1) || zGrid != camera.zGrid())
+					if (xGrid != camera.xGrid() || yGrid != camera.yGrid() || zGrid != camera.zGrid())
 					{
 						printf("Found one at %d %d %d\n", xGrid, yGrid, zGrid);
 						worldGrid.RemoveBlock(xGrid, yGrid, zGrid);
@@ -287,7 +287,7 @@ int main(void)
 
 		// 2D drawing from here
 		FsSwapBuffers();
-		FsSleep(5);
+		FsSleep(dt);
 	}
 
 	return 0;

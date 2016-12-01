@@ -3,12 +3,18 @@
 
 CameraObject::CameraObject()
 {
-	Initialize(0.0, 0.0, 0.0);
+	roomSize = 100;
+	Initialize(roomSize, 0.0, 0.0, 0.0);
 }
 
-CameraObject::CameraObject(double startX, double startY, double startZ)
+CameraObject::CameraObject(int roomSize)
 {
-	Initialize(startX, startY, startZ);
+	Initialize(roomSize, 0.0, 0.0, 0.0);
+}
+
+CameraObject::CameraObject(int roomSize, double startX, double startY, double startZ)
+{
+	Initialize(roomSize, startX, startY, startZ);
 }
 
 double CameraObject::x(void)
@@ -56,9 +62,11 @@ int CameraObject::zGrid(void) const
 	return gridLocation[2];
 }
 
-void CameraObject::Initialize(double startX, double startY, double startZ)
+void CameraObject::Initialize(int roomSizeIn, double startX, double startY, double startZ)
 {
+	roomSize = roomSizeIn;
 	SetVec(pos, startX, startY, startZ);
+	dxMove = 0; dyMove = 0; dzMove = 0;
 	h = 0;
 	p = 0;
 	b = 0;
@@ -67,11 +75,14 @@ void CameraObject::Initialize(double startX, double startY, double startZ)
 	jumps = 5;
 	blockSize = 8;
 
+	jumpVel = sqrt(3.0 * (double)blockSize*-GRAV);
+	printf("JumpVel = %lf\n", jumpVel);
+
 	playerBlock.setCoordinate(startX, 0, startY);
 	playerBlock.blockSize = 8;
 
 	fov = YsPi / 6.0;  // 30 degree
-	nearZ = 2;
+	nearZ = 1;
 	farZ = 1000.0;
 	viewRadius = 1000;
 	zoom = 0.0;
@@ -296,7 +307,6 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 	}
 	if (!stationary)
 	{
-		std::vector<double> delta = { 0,0,0 };
 		std::vector<double> curFV = { 0,0,0 };
 		SetVec(curFV, forwardVector);
 		if (gravityOn)
@@ -305,74 +315,55 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 		}
 		if (FsGetKeyState(FSKEY_W))
 		{
-			dxMove += curFV[0];
-			dyMove += curFV[1];
-			dzMove += curFV[2];
+			dxMove += curFV[0] / 2.0;
+			dyMove += curFV[1] / 2.0;
+			dzMove += curFV[2] / 2.0;
 			//VecPlus(pos, curFV);
 		}
 		if (FsGetKeyState(FSKEY_S))
 		{
-			dxMove -= curFV[0];
-			dyMove -= curFV[1];
-			dzMove -= curFV[2];
+			dxMove -= curFV[0] / 2.0;
+			dyMove -= curFV[1] / 2.0;
+			dzMove -= curFV[2] / 2.0;
 			//VecMinus(pos, curFV);
 		}
 		if (FsGetKeyState(FSKEY_D))
 		{
-			dxMove -= curFV[2];
-			dzMove += curFV[0];
+			dxMove -= curFV[2] / 2.0;
+			dzMove += curFV[0] / 2.0;
 		}
 		if (FsGetKeyState(FSKEY_A))
 		{
-			dzMove += curFV[2];
-			dxMove -= curFV[0];
+			dxMove += curFV[2] / 2.0;
+			dzMove -= curFV[0] / 2.0;
 		}
-		hitCheck(blockMap, curFV);
 
 		if (gravityOn)
 		{
 			//printf("Gravity On");
-			index = (xGrid()) + (zGrid()*roomSize) + ((yGrid() - 1)*pow(roomSize, 2));
-			int index1 = (xGrid()) + (zGrid()*roomSize) + (yGrid()*pow(roomSize, 2));
 
-			if (blockMap.find(index) != blockMap.end())
-			{
-				printf("GROUNDED");
-				pos[1] = yGrid() * 8;
-				vertVel = 0.0;
-			}
-			if (key == FSKEY_SPACE)
+			if (key == FSKEY_SPACE && jumps != 0)
 			{
 				printf("JUMPING");
-				vertVel += 4.0;
-				pos[1] += vertVel;
-				//jumps--;
+				vertVel = jumpVel;
+				jumps--;
 			}
-
-
-			if (blockMap.find(index) == blockMap.end())
+			else
 			{
-
-				printf("vertVel: %lf \n", vertVel);
-
 				vertVel += GRAV;
-				pos[1] += vertVel;
-
-				printf("FALLING");
 			}
 
-
-
+			dyMove = vertVel;
 		}
 		else // Gravity Off
 		{
 			if (FsGetKeyState(FSKEY_1))
 			{
-				pos[1] += 2.0;
+				dyMove += 1.0;
 			}
 			if (FsGetKeyState(FSKEY_2) && pos[1] >= 0)
 			{
-				pos[1] -= 2.0;
+				dyMove -= 1.0;
 			}
 		}
 
@@ -384,9 +375,10 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 		{
 			camHeight = 12.0;
 		}
-		//printf("%lf\n\n", camHeight);
+		hitCheck(blockMap, curFV);
 		playerBlock.setPosition(pos[0] - playerBlock.blockSize / 2.0, pos[1], pos[2] - playerBlock.blockSize / 2.0);
 		SetGridLocation();
+		dxMove = 0; dyMove = 0; dzMove = 0;
 	}
 
 	if (FsGetKeyState(FSKEY_PLUS))
@@ -403,76 +395,139 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 			viewRadius -= 100;
 		}
 	}
-	//printf("%lf %lf %lf\n", playerBlock.pos[0], playerBlock.pos[1], playerBlock.pos[2]);
+
 	DrawCamera();
 	SetFrustrumCriteria();
 }
 
 void CameraObject::hitCheck(std::map<int, std::unique_ptr<Block>> &blockMap, std::vector<double> &curFV)
 {
+	printf("roomSize = %d\n", roomSize);
 	double px0, px1, pz0, pz1, py0, py1;
-	int checkX, checkY, checkZ;
+	int cx0, cy0, cz0, checkX, checkY, checkZ;
 
-	px1 = pos[0] + dxMove;
-	pz1 = pos[2] + dzMove;
+	px1 = pos[0] + dxMove; // centerblock after move
 	py1 = pos[1] + dyMove;
+	pz1 = pos[2] + dzMove;
 
-	//px0 = ((int)pos[0]%blockSize) / (blockSize / 4);
-	//pz0 = ((int)pos[2]%blockSize) / (blockSize / 4);
+	cx0 = ((int)pos[0] % blockSize) / (blockSize / 4);
+	cy0 = pos[1] / blockSize;
+	cz0 = ((int)pos[2] % blockSize) / (blockSize / 4);
+
 	checkX = ((int)px1%blockSize) / (blockSize / 4);
+	checkY = py1 / blockSize;
 	checkZ = ((int)pz1%blockSize) / (blockSize / 4);
-	checkY = ((int)py1%blockSize) / (blockSize / 4);
 
-
-
-	//printf("px0: %lf pz0: %lf, px1: %lf, pz1: %lf \n", px0,pz0,px1,pz1);
-	//printf("x: %lf, z: %lf \n", x1mid,z1mid);
-	if (dxMove != 0 || dzMove != 0 || dyMove != 0)
+	if (dxMove != 0 && cx0 != checkX && checkX == 0 || checkX == 3)
 	{
-		if (checkX == 0)
+		int xIdx = xGrid() + (dxMove < 0 ? -1 : 1);
+		index = xIdx + zGrid()*roomSize + yGrid()*pow(roomSize, 2);
+		if (xIdx >= 0 && xIdx < roomSize && blockMap.find(index) == blockMap.end()) // crouch check needs to be added
 		{
-			index = (xGrid() - 1) + (zGrid()*roomSize) + (yGrid()*pow(roomSize, 2));
-			if (blockMap.find(index) == blockMap.end())
+			if (camHeight == (playerBlock.blockSize / 2.0) || blockMap.find(index + pow(roomSize, 2)) == blockMap.end()) // if crouching
 			{
 				pos[0] += dxMove;
 			}
-		}
-
-		if (checkX == 3)
-		{
-			index = (xGrid() + 1) + (zGrid()*roomSize) + (yGrid()*pow(roomSize, 2));
-			if (blockMap.find(index) == blockMap.end())
+			else
 			{
-				pos[0] += dxMove;
+				pos[0] = xGrid()*blockSize + (dxMove < 0 ? +blockSize / 4.0 : blockSize*3.0 / 4.0);
 			}
 		}
-
-		if (checkX == 1 || checkX == 2)
+		else
 		{
-			pos[0] += dxMove;
+			pos[0] = xGrid()*blockSize + (dxMove < 0 ? +blockSize / 4.0 : blockSize*3.0 / 4.0);
 		}
+	}
+	else
+	{
+		pos[0] += dxMove;
+	}
 
-		if (checkZ == 0)
+	if (dzMove != 0 && cz0 != checkZ && checkZ == 0 || checkZ == 3) // check Z direction
+	{
+		int zIdx = zGrid() + (dzMove < 0 ? -1 : 1);
+		index = xGrid() + zIdx*roomSize + yGrid()*pow(roomSize, 2);
+		if (zIdx >= 0 && zIdx < roomSize && blockMap.find(index) == blockMap.end())
 		{
-			index = xGrid() + ((zGrid() - 1)*roomSize) + (yGrid()*pow(roomSize, 2));
-			if (blockMap.find(index) == blockMap.end())
-			{
-				pos[2] += dzMove;
-			}
-		}
-
-		if (checkZ == 3)
-		{
-			index = (xGrid()) + ((zGrid() + 1)*roomSize) + (yGrid()*pow(roomSize, 2));
-			if (blockMap.find(index) == blockMap.end())
+			printf("CamHeight = %d", camHeight);
+			if (camHeight == (playerBlock.blockSize / 2.0) || blockMap.find(index + pow(roomSize, 2)) == blockMap.end()) // crouch check needs to be added
 			{
 				pos[2] += dzMove;
 			}
+			else
+			{
+				pos[2] = zGrid()*blockSize + (dzMove < 0 ? +blockSize / 4.0 : blockSize*3.0 / 4.0);
+			}
 		}
-		if (checkZ == 1 || checkZ == 2)
+		else
 		{
-			pos[2] += dzMove;
+			pos[2] = zGrid()*blockSize + (dzMove < 0 ? +blockSize / 4.0 : blockSize*3.0 / 4.0);
 		}
+	}
+	else
+	{
+		pos[2] += dzMove;
+	}
 
+	if (dyMove != 0 && cy0 != checkY) // check Y direction, only for falling
+	{
+		int yIdx = yGrid() + (dyMove < 0 ? -1 : 2);
+		index = xGrid() + zGrid()*roomSize + yIdx*pow(roomSize, 2);
+		if (dyMove <= 0) // falling or standing
+		{
+			if (blockMap.find(index) != blockMap.end()) // hit floor
+			{
+				jumps = 5;
+				vertVel = 0;
+				pos[1] = yGrid()*blockSize;
+			}
+			else
+			{
+				pos[1] += dyMove;
+			}
+			if (dyMove == GRAV && blockMap.find(index + 2 * pow(roomSize, 2)) != blockMap.end()) // stay crouched if there's a block right above you
+			{
+				camHeight = blockSize / 2.0;
+			}
+		}
+		else // jumping
+		{
+			if (camHeight == blockSize / 2.0) // crouching
+			{
+				if (blockMap.find(index) != blockMap.end()) // hit ceiling crouched
+				{
+					vertVel = 0;
+					pos[1] = (yGrid()+1)*blockSize;
+				}
+				else
+				{
+					pos[1] += dyMove;
+				}
+			}
+			else
+			{
+				if (blockMap.find(index) != blockMap.end() || blockMap.find(index + pow(roomSize, 2)) != blockMap.end()) // hit ceiling un-crouched
+				{
+					vertVel = 0;
+					pos[1] = yGrid()*blockSize;
+				}
+				else
+				{
+					pos[1] += dyMove;
+				}
+			}
+		}
+	}
+	else // didn't cross boundary
+	{
+		if (dyMove > 0 && camHeight != blockSize/2.0 && blockMap.find(xGrid() + zGrid()*roomSize + (yGrid() + 2)*pow(roomSize, 2)) != blockMap.end())
+		{
+			vertVel = 0;
+			pos[1] = yGrid()*blockSize;
+		}
+		else
+		{
+			pos[1] += dyMove;
+		}
 	}
 }

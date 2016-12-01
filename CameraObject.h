@@ -13,10 +13,11 @@ class CameraObject
 public:
 	//double x, y, z;
 	double grav = 0;
-	int roomSize=100;
+	int roomSize = 0;
 	int index = 0;
 	double h, p, b;
 	double dxMove, dyMove, dzMove;
+	double jumpVel;
 	double vertVel, camHeight, zoom, viewRadius, sensitivity, fov, nearZ, farZ, coneAngle;
 	std::vector<double> forwardVector = { 0,0,0 };
 	std::vector<double> pos = { 0,0,0 };
@@ -39,9 +40,10 @@ public:
 	int zGrid(void) const;
 
 	CameraObject();
-	CameraObject(double xLoc, double yLoc, double zLoc);
+	CameraObject(int roomSize);
+	CameraObject(int roomSize, double xLoc, double yLoc, double zLoc);
 
-	void Initialize(double startX, double startY, double startZ);
+	void Initialize(int roomSize, double startX, double startY, double startZ);
 	void SetUpCameraProjection(void);
 	void SetUpCameraTransformation(void);
 	void DrawCamera(void);
@@ -51,9 +53,7 @@ public:
 	void GetForwardVector(void);
 	void inline SetGridLocation(void);
 	void inline SetFrustrumCriteria(void);
-	void Update(int &key,std::map<int, std::unique_ptr<Block>> &blockMap );
+	void Update(int &key,std::map<int, std::unique_ptr<Block>> &blockMap);
 };
-
-
 
 #endif // !CAMERA_CLASS_INCLUDED
