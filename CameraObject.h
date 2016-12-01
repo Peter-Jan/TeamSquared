@@ -16,7 +16,7 @@ public:
 	int roomSize=100;
 	int index = 0;
 	double h, p, b;
-	double dx, dy, dz;
+	double dxMove, dyMove, dzMove;
 	double vertVel, camHeight, zoom, viewRadius, sensitivity, fov, nearZ, farZ, coneAngle;
 	std::vector<double> forwardVector = { 0,0,0 };
 	std::vector<double> pos = { 0,0,0 };
