@@ -447,6 +447,11 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 				}
 			}
 
+			if (checkX == 1 || checkX == 2)
+			{
+				pos[0] += dxMove;
+			}
+
 			if (checkZ == 0)
 			{
 				index = xGrid() + ((zGrid() - 1)*roomSize) + (yGrid()*pow(roomSize, 2));
@@ -463,6 +468,10 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 				{
 					pos[2] += dzMove;
 				}
+			}
+			if (checkZ == 1 || checkZ == 2)
+			{
+				pos[2] += dzMove;
 			}
 
 		}
