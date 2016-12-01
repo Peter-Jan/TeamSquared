@@ -283,7 +283,6 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 		}
 		if (FsGetKeyState(FSKEY_RIGHT))
 		{
-<<<<<<< HEAD
 			h -= YsPi / 240.0;
 		}
 		if (FsGetKeyState(FSKEY_UP))
@@ -341,46 +340,15 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 				printf("GROUNDED");
 				pos[1] = yGrid() * 8;
 				vertVel = 0.0;
-=======
-			std::vector<double> delta = { 0,0,0 };
-			std::vector<double> curFV = { 0,0,0 };
-			SetVec(curFV, forwardVector);
-			if (gravityOn)
-				{
-					curFV[1] = 0;
-				}
-			if (FsGetKeyState(FSKEY_W))
-			{
-				dxMove += curFV[0];
-				dyMove += curFV[1];
-				dzMove += curFV[2];
-				//VecPlus(pos, curFV);
-			}
-			if (FsGetKeyState(FSKEY_S))
-			{
-				dxMove -= curFV[0];
-				dyMove -= curFV[1];
-				dzMove -= curFV[2];
-				//VecMinus(pos, curFV);
-			}
-			if (FsGetKeyState(FSKEY_D))
-			{
-				dxMove -= curFV[2];
-				dzMove += curFV[0];
->>>>>>> d3773d842621b91f4e778624765e64de5062498a
 			}
 			if (key == FSKEY_SPACE)
 			{
-<<<<<<< HEAD
 				printf("JUMPING");
 				vertVel += 4.0;
 				pos[1] += vertVel;
 				//jumps--;
-=======
-				dzMove += curFV[2];
-				dxMove -= curFV[0];
->>>>>>> d3773d842621b91f4e778624765e64de5062498a
 			}
+
 
 			if (blockMap.find(index) == blockMap.end())
 			{
@@ -392,6 +360,9 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 
 				printf("FALLING");
 			}
+
+
+
 		}
 		else // Gravity Off
 		{
@@ -403,13 +374,6 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 			{
 				pos[1] -= 2.0;
 			}
-<<<<<<< HEAD
-=======
-			//printf("%lf\n\n", camHeight);
-			hitCheck(blockMap, curFV);
-			playerBlock.setPosition(pos[0] - playerBlock.blockSize / 2.0, pos[1], pos[2] - playerBlock.blockSize / 2.0);
-			SetGridLocation();
->>>>>>> d3773d842621b91f4e778624765e64de5062498a
 		}
 
 		if (FsGetKeyState(FSKEY_CTRL))
@@ -434,7 +398,6 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 	}
 	if (FsGetKeyState(FSKEY_MINUS))
 	{
-<<<<<<< HEAD
 		if (viewRadius > 0)
 		{
 			viewRadius -= 100;
@@ -456,6 +419,7 @@ void CameraObject::hitCheck(std::map<int, std::unique_ptr<Block>> &blockMap, std
 	int zleft = 0;
 	int zright = 0;
 
+
 	x1mid = pos[0] + curFV[0];
 	z1mid = pos[2] + curFV[2];
 
@@ -475,81 +439,27 @@ void CameraObject::hitCheck(std::map<int, std::unique_ptr<Block>> &blockMap, std
 			if (blockMap.find(index) == blockMap.end())
 			{
 				pos[0] += dx;
-=======
-		double px0, px1, pz0,pz1,py0,py1;
-		int checkX, checkY, checkZ;
-
-		px1 = pos[0] + dxMove ;
-		pz1 = pos[2] + dzMove ;
-		py1 = pos[1] + dyMove;
-
-		//px0 = ((int)pos[0]%blockSize) / (blockSize / 4);
-		//pz0 = ((int)pos[2]%blockSize) / (blockSize / 4);
-		checkX = ((int)px1%blockSize) / (blockSize / 4);
-		checkZ = ((int)pz1%blockSize) / (blockSize / 4);
-		checkY = ((int)py1%blockSize) / (blockSize / 4);
-
-
-		
-		//printf("px0: %lf pz0: %lf, px1: %lf, pz1: %lf \n", px0,pz0,px1,pz1);
-		//printf("x: %lf, z: %lf \n", x1mid,z1mid);
-		if (dxMove != 0 || dzMove != 0 || dyMove != 0 )
-		{
-			if (checkX == 0)
-			{
-				index = (xGrid() - 1) + (zGrid()*roomSize) + (yGrid()*pow(roomSize, 2));
-				if (blockMap.find(index) == blockMap.end())
-				{
-					pos[0] += dxMove;
-				}
->>>>>>> d3773d842621b91f4e778624765e64de5062498a
 			}
 		}
 
-<<<<<<< HEAD
 		if (px1 == 3)
 		{
 			index = (xGrid() + 1) + (zGrid()*roomSize) + (yGrid()*pow(roomSize, 2));
 			if (blockMap.find(index) == blockMap.end())
 			{
 				pos[0] += dx;
-=======
-			if (checkX == 3)
-			{
-				index = (xGrid() + 1) + (zGrid()*roomSize) + (yGrid()*pow(roomSize, 2));
-				if (blockMap.find(index) == blockMap.end())
-				{
-					pos[0] += dxMove;
-				}
->>>>>>> d3773d842621b91f4e778624765e64de5062498a
 			}
 		}
 
-<<<<<<< HEAD
 		if (pz1 == 0)
 		{
 			index = xGrid() + ((zGrid() - 1)*roomSize) + (yGrid()*pow(roomSize, 2));
 			if (blockMap.find(index) == blockMap.end())
 			{
 				pos[2] += dz;
-=======
-			if (checkX == 1 || checkX == 2)
-			{
-				pos[0] += dxMove;
-			}
-
-			if (checkZ == 0)
-			{
-				index = xGrid() + ((zGrid() - 1)*roomSize) + (yGrid()*pow(roomSize, 2));
-				if (blockMap.find(index) == blockMap.end())
-				{
-					pos[2] += dzMove;
-				}
->>>>>>> d3773d842621b91f4e778624765e64de5062498a
 			}
 		}
 
-<<<<<<< HEAD
 		if (pz1 == 3)
 		{
 			index = (xGrid()) + ((zGrid() + 1)*roomSize) + (yGrid()*pow(roomSize, 2));
@@ -567,20 +477,3 @@ void CameraObject::hitCheck(std::map<int, std::unique_ptr<Block>> &blockMap, std
 		//}
 	}
 }
-=======
-			if (checkZ == 3)
-			{
-				index = (xGrid() ) + ((zGrid() + 1)*roomSize) + (yGrid()*pow(roomSize, 2));
-				if (blockMap.find(index) == blockMap.end())
-				{
-					pos[2] += dzMove;
-				}
-			}
-			if (checkZ == 1 || checkZ == 2)
-			{
-				pos[2] += dzMove;
-			}
-
-		}
-	}
->>>>>>> d3773d842621b91f4e778624765e64de5062498a
