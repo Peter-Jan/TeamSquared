@@ -34,6 +34,7 @@ public:
 	int lb, mb, rb, mx, my, mouseEvent, key, wid, hei, winx0, winy0, winx1, winy1;
 	int mouseOffsetX = 0, mouseOffsetY = 0;
 	bool cursorLock = FALSE;
+    int cursorHidden = FALSE;
 	bool stationary = FALSE;
 	bool gravityOn = FALSE;
 

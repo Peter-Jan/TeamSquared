@@ -133,10 +133,9 @@ int main(void)
 			}
 			worldGrid.DrawTerrain(camera, reductionMode, key, texturesOn);
 		}
-
+        int xGrid, yGrid, zGrid;
 		switch (FsGetMouseEvent(lb, mb, rb, mx, my))
 		{
-			int xGrid, yGrid, zGrid;
 		case FSMOUSEEVENT_LBUTTONDOWN:
 			printf("USER CLICKED\n");
 

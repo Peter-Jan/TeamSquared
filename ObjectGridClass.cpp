@@ -71,9 +71,13 @@ void Item::Draw(int x0, int y0, int x1, int y1)
 	YsGlDrawFontBitmap6x7(name);
 	glColor3ub(255, 255, 255);
 	glRasterPos2d((double)x1 - 10, (double)y1 - 10);
-	YsGlDrawFontBitmap10x14(itoa(quantity, quant, 9));
-
-	if (highlight)
+#if defined(_WIN32_WINNT)
+    YsGlDrawFontBitmap10x14(itoa(quantity, quant, 9));
+#else
+    sprintf(quant,"%d",quantity);
+    YsGlDrawFontBitmap10x14(quant);
+#endif
+    if (highlight)
 	{
 		glColor3ub(0, 255, 0);
 		glBegin(GL_LINE_LOOP);
@@ -230,7 +234,7 @@ Grid::Grid(int x0, int y0, int x1, int y1, int numObjects)
 		cellY = (double)(gridHeight - (rows + 1)*border) / (double)rows;
 		//printf("cellWidth = %lf, cellHeight = %lf\n", cellX, cellY);
 
-		cellWidth = min(cellX, cellY);
+		cellWidth = fmin(cellX, cellY);
 		cellHeight = cellWidth;
 
 		xBorder = (gridWidth - cellWidth*cols - border*(cols - 1)) / 2;
@@ -316,6 +320,7 @@ void Grid::MoveCell(std::unique_ptr<Item> &origin, std::unique_ptr<Item> &destin
 		origin.release();
 	}
 	activeCell = NULLINT;
+
 }
 
 int Grid::MoveCell(std::unique_ptr<Item> &origin, std::unique_ptr<Item> &destination, int number)
@@ -342,6 +347,7 @@ int Grid::MoveCell(std::unique_ptr<Item> &origin, std::unique_ptr<Item> &destina
 		//return 0;
 	}
 	activeCell = NULLINT;    //    cell in grid that calls movecell is empty
+    return -2;
 }
 
 bool Grid::InsideBounds(int &mx, int &my)
@@ -438,6 +444,7 @@ int Grid::CheckClick(int &mx, int &my)
 		transfer = TRUE;
 		return -2;
 	}
+    return -1;
 }
 
 void Grid::AddPermElement()
@@ -516,6 +523,7 @@ bool Button::CheckCrafting(Grid &ReqChart)
 		}
 		count++;
 	}
+    return false;
 }
 
 int Button::ClickCheck(int &mx, int &my)

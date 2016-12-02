@@ -1,5 +1,9 @@
 #include "CameraObject.h"
-
+#include "fssimplewindow.h"
+#if defined(_WIN32_WINNT) // Windows mouse movement routine
+#else
+#include <ApplicationServices/ApplicationServices.h>
+#endif
 
 CameraObject::CameraObject()
 {
@@ -163,7 +167,11 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 {
 	FsPollDevice();
 	mouseEvent = FsGetMouseEvent(lb, mb, rb, mx, my);
+#if defined(_WIN32_WINNT) // Windows mouse movement routine
 	FsGetWindowPosition(winx0, winy0, winx1, winy1);
+#else
+    FsGetWindowPosition(winx0, winy0);
+#endif
 	FsGetWindowSize(wid, hei);
 	mouseOffsetX = (winx1 - winx0 - wid) / 2;
 	mouseOffsetY = (winy1 - winy0 - hei) - mouseOffsetX;
@@ -236,33 +244,39 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 			//printf("cameraH = %lf, cameraP = %lf\n", h, p);
 			SetCursorPos(winx0 + wid / 2, winy0 + hei / 2);
 		}
-		else
-		{
-			//printf("mx = %d, my = %d\n", mx, my);
-		}
 	}
 #else
 	CGDirectDisplayID ID = CGMainDisplayID();
 	CGRect CurRect;
 	CurRect = CGDisplayBounds(ID);
 	CGFloat monitorheight = CurRect.size.height;
-	CGPoint mouse;
+	CGPoint mouseCenter;
 
-	mouse.x = winx0 + wid / 2;
-	mouse.y = monitorheight - winy0 - hei / 2;
-	if (key == FSKEY_TAB)
-	{
-		cursorLock = !cursorLock;
+	mouseCenter.x = winx0 + wid / 2;
+	mouseCenter.y = monitorheight - winy0 - hei / 2;
+    printf("%d cursorlock\n",cursorLock);
+//	if (key == FSKEY_TAB)
+//	{
+//		cursorLock = !cursorLock;
 		if (cursorLock)
 		{
-			CGDisplayHideCursor(ID);
-			CGDisplayMoveCursorToPoint(ID, mouse);
+            if (cursorHidden == 0)
+            {
+                CGDisplayHideCursor(ID);
+                CGDisplayMoveCursorToPoint(ID, mouseCenter);
+                cursorHidden = 1;
+                printf("oh shit hide\n");
+            }
 		}
 		else
 		{
-			CGDisplayShowCursor(ID);
+            if (cursorHidden == 1)
+            {
+                CGDisplayShowCursor(ID);
+                cursorHidden = 0;
+            }
 		}
-	}
+//	}
 
 	if (cursorLock == 1)
 	{
@@ -278,12 +292,11 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 		h += dh;
 		p += dp;
 
-		//printf("%d, %d, %d, %d\n", mx, my, pastmx, pastmy);
+        printf("%d, %d, %f, %f\n", mx, my, dx, dy);
 
-		CGDisplayMoveCursorToPoint(ID, mouse);
-		CGWarpMouseCursorPosition(mouse);
+		CGWarpMouseCursorPosition(mouseCenter);
 		CGAssociateMouseAndMouseCursorPosition(true);
-		FsGetMouseState(lb, mb, rb, pastmx, pastmy);
+    }
 #endif
 
 	if (cursorLock == 0) // arrowView-control
