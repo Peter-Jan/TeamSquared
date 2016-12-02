@@ -254,7 +254,6 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 
 	mouseCenter.x = winx0 + wid / 2;
 	mouseCenter.y = monitorheight - winy0 - hei / 2;
-    printf("%d cursorlock\n",cursorLock);
 //	if (key == FSKEY_TAB)
 //	{
 //		cursorLock = !cursorLock;
@@ -265,7 +264,6 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
                 CGDisplayHideCursor(ID);
                 CGDisplayMoveCursorToPoint(ID, mouseCenter);
                 cursorHidden = 1;
-                printf("oh shit hide\n");
             }
 		}
 		else
@@ -291,8 +289,6 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 		dp = dy / 240.0 * sensitivity;
 		h += dh;
 		p += dp;
-
-        printf("%d, %d, %f, %f\n", mx, my, dx, dy);
 
 		CGWarpMouseCursorPosition(mouseCenter);
 		CGAssociateMouseAndMouseCursorPosition(true);
@@ -430,9 +426,10 @@ void CameraObject::hitCheck(std::map<int, std::unique_ptr<Block>> &blockMap, std
 	checkY = py1 / blockSize;
 	checkZ = ((int)pz1%blockSize) / (blockSize / 4);
 
-	if (dxMove != 0 && cx0 != checkX && checkX == 0 || checkX == 3)
+	if (dxMove != 0 && cx0 != checkX && (checkX == 0 || checkX == 3))
 	{
 		int xIdx = xGrid() + (dxMove < 0 ? -1 : 1);
+        printf("xindx to check = %d\n",xIdx);
 		index = xIdx + zGrid()*roomSize + yGrid()*pow(roomSize, 2);
 		if (xIdx >= 0 && xIdx < roomSize && blockMap.find(index) == blockMap.end()) // crouch check needs to be added
 		{
@@ -455,7 +452,7 @@ void CameraObject::hitCheck(std::map<int, std::unique_ptr<Block>> &blockMap, std
 		pos[0] += dxMove;
 	}
 
-	if (dzMove != 0 && cz0 != checkZ && checkZ == 0 || checkZ == 3) // check Z direction
+	if (dzMove != 0 && cz0 != checkZ && (checkZ == 0 || checkZ == 3)) // check Z direction
 	{
 		int zIdx = zGrid() + (dzMove < 0 ? -1 : 1);
 		index = xGrid() + zIdx*roomSize + yGrid()*pow(roomSize, 2);
