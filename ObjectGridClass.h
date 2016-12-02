@@ -25,18 +25,26 @@
 #include "ysglfontdata.h"
 #include "MiscFunctions.h"
 
-//const int WINWID = 800, WINHEI = 600;
-
 class Item
 {
 public:
 	Item();
+	Item(int ClassType, int classID, char *itemName, int quantity, int texLocation, int weight, double range,
+		int damage, int health, int str, double speed, bool hitscan, bool stackable, bool highlight,
+		bool outline);
+	Item(int ClassType, int classID, char *itemName, int quantity, int texLocation, int weight, double range,
+		int damage, int health, int str, double speed, bool hitscan, bool stackable, bool highlight,
+		bool outline, int numberOfIngredients, int itemCodes[], int itemQuants[], int craftedCode, int craftedQuant); // recipes
 	void copyFrom(const Item &fromItem);
 	Item(const std::unique_ptr<Item> &fromPtr);
 	Item &operator=(const std::unique_ptr<Item> &fromPtr);
 	~Item();
 	int color[3] = { 0,0,0 };
+	char name[256];
+	int classType;
+	int classID;
 	int quantity = 1;
+	int texLoc;
 	int weight = 0;
 	double range;
 	int damage; // health dmg dealt
@@ -44,7 +52,6 @@ public:
 	int strength; // durability vs another object
 	double speed; // cooldown timer, in seconds
 	bool hitscan; // true = instant, false = projectile
-	char name[256];
 	bool stackable = FALSE;
 	bool highlight = FALSE;
 	bool outline = FALSE;
@@ -53,9 +60,11 @@ public:
 	void Increase(int quant);
 	void Decrease(int quant);
 	void Draw(int x0, int y0, int x1, int y1);
-	//void virtual Use();
-	std::vector<std::unique_ptr<Item>> materialList;
-	std::unique_ptr<Item> craftedItem;
+	void virtual Use() {}
+	int numIngredients = 0;
+	std::map<int, int> ingredients; // <item code, quantity>
+	int craftItem; // <item code>
+	int craftQuantity; // <items gained through crafting>
 };
 
 class Material : public Item
@@ -89,30 +98,6 @@ public:
 	~Recipe() {}
 };
 
-class Axe : public Weapon
-{
-public:
-	Axe();
-};
-
-class AxeRecipe : public Recipe
-{
-public:
-	AxeRecipe();
-};
-
-class Hammer : public Weapon
-{
-public:
-	Hammer();
-};
-
-class HammerRecipe : public Recipe
-{
-public:
-	HammerRecipe();
-};
-
 class Grid
 {
 public:
@@ -130,7 +115,8 @@ public:
 	Grid(int x0, int y0, int x1, int y1, int numObjects);
 	void CleanUp(void);
 	void Draw(void);
-	bool AddElement(std::unique_ptr<Item> &item);
+	bool AddElement(std::map<int, std::unique_ptr<Item>> &itemLibrary, int ClassCode);
+	bool AddElement(std::map<int, std::unique_ptr<Item>> &itemLibrary, std::unique_ptr<Item> &item);
 	bool AddElement(int elemIndex, std::unique_ptr<Item> &item);
 	void MoveCell(std::unique_ptr<Item> &origin, std::unique_ptr<Item> &destination);
 	int MoveCell(std::unique_ptr<Item> &origin, std::unique_ptr<Item> &destination, int number);
@@ -138,8 +124,8 @@ public:
 	bool InsideBounds(int &mx, int &my);
 	void TryTransfer(int &mx, int &my, Grid &other);
 	void TryTransfer(int &mx, int &my, Grid &other, int number);
-	void AddPermElement(void);
-	void Tellinfo(int &mx, int &my, Grid &other);
+	void AddPermElement(std::map<int, std::unique_ptr<Item>> &itemLib);
+	void Tellinfo(std::map<int, std::unique_ptr<Item>> &itemLib, int &mx, int &my, Grid &other);
 };
 
 class Button

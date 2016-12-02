@@ -9,16 +9,43 @@ int main(void)
 	int terminate = 0;
 	int lb, mb, rb, mx, my, mouseEvent, key = 0;
 	int drawCount = 0;
-	Terrain worldGrid(30, 2);
+	Terrain worldGrid(10, 2);
 	CameraObject camera(worldGrid.roomSize), camera2(worldGrid.roomSize);
 	worldGrid.texId=decodePng();
 
 	// texX, texY, bgColor[3], health, quantity
 
+	std::map<int, std::unique_ptr<Item>> itemLibrary;
+	//							 <ClassCode, name, quant, texture#, weight, range, damage, health, strength, speed, hitscan, stackable, highlight, outline, numIngedients, matCodes[numIngedients], quantities[numIngedients], craftedItemCode, craftedQuant>
+	// materials,   ClassCode == 0,   0 - 100
+	itemLibrary[0].reset(new Item(0, 0, "Dirt",    1, 0, 1, 8.0, 0,  2, 0, 0.0, true, true, false, false));
+	itemLibrary[1].reset(new Item(0, 1, "Stone",   1, 1, 1, 8.0, 0,  4, 1, 0.0, true, true, false, false));
+	itemLibrary[2].reset(new Item(0, 2, "Steel",   1, 2, 1, 8.0, 0,  6, 1, 0.0, true, true, false, false));
+	itemLibrary[3].reset(new Item(0, 3, "Wood",    1, 3, 1, 8.0, 0,  3, 0, 0.0, true, true, false, false));
+	itemLibrary[4].reset(new Item(0, 4, "Ruby",    1, 4, 1, 8.0, 0, 10, 2, 0.0, true, true, false, false));
+	itemLibrary[5].reset(new Item(0, 5, "Emerald", 1, 5, 1, 8.0, 0,  6, 2, 0.0, true, true, false, false));
+
+	// weapons,     ClassCode == 1, 101 - 200
+	itemLibrary[101].reset(new Item(1, 101, "Stick", 1, 101, 1, 4.0, 1, 0, 0, 0.5, true, false, false, false));
+	itemLibrary[102].reset(new Item(1, 102, "RockHammer", 1, 102, 1, 4.0, 1, 0, 0, 0.5, true, false, false, false));
+
+	// consumables, ClassCode == 2, 201 - 300
+	itemLibrary[201].reset(new Item(2, 201, "Orange",  1, 201, 1, 0.0, 0, 10, 2, 15, true, true, false, false));
+
+	// recipes,     ClassCode == 3, 301 - 400
+	int *ingredientCodes = new int[1]{ 3 };
+	int *ingredientQuants = new int[1]{ 1 };
+	itemLibrary[301].reset(new Item(3, 301, "Lv1 Stick", 1, 301, 1, 0.0, 1, 0, 0, 0.5, true, false, false, false, 1, ingredientCodes, ingredientQuants, 101, 1));
+	delete[] ingredientCodes, ingredientQuants;
+	ingredientCodes = new int[2]{ 3,1 };
+	ingredientQuants = new int[2]{ 3,2 };
+	itemLibrary[302].reset(new Item(3, 302,"Lv1 RockHammer", 1, 302, 1, 0.0, 1, 0, 0, 0.5, true, false, false, false, 2, ingredientCodes, ingredientQuants, 102, 1));
+	delete[] ingredientCodes, ingredientQuants;
+
 	std::vector<int> dirt = { 0,0,255,255,255,1,1 };
 	std::vector<int> stone = { 5,0,255,255,255,1,1 };
 	std::vector<int> steel = { 2,0,255,255,255,1,1 };
-	std::vector<int> bark = { 1,1,255,255,255,1,1 };
+	std::vector<int> wood = { 1,1,255,255,255,1,1 };
 	std::vector<int> ruby = { 4,0,255,255,255,1,1 };
 	std::vector<int> emerald = { 1,0,255,255,255,1,1 };
 	std::vector<int> orange = { 3,0,255,255,255,1,1 };
@@ -27,7 +54,7 @@ int main(void)
 	materials.push_back(dirt);
 	materials.push_back(stone);
 	materials.push_back(steel);
-	materials.push_back(bark);
+	materials.push_back(wood);
 	materials.push_back(ruby);
 	materials.push_back(emerald);
 	materials.push_back(orange);
@@ -60,7 +87,7 @@ int main(void)
 	Grid ReqChart(400, 260, 700, 500, 10);
 	Button but;
 
-	crafting.AddPermElement();
+	crafting.AddPermElement(itemLibrary);
 
 	while (0 == terminate)
 	{
@@ -147,11 +174,24 @@ int main(void)
 					printf("\nInside the Button!");
 					if (but.CheckCrafting(ReqChart))
 					{
-						printf("\nReady to craft!");//then call crafting implementation function
+						printf("\nReady to craft!"); //then call crafting implementation function
 
-						inventory.AddElement(crafting.gridVec[crafting.activeCell]);
-
-						crafting.activeCell = NULLINT;
+						if (inventory.AddElement(itemLibrary, crafting.gridVec[crafting.activeCell]) == true)
+						{
+							crafting.activeCell = NULLINT;
+							for (auto &elem : ReqChart.gridVec)
+							{
+								if (elem != nullptr)
+								{
+									printf("resetting elements");
+									elem.reset(nullptr);
+								}
+								else
+								{
+									break;
+								}
+							}
+						}
 					}
 					else
 					{
@@ -179,9 +219,33 @@ int main(void)
 						crafting.activeCell = NULLINT;
 						if (crafting.CheckClick(mx, my) == NULLINT && crafting.gridVec[crafting.activeCell] != nullptr) // if clicked cell has a recipe
 						{
-							// ReturnPartialItems(tempCell)
-							printf("Inside crafting table, activeCell = %d", crafting.activeCell);
-							crafting.Tellinfo(mx, my, ReqChart);
+							printf("Inside crafting table, activeCell = %d", tempCell);
+							int retQuant = 0;
+							int i = 0;
+							for (auto &part : crafting.gridVec[tempCell]->ingredients)
+							{
+								retQuant = part.second - ReqChart.gridVec[i]->quantity;
+								if (retQuant > 0)
+								{
+									for (auto &item : inventory.gridVec)
+									{
+										if (item == nullptr)
+										{
+											item.swap(ReqChart.gridVec[i]);
+											item->quantity = retQuant;
+											break;
+										}
+										else if (item->classID == ReqChart.gridVec[i]->classID)
+										{
+											item->quantity += retQuant;
+											break;
+										}
+									}
+								}
+								ReqChart.gridVec[i].reset(nullptr);
+								i++;
+							}
+							crafting.Tellinfo(itemLibrary, mx, my, ReqChart);
 						}
 						else
 						{
@@ -193,7 +257,7 @@ int main(void)
 						if (crafting.gridVec[crafting.activeCell] != nullptr) // if clicked cell has a recipe
 						{
 							printf("Inside crafting table, activeCell == %d", crafting.activeCell);
-							crafting.Tellinfo(mx, my, ReqChart);
+							crafting.Tellinfo(itemLibrary, mx, my, ReqChart);
 							//crafting.activeCell = NULLINT;
 						}
 						else
