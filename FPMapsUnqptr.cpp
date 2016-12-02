@@ -1,6 +1,7 @@
 #include "Terrain.h"
 #include "Decoder.h"
 #include "ObjectGridClass.h"
+#include "enemy.h"
 
 int main(void)
 {
@@ -33,6 +34,8 @@ int main(void)
 	materials.push_back(orange);
 
 	worldGrid.AddBlock(20, 20, 20, orange);
+	enemy dasEnemy(worldGrid.roomSize,21*8,21*8,21*8);
+
 
 	camera.playerBlock.roomSize = worldGrid.roomSize;
 	camera2.playerBlock.roomSize = worldGrid.roomSize;
@@ -116,6 +119,9 @@ int main(void)
 		glPolygonOffset(1, 1);
 
 		// 3D drawing from here
+		dasEnemy.drawEnemy();
+		dasEnemy.chase(camera);
+		
 
 		if (switchCamera)
 		{
