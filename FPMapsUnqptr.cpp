@@ -10,7 +10,7 @@ int main(void)
 	int terminate = 0;
 	int lb, mb, rb, mx, my, mouseEvent, key = 0;
 	int drawCount = 0;
-	Terrain worldGrid(10, 2);
+	Terrain worldGrid(20, 2);
 	CameraObject camera(worldGrid.roomSize), camera2(worldGrid.roomSize);
 	worldGrid.texId=decodePng();
 
