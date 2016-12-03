@@ -324,27 +324,27 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 		}
 		if (FsGetKeyState(FSKEY_W))
 		{
-			dxMove += curFV[0] / 2.0;
-			dyMove += curFV[1] / 2.0;
-			dzMove += curFV[2] / 2.0;
+			dxMove += curFV[0] / 1.0;
+			dyMove += curFV[1] / 1.0;
+			dzMove += curFV[2] / 1.0;
 			//VecPlus(pos, curFV);
 		}
 		if (FsGetKeyState(FSKEY_S))
 		{
-			dxMove -= curFV[0] / 2.0;
-			dyMove -= curFV[1] / 2.0;
-			dzMove -= curFV[2] / 2.0;
+			dxMove -= curFV[0] / 1.0;
+			dyMove -= curFV[1] / 1.0;
+			dzMove -= curFV[2] / 1.0;
 			//VecMinus(pos, curFV);
 		}
 		if (FsGetKeyState(FSKEY_D))
 		{
-			dxMove -= curFV[2] / 2.0;
-			dzMove += curFV[0] / 2.0;
+			dxMove -= curFV[2] / 1.0;
+			dzMove += curFV[0] / 1.0;
 		}
 		if (FsGetKeyState(FSKEY_A))
 		{
-			dxMove += curFV[2] / 2.0;
-			dzMove -= curFV[0] / 2.0;
+			dxMove += curFV[2] / 1.0;
+			dzMove -= curFV[0] / 1.0;
 		}
 
 		if (gravityOn)

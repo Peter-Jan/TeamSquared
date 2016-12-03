@@ -222,7 +222,7 @@ void Block::DrawTexture(GLuint texId,double imageX,double imageY)
 	}
 
 	// Right Side
-	if (sideVisible[1])
+	if (sideVisible[1])   
 	{
 		glTexCoord2d((imageX+1)/6, (imageY+1) / 2);
 		glVertex3d(x1, pos[1], z1);
@@ -274,7 +274,7 @@ void Block::DrawTexture(GLuint texId,double imageX,double imageY)
 	// Top Side
 	if (sideVisible[5])
 	{
-		if (textMapX == 0 && textMapY == 0)
+		if (imageX == 0 && imageY == 0)
 		{
 			glTexCoord2d(imageX / 6, 1.0);
 			glVertex3d(pos[0], y1, z1);

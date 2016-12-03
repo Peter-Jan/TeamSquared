@@ -3,6 +3,7 @@
 
 #include "MiscFunctions.h"
 
+
 #if defined(_WIN32_WINNT) // Windows mouse movement routine
 #else
 #include <ApplicationServices/ApplicationServices.h>
@@ -30,6 +31,8 @@ public:
 	std::vector<double> forwardVector = { 0,0,0 };
 	std::vector<double> pos = { 0,0,0 };
 	std::vector<int> gridLocation = { 0,0,0 };
+	//std::vector<enemy> enemyList;
+
 	int blockSize, jumps = 5;
 	int lb, mb, rb, mx, my, mouseEvent, key, wid, hei, winx0, winy0, winx1, winy1;
 	int mouseOffsetX = 0, mouseOffsetY = 0;

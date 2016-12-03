@@ -12,20 +12,86 @@ Item::Item()
 {
 }
 
+Item::Item(int ClassCode, int classIDIN, char *itemName, int quantIn, int texLocation, int weightIn, double rangeIn,
+	int damageIn, int healthIn, int str, double speedIn, bool hitscanIn, bool stackIn, bool high,
+	bool outlineIn)
+{
+	classType = ClassCode;
+	classID = classIDIN;
+	sprintf(name, itemName);
+	quantity = quantIn;
+	texLoc = texLocation;
+	weight = weightIn;
+	range = rangeIn;
+	damage = damageIn;
+	health = healthIn;
+	strength = str;
+	speed = speedIn;
+	hitscan = hitscanIn;
+	stackable = stackIn;
+	highlight = high;
+	outline = outlineIn;
+}
+
+Item::Item(int ClassCode, int classIDIN, char *itemName, int quantIn, int texLocation, int weightIn, double rangeIn,
+	int damageIn, int healthIn, int str, double speedIn, bool hitscanIn, bool stackIn, bool high,
+	bool outlineIn, int numberOfIngredients, int itemCodes[], int itemQuants[], int craftedCode, int craftedQuant)
+{
+	classType = ClassCode;
+	classID = classIDIN;
+	sprintf(name, itemName);
+	quantity = quantIn;
+	texLoc = texLocation;
+	weight = weightIn;
+	range = rangeIn;
+	damage = damageIn;
+	health = healthIn;
+	strength = str;
+	speed = speedIn;
+	hitscan = hitscanIn;
+	stackable = stackIn;
+	highlight = high;
+	outline = outlineIn;
+	numIngredients = numberOfIngredients;
+	if (numberOfIngredients != 0)
+	{
+		for (int i = 0; i < numberOfIngredients; i++)
+		{
+			ingredients[itemCodes[i]] = itemQuants[i];
+		}
+		craftItem = craftedCode;
+		craftQuantity = craftedQuant;
+	}
+	else
+	{
+		// stuff stays nullptr'd
+	}
+}
+
 void Item::copyFrom(const Item &fromItem)
 {
+	classType = fromItem.classType;
+	classID = fromItem.classID;
+	sprintf(name, fromItem.name);
 	quantity = fromItem.quantity;
+	texLoc = fromItem.texLoc;
 	weight = fromItem.weight;
 	range = fromItem.range;
-	damage = fromItem.damage; // health dmg dealt
-	health = fromItem.health; // restorative hp amount
-	strength = fromItem.strength; // durability vs another object
-	speed = fromItem.speed; // cooldown timer, in seconds
-	hitscan = fromItem.hitscan; // true = instant, false = projectile
-	strcpy(name, fromItem.name);
+	damage = fromItem.damage;
+	health = fromItem.health;
+	strength = fromItem.strength;
+	speed = fromItem.speed;
+	hitscan = fromItem.hitscan;
 	stackable = fromItem.stackable;
 	highlight = fromItem.highlight;
 	outline = fromItem.outline;
+	numIngredients = fromItem.numIngredients;
+	for (auto &iPair : fromItem.ingredients)
+	{
+		ingredients[iPair.first] = iPair.second;
+	}
+	craftItem = fromItem.craftItem;
+	craftQuantity = fromItem.craftQuantity;
 }
 
 Item &Item::operator=(const std::unique_ptr<Item> &fromPtr)
@@ -119,7 +185,6 @@ Material::~Material()
 
 Material::Material(char perm[],int q)
 {
-	//strcpy(name, perm);
 	sprintf(name, perm);
 	color[rand() % 3] = (strlen(name) * 10) % 255;
 	quantity = q;
@@ -128,50 +193,6 @@ Material::Material(char perm[],int q)
 
 void Material::CleanUp(void)
 {
-}
-
-Axe::Axe()
-{
-	damage = 3;
-	strength = 1;
-	speed = 0.5; //attack per sec
-	hitscan = true;
-	range = 3 * blockSize;
-	sprintf(name, "Axe");
-	quantity = 1;
-}
-
-AxeRecipe::AxeRecipe()
-{
-	color[rand() % 3] = (strlen(name) * 10) % 255;
-	quantity = 1;
-	sprintf(name, "Axe");
-	materialList.resize(2);
-	materialList[0].reset(new Material("Wood", 2));
-	materialList[1].reset(new Material("Stone", 3));
-	craftedItem.reset(new Axe);
-}
-
-Hammer::Hammer()
-{
-	damage = 2;
-	strength = 2;
-	speed = 1.0;
-	hitscan = true;
-	range = 8 * blockSize;
-	sprintf(name, "Hammer");
-	quantity = 1;
-}
-
-HammerRecipe::HammerRecipe()
-{
-	color[rand() % 3] = (strlen(name) * 10) % 255;
-	quantity = 1;
-	sprintf(name, "Hammer");
-	materialList.resize(2);
-	materialList[0].reset(new Material("Wood", 4));
-	materialList[1].reset(new Material("Stone", 10));
-	craftedItem.reset(new Axe);
 }
 
 Grid::Grid()
@@ -189,17 +210,65 @@ void Grid::CleanUp(void)
 	gridVec.clear();
 }
 
-bool Grid::AddElement(std::unique_ptr<Item> &item)
+bool Grid::AddElement(std::map<int, std::unique_ptr<Item>> &itemLibrary, int itemCode)
 {
-	int i = -1;
 	for (auto &elem : gridVec)
 	{
-		i++;
 		if (elem == nullptr)
 		{
-			elem = std::move(item->craftedItem); // removes crafted item from recipe -> not good
-			//elem.reset(item->craftedItem);
-			//*elem = item;
+			switch (itemLibrary[itemCode]->classType)
+			{
+			case 0:
+				elem.reset(new Material());
+				break;
+			case 1:
+				elem.reset(new Weapon());
+				break;
+			case 2:
+				elem.reset(new Useable());
+				break;
+			case 3:
+				elem.reset(new Recipe());
+				break;
+			}
+			elem->copyFrom(itemLibrary[itemCode]);
+			return TRUE;
+		}
+	}
+	printf("Inventory full\n");
+	return FALSE;
+}
+
+bool Grid::AddElement(std::map<int, std::unique_ptr<Item>> &itemLibrary, std::unique_ptr<Item> &item)
+{
+	printf("Something Very Amiss");
+	for (auto &elem : gridVec)
+	{
+		printf("Something Amiss");
+		if (elem == nullptr) // empty spot
+		{
+			switch (itemLibrary[item->craftItem]->classType)
+			{
+			case 0:
+				elem.reset(new Material);
+				break;
+			case 1:
+				elem.reset(new Weapon);
+				break;
+			case 2:
+				elem.reset(new Useable);
+				break;
+			case 3:
+				elem.reset(new Recipe);
+				break;
+			}
+			elem->copyFrom(itemLibrary[item->craftItem]);
+			elem->quantity = item->craftQuantity;
+			return TRUE;
+		}
+		else if (strcmp(itemLibrary[item->craftItem]->name, elem->name) && itemLibrary[item->craftItem]->stackable == true)
+		{
+			elem->quantity += item->craftQuantity;
 			return TRUE;
 		}
 	}
@@ -447,39 +516,52 @@ int Grid::CheckClick(int &mx, int &my)
     return -1;
 }
 
-void Grid::AddPermElement()
+void Grid::AddPermElement(std::map<int,std::unique_ptr<Item>> &itemLib) // always meant to be recipe
 {
 	printf("Made it\n");
-	std::unique_ptr<Item> recipe(new AxeRecipe);
-	for (auto &elem : gridVec)
+	for (auto &item : itemLib)
 	{
-		if (elem == nullptr)
+		if (item.first > 300)
 		{
-			elem.swap(recipe);
+			for (auto &elem : gridVec)
+			{
+				if (elem == nullptr)
+				{
+					elem.reset(new Recipe);
+					elem->copyFrom(item.second);
+					break;
+				}
+			}
 		}
 	}
-	recipe.reset(new HammerRecipe);
-	for (auto &elem : gridVec)
-	{
-		if (elem == nullptr)
-		{
-			elem.swap(recipe);
-		}
-	}
-	recipe.release();
-	//AddElement(recipe);
 }
 
-void Grid::Tellinfo(int &mx, int &my,Grid &other)
+void Grid::Tellinfo(std::map<int, std::unique_ptr<Item>> &itemLib, int &mx, int &my,Grid &other)
 {
-	printf("Telling Info");
+	printf("Telling Info\n");
 	gridVec[activeCell]->highlight = FALSE;
-	printf("%d Active Cell\n");
+	printf("%d Active Cell\n", activeCell);
 	int i = 0;
-	for (auto &item : gridVec[activeCell]->materialList)
+	printf("Number of Items = %d\n", gridVec[activeCell]->numIngredients);
+	for (auto &itemCodeQuant : gridVec[activeCell]->ingredients)
 	{
-		printf("New Item\n");
-		other.gridVec[i].reset(new Material(item->name, item->quantity));
+		switch (itemCodeQuant.first)
+		{
+		case 0:
+			other.gridVec[i].reset(new Material);
+			break;
+		case 1:
+			other.gridVec[i].reset(new Weapon);
+			break;
+		case 2:
+			other.gridVec[i].reset(new Useable);
+			break;
+		case 3:
+			other.gridVec[i].reset(new Recipe);
+			break;
+		}
+		other.gridVec[i]->copyFrom(itemLib[itemCodeQuant.first]);
+		other.gridVec[i]->quantity = itemCodeQuant.second;
 		i++;
 	}
 	printf("Done with Items\n");
