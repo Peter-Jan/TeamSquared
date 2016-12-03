@@ -16,18 +16,15 @@ public:
 	void setParam(int health, int quantity);
 	void setName(std::string inStr);
 	void setXYZ(double x, double y, double z);
+	int TakeDamage(int wepStr, int wepdmg);
 	int getImx() const;
 	int getImy() const;
 	std::string getName() const;
 protected:
+	int healthParam, quantParam;
 	int imageX, imageY;
-	int healthParam, quantParam,health;
 	std::string name;
 };
-
-
-
-
 
 #endif // !MATERIAL_BLOCK
 

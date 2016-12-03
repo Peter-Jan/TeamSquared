@@ -8,22 +8,24 @@ int BlockDist(const Block &block1, const Block &block2)
 Terrain::Terrain()
 {
 	roomSize = 10; // default
-	Initialize(0);
+	std::vector<int> standIn = { 0 };
+	Initialize(0, standIn);
 }
 
 Terrain::Terrain(int size)
 {
 	roomSize = size;
-	Initialize(0);
+	std::vector<int> standIn = { 0 };
+	Initialize(0, standIn);
 }
 
-Terrain::Terrain(int size, int randomVsOrdered) // 0 = random, 1 = linear, 2 = Terrain generator
+Terrain::Terrain(int size, int randomVsOrdered, std::vector<int> &matVec) // 0 = random, 1 = linear, 2 = Terrain generator
 {
 	roomSize = size;
-	Initialize(randomVsOrdered);
+	Initialize(randomVsOrdered, matVec);
 }
 
-void Terrain::Initialize(int randomVsOrdered) // 0 = random, 1 = linear
+void Terrain::Initialize(int randomVsOrdered, std::vector<int> &matVec) // 0 = random, 1 = linear
 {
 	indexCheck[0] = -1; indexCheck[1] = 1; indexCheck[2] = -roomSize; indexCheck[3] = roomSize;
 	indexCheck[4] = -pow(roomSize, 2); indexCheck[5] = pow(roomSize, 2); // left, right, back, front, bottom, top
@@ -39,13 +41,13 @@ void Terrain::Initialize(int randomVsOrdered) // 0 = random, 1 = linear
 	}
 	else
 	{
-		GenerateFunctionTerrain();
+		GenerateFunctionTerrain(matVec);
 	}
 	HideSides();
 
 }
 
-void Terrain::GenerateFunctionTerrain(void)
+void Terrain::GenerateFunctionTerrain(std::vector<int> &matVec)
 {
 	int y = 0;
 
@@ -69,9 +71,7 @@ void Terrain::GenerateFunctionTerrain(void)
 			while (y >= 0)
 			{
 				index = x + roomSize*z + pow(roomSize, 2)*y;
-				std::unique_ptr<Block> newPtr;
-				newPtr.reset(new Block(roomSize, x, y, z));
-				blockMap[index] = std::move(newPtr);
+				blockMap[index].reset(new materialBlock(roomSize, x, y, z, matVec));
 				y--;
 				blockNum++;
 			}
@@ -84,8 +84,6 @@ void Terrain::GenerateFunctionTerrain(void)
 void Terrain::GenerateMaterial(materialBlock matBlock)
 {
 	int matR, matG, matB;
-	//AddBlock(matBlock.getX(),matBlock.getY(),matBlock.getY(),matBlock.textMapX,matBlock.textMapY,matBlock.getR(),matBlock.getG(),matBlock.getB());
-	//printf("X: %d,Y: %d ", matBlock.textMapX, matBlock.textMapY);
 }
 
 Terrain::~Terrain()
@@ -97,7 +95,6 @@ void inline Terrain::GenerateRandom(void)
 	Block tempBlock;
 	for (int i = 0; i < blockNum; i++) // random blocks
 	{
-		//tempBlock = Block(roomSize);
 		std::unique_ptr<Block> newPtr;
 		newPtr.reset(new Block(roomSize));
 		blockMap[newPtr->index] = std::move(newPtr);
@@ -257,20 +254,20 @@ void Terrain::AddBlock(int x, int y, int z, std::vector<int> matVec)
 	}
 }
 
-void Terrain::RemoveBlock(int x, int y, int z)
+void Terrain::RemoveBlock(Grid &inventory, int x, int y, int z)
 {
 	int newLocation = x + z*roomSize + y*roomSize*roomSize;
 	//printf("newLocation = %d\n", newLocation);
 	//printf("BEFORE renderMap size = %d, blockMap size = %d\n", renderMap.size(), blockMap.size());
 	if (blockMap.find(newLocation) != blockMap.end()) // if the removed block is in the list of existing blocks
 	{
-		//printf("In here\n");
 		ShowSingleBlockSides(newLocation);
 		blockNum--;
 		if (renderMap.find(newLocation) != renderMap.end())
 		{
 			renderMap.erase(newLocation);
 		}
+		//inventory.AddElement()
 		blockMap.erase(newLocation);
 		//printf("renderMap size = %d, blockMap size = %d\n", renderMap.size(), blockMap.size());
 	}

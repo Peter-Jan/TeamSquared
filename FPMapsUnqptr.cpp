@@ -10,14 +10,11 @@ int main(void)
 	int terminate = 0;
 	int lb, mb, rb, mx, my, mouseEvent, key = 0;
 	int drawCount = 0;
-	Terrain worldGrid(30, 2);
-	CameraObject camera(worldGrid.roomSize), camera2(worldGrid.roomSize);
-	worldGrid.texId=decodePng();
 
 	// texX, texY, bgColor[3], health, quantity
 
 	std::map<int, std::unique_ptr<Item>> itemLibrary;
-	//							 <ClassCode, name, quant, texture#, weight, range, damage, health, strength, speed, hitscan, stackable, highlight, outline, numIngedients, matCodes[numIngedients], quantities[numIngedients], craftedItemCode, craftedQuant>
+	//							 <ClassCode, itemCode, name, quant, texture#, weight, range, damage, health, strength, speed, hitscan, stackable, highlight, outline, numIngedients, matCodes[numIngedients], quantities[numIngedients], craftedItemCode, craftedQuant>
 	// materials,   ClassCode == 0,   0 - 100
 	itemLibrary[0].reset(new Item(0, 0, "Dirt",    1, 0, 1, 8.0, 0,  2, 0, 0.0, true, true, false, false));
 	itemLibrary[1].reset(new Item(0, 1, "Stone",   1, 1, 1, 8.0, 0,  4, 1, 0.0, true, true, false, false));
@@ -43,13 +40,14 @@ int main(void)
 	itemLibrary[302].reset(new Item(3, 302,"Lv1 RockHammer", 1, 302, 1, 0.0, 1, 0, 0, 0.5, true, false, false, false, 2, ingredientCodes, ingredientQuants, 102, 1));
 	delete[] ingredientCodes, ingredientQuants;
 
-	std::vector<int> dirt = { 0,0,255,255,255,1,1 };
-	std::vector<int> stone = { 5,0,255,255,255,1,1 };
-	std::vector<int> steel = { 2,0,255,255,255,1,1 };
-	std::vector<int> wood = { 1,1,255,255,255,1,1 };
-	std::vector<int> ruby = { 4,0,255,255,255,1,1 };
-	std::vector<int> emerald = { 1,0,255,255,255,1,1 };
-	std::vector<int> orange = { 3,0,255,255,255,1,1 };
+	//					<itemCode, texX, texY, r,g,b, strength, health, quant
+	std::vector<int> dirt =    { 0,   0,0,255,255,255, 0,  2, 3 };
+	std::vector<int> stone =   { 1,   5,0,255,255,255, 1,  4, 1 };
+	std::vector<int> steel =   { 2,   2,0,255,255,255, 1,  6, 0 };
+	std::vector<int> wood =    { 3,   1,1,255,255,255, 0,  3, 2 };
+	std::vector<int> ruby =    { 4,   4,0,255,255,255, 2, 10, 0 };
+	std::vector<int> emerald = { 5,   1,0,255,255,255, 2,  6, 0 };
+	std::vector<int> orange =  { 201, 3,0,255,255,255, 0, 10, 6 };
 
 	std::vector<std::vector<int>> materials;
 	materials.push_back(dirt);
@@ -59,6 +57,18 @@ int main(void)
 	materials.push_back(ruby);
 	materials.push_back(emerald);
 	materials.push_back(orange);
+
+	Grid inventory(20, 20, 350, 500, 20);
+	Grid toolbar(100, 500, 700, 600, 10);
+	Grid crafting(400, 20, 700, 240, 10);
+	Grid ReqChart(400, 260, 700, 500, 10);
+	Button but;
+
+	crafting.AddPermElement(itemLibrary);
+
+	Terrain worldGrid(30, 2, materials[0]);
+	CameraObject camera(worldGrid.roomSize), camera2(worldGrid.roomSize);
+	worldGrid.texId = decodePng();
 
 	worldGrid.AddBlock(5, 5, 5, orange);
 	enemy dasEnemy(worldGrid.roomSize,21*8,21*8,21*8);
@@ -82,14 +92,6 @@ int main(void)
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CW); // vertices of any object's front face (aka outside face) should always be specified in CLOCKWISE order
 	glCullFace(GL_BACK); // back 3 sides of each block are automatically removed by this openGL culling function
-
-	Grid inventory(20, 20, 350, 500, 20);
-	Grid toolbar(100, 500, 700, 600, 10);
-	Grid crafting(400, 20, 700, 240, 10);
-	Grid ReqChart(400, 260, 700, 500, 10);
-	Button but;
-
-	crafting.AddPermElement(itemLibrary);
 
 	while (0 == terminate)
 	{
@@ -334,8 +336,13 @@ int main(void)
 				{
 					if (xGrid != camera.xGrid() || yGrid != camera.yGrid() || zGrid != camera.zGrid())
 					{
+						int idx = xGrid + zGrid*worldGrid.roomSize + yGrid*pow(worldGrid.roomSize, 2);
 						//printf("Found one at %d %d %d\n", xGrid, yGrid, zGrid);
-						worldGrid.RemoveBlock(xGrid, yGrid, zGrid);
+						int blockHealth = worldGrid.blockMap[idx]->TakeDamage(0, 1);
+						if (blockHealth <= 0)
+						{
+							worldGrid.RemoveBlock(inventory, xGrid, yGrid, zGrid);
+						}
 					}
 				}
 				else

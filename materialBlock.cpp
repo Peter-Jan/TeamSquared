@@ -7,17 +7,17 @@ materialBlock::materialBlock()
 
 materialBlock::materialBlock(int roomsize, int xIn, int yIn, int zIn, std::vector<int> matVec) : Block(roomsize, xIn, yIn, zIn)
 {
-	//printf("calling parent constructor\n");
-	textMapX = matVec[0];
-	textMapY = matVec[1];
-	setColor(matVec[2], matVec[3], matVec[4]);
-	setParam(matVec[5], matVec[6]);
-	//printf("Success\n");
+	itemCode = matVec[0];
+	textMapX = matVec[1];
+	textMapY = matVec[2];
+	setColor(matVec[3], matVec[4], matVec[5]);
+	strength = matVec[6];
+	health = matVec[7];
+	setParam(matVec[7], matVec[8]);
 }
 
 materialBlock::~materialBlock()
 {
-
 }
 
 int materialBlock::getImx() const
@@ -29,8 +29,10 @@ int materialBlock::getImy() const
 {
 	return imageY;
 }
+
 void materialBlock::initialize()
 {
+	itemCode = 0;
 	setImage(0, 0);
 	health = 0;
 	healthParam = 0;
@@ -38,6 +40,7 @@ void materialBlock::initialize()
 	name = "unassigned";
 	//printf("X: %d, Y: %d ", textMapX, textMapY);
 }
+
 std::string materialBlock::getName() const
 {
 	return name;
@@ -68,4 +71,13 @@ void materialBlock::setName(std::string inStr)
 void materialBlock::setXYZ(double x, double y, double z)
 {
 	Block::setCoordinate(x, y, z);
+}
+
+int materialBlock::TakeDamage(int wepStr, int wepDmg)
+{
+	if (wepStr >= strength)
+	{
+		health -= wepDmg;
+		return health;
+	}
 }

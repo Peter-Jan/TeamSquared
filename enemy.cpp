@@ -56,13 +56,13 @@ void enemy::initialize(int roomSizeIn, double startX, double startY, double star
 	roomSize = roomSizeIn;
 	SetVec(pos, startX, startY, startZ);
 	//printf("xG: %d, yG: %d, zG: %d\n", gridLocation[0], gridLocation[1], gridLocation[2]);
-	printf("xG: %lf, yG: %lf, zG: %lf\n", startX, startY, startZ);
+	//printf("xG: %lf, yG: %lf, zG: %lf\n", startX, startY, startZ);
 
 	SetGridLocation();
 	frenemy.setCoordinate(gridLocation[0], gridLocation[1], gridLocation[2]);		//takes grid coordinates
 	dxMove = 0; dyMove = 0; dzMove = 0;
 	blockSize = 8;
-	printf("FRENEMY x: %lf, y: %lf, z: %lf\n", frenemy.pos[0], frenemy.pos[1], frenemy.pos[2]);
+	//printf("FRENEMY x: %lf, y: %lf, z: %lf\n", frenemy.pos[0], frenemy.pos[1], frenemy.pos[2]);
 
 
 }
@@ -114,11 +114,11 @@ int enemy::chase(CameraObject player, std::map<int, std::unique_ptr<Block>> &blo
 
 	setPosM();
 	SetGridLocation();
-	printf("CHASEVEC: x: %lf,y: %lf,z: %lf \n", chaseVec[0],chaseVec[1],chaseVec[2]);
-	printf("ENEMY: x: %lf,y: %lf,z: %lf \n", posM[0], posM[1], posM[2]);
-	printf("ENEMY GRID: x: %d,y: %d,z: %d \n\n", xGrid(), yGrid(), zGrid());
-	printf("PLAYER: x: %lf,y: %lf,z: %lf \n", player.x(), player.y(), player.z());
-	printf("PLAYER GRID: x: %d,y: %d,z: %d \n\n", player.xGrid(), player.yGrid(), player.zGrid());
+	//printf("CHASEVEC: x: %lf,y: %lf,z: %lf \n", chaseVec[0],chaseVec[1],chaseVec[2]);
+	//printf("ENEMY: x: %lf,y: %lf,z: %lf \n", posM[0], posM[1], posM[2]);
+	//printf("ENEMY GRID: x: %d,y: %d,z: %d \n\n", xGrid(), yGrid(), zGrid());
+	//printf("PLAYER: x: %lf,y: %lf,z: %lf \n", player.x(), player.y(), player.z());
+	//printf("PLAYER GRID: x: %d,y: %d,z: %d \n\n", player.xGrid(), player.yGrid(), player.zGrid());
 	frenemy.setPosition(pos[0], pos[1], pos[2]);
 	hitCheck(blockMap, chaseVec);
 	if (player.xGrid() == xGrid() && player.yGrid() == yGrid() && player.zGrid() == zGrid())
