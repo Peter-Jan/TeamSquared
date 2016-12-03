@@ -63,7 +63,6 @@ int main(void)
 	worldGrid.AddBlock(5, 5, 5, orange);
 	enemy dasEnemy(worldGrid.roomSize,21*8,21*8,21*8);
 
-
 	camera.playerBlock.roomSize = worldGrid.roomSize;
 	camera2.playerBlock.roomSize = worldGrid.roomSize;
 
