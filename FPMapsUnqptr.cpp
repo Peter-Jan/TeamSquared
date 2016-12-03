@@ -10,7 +10,7 @@ int main(void)
 	int terminate = 0;
 	int lb, mb, rb, mx, my, mouseEvent, key = 0;
 	int drawCount = 0;
-	Terrain worldGrid(20, 2);
+	Terrain worldGrid(30, 2);
 	CameraObject camera(worldGrid.roomSize), camera2(worldGrid.roomSize);
 	worldGrid.texId=decodePng();
 
@@ -60,15 +60,15 @@ int main(void)
 	materials.push_back(emerald);
 	materials.push_back(orange);
 
-	worldGrid.AddBlock(20, 20, 20, orange);
+	worldGrid.AddBlock(5, 5, 5, orange);
 	enemy dasEnemy(worldGrid.roomSize,21*8,21*8,21*8);
 
 
 	camera.playerBlock.roomSize = worldGrid.roomSize;
 	camera2.playerBlock.roomSize = worldGrid.roomSize;
 
-	camera.pos[0] = 20.0;
-	camera.pos[1] = 200.0;
+	camera.pos[0] = 200.0;
+	camera.pos[1] = 50.0;
 	camera.pos[2] =  20.0;
 	camera2.pos[0] += worldGrid.roomSize / 2 * camera2.blockSize;
 	camera2.pos[1] += worldGrid.roomSize / 2 * camera2.blockSize;
@@ -146,8 +146,9 @@ int main(void)
 		glPolygonOffset(1, 1);
 
 		// 3D drawing from here
+		//dasEnemy.frenemy.DrawTexture((GLuint)1,0,0);
 		dasEnemy.drawEnemy();
-		dasEnemy.chase(camera);
+		terminate = dasEnemy.chase(camera,worldGrid.blockMap);
 		
 
 		if (switchCamera)
