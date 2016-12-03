@@ -242,51 +242,56 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 		}
 	}
 #else
-	CGDirectDisplayID ID = CGMainDisplayID();
-	CGRect CurRect;
-	CurRect = CGDisplayBounds(ID);
-	CGFloat monitorheight = CurRect.size.height;
-	CGPoint mouse;
-
-	mouse.x = winx0 + wid / 2;
-	mouse.y = monitorheight - winy0 - hei / 2;
-	if (key == FSKEY_TAB)
-	{
-		cursorLock = !cursorLock;
-		if (cursorLock)
-		{
-			CGDisplayHideCursor(ID);
-			CGDisplayMoveCursorToPoint(ID, mouse);
-		}
-		else
-		{
-			CGDisplayShowCursor(ID);
-		}
-	}
-
-	if (cursorLock == 1)
-	{
-		FsPollDevice();
-		FsGetMouseState(lb, mb, rb, mx, my);
-		double dx, dy, dh, dp;
-		int wid, hei;
-		FsGetWindowSize(wid, hei);
-		dx = wid / 2 - mx;
-		dy = hei / 2 - my - 1;
-		dh = dx / 240.0 * sensitivity;
-		dp = dy / 240.0 * sensitivity;
-		h += dh;
-		p += dp;
-
-		//printf("%d, %d, %d, %d\n", mx, my, pastmx, pastmy);
-
-		CGDisplayMoveCursorToPoint(ID, mouse);
-		CGWarpMouseCursorPosition(mouse);
-		CGAssociateMouseAndMouseCursorPosition(true);
-		FsGetMouseState(lb, mb, rb, pastmx, pastmy);
+    CGDirectDisplayID ID = CGMainDisplayID();
+    CGRect CurRect;
+    CurRect = CGDisplayBounds(ID);
+    CGFloat monitorheight = CurRect.size.height;
+    CGPoint mouseCenter;
+    
+    mouseCenter.x = winx0 + wid / 2;
+    mouseCenter.y = monitorheight - winy0 - hei / 2;
+    //	if (key == FSKEY_TAB)
+    //	{
+    //		cursorLock = !cursorLock;
+    if (cursorLock)
+    {
+        if (cursorHidden == 0)
+        {
+            CGDisplayHideCursor(ID);
+            CGDisplayMoveCursorToPoint(ID, mouseCenter);
+            cursorHidden = 1;
+        }
+    }
+    else
+    {
+        if (cursorHidden == 1)
+        {
+            CGDisplayShowCursor(ID);
+            cursorHidden = 0;
+        }
+    }
+    //	}
+    
+    if (cursorLock == 1)
+    {
+        FsPollDevice();
+        FsGetMouseState(lb, mb, rb, mx, my);
+        double dx, dy, dh, dp;
+        int wid, hei;
+        FsGetWindowSize(wid, hei);
+        dx = wid / 2 - mx;
+        dy = hei / 2 - my - 1;
+        dh = dx / 240.0 * sensitivity;
+        dp = dy / 240.0 * sensitivity;
+        h += dh;
+        p += dp;
+        
+        CGWarpMouseCursorPosition(mouseCenter);
+        CGAssociateMouseAndMouseCursorPosition(true);
+    }
 #endif
-
-	if (cursorLock == 0) // arrowView-control
+    
+    if (cursorLock == 0) // arrowView-control
 	{
 		if (FsGetKeyState(FSKEY_LEFT))
 		{
