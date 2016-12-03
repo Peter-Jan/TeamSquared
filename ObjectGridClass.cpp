@@ -137,6 +137,12 @@ void Item::Draw(int x0, int y0, int x1, int y1)
 	YsGlDrawFontBitmap6x7(name);
 	glColor3ub(255, 255, 255);
 	glRasterPos2d((double)x1 - 10, (double)y1 - 10);
+#if defined(_WIN32_WINNT)
+    YsGlDrawFontBitmap10x14(itoa(quantity, quant, 9));
+#else
+    sprintf(quant,"%d",quantity);
+    YsGlDrawFontBitmap10x14(quant);
+#endif
 	YsGlDrawFontBitmap10x14(itoa(quantity, quant, 9));
 
 	if (highlight)
