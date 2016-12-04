@@ -34,14 +34,8 @@ public:
 	void Initialize(int randomVsOrdered);
 
 	void inline GenerateRandom(void);
-<<<<<<< HEAD
 	void inline Terrain::GenerateOrdered(void);
 	void GenerateFunctionTerrain(void);
-=======
-	void inline GenerateOrdered(void);
-	void GenerateFunctionTerrain(std::vector<int> &matVec);
-
->>>>>>> 6642316f6f3f2962a5891099646b74b89de24d34
 	void GenerateMaterial(materialBlock matBlock);
 
 	void HideSides(void);

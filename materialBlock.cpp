@@ -79,10 +79,5 @@ int materialBlock::TakeDamage(int wepStr, int wepDmg)
 	{
 		health -= wepDmg;
 	}
-<<<<<<< HEAD
 	return health;
 }
-=======
-    return health;
-}
->>>>>>> 6642316f6f3f2962a5891099646b74b89de24d34
