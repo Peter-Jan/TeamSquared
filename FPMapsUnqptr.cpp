@@ -112,6 +112,7 @@ int main(void)
 		FsGetWindowSize(wid, hei);
 
 		key = FsInkey();
+
 		switch (key)
 		{
 		case FSKEY_ESC:
@@ -123,14 +124,14 @@ int main(void)
 		case FSKEY_C:
 			switchCamera = !switchCamera;
 			break;
-		case FSKEY_3:
+		case FSKEY_G:
 			camera.gravityOn = !camera.gravityOn;
 			break;
 		case FSKEY_T:
 			texturesOn = !texturesOn;
 			if (texturesOn)
 			{
-				glEnable(GL_TEXTURE_2D);		// Turn on the texture mapping 
+				glEnable(GL_TEXTURE_2D); // Turn on the texture mapping
 			}
 			else
 			{
@@ -361,7 +362,7 @@ int main(void)
 			}
 			break;
 		}
-			
+		
 		// Set up 2D drawing
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
@@ -378,6 +379,7 @@ int main(void)
 			but.Draw(but.x, but.y);
 		}
 
+		toolbar.activeTool = camera.activeTool;
 		toolbar.Draw(); // always draw the toolbar
 
 		{ // draw crosshairs

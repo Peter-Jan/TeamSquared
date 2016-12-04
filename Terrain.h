@@ -36,7 +36,6 @@ public:
 	void inline GenerateRandom(void);
 	void inline Terrain::GenerateOrdered(void);
 	void GenerateFunctionTerrain(void);
-	void GenerateMaterial(materialBlock matBlock);
 
 	void HideSides(void);
 	void HideSingleBlockSides(int i);

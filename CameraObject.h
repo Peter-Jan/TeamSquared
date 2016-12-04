@@ -17,6 +17,10 @@
 #define TRUE 1
 #endif
 
+#ifndef NULLINT
+#define NULLINT -1
+#endif
+
 class CameraObject
 {
 public:
@@ -36,6 +40,7 @@ public:
 	int blockSize, jumps = 5;
 	int lb, mb, rb, mx, my, mouseEvent, key, wid, hei, winx0, winy0, winx1, winy1;
 	int mouseOffsetX = 0, mouseOffsetY = 0;
+	int activeTool = NULLINT;
 	bool cursorLock = FALSE;
     bool cursorHidden = FALSE;
 	bool stationary = FALSE;

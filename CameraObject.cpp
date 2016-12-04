@@ -174,10 +174,19 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 	//printf("MouseOffX = %d, MouseOffY = %d\n", mouseOffsetX, mouseOffsetY);
 	GetForwardVector();
 
-	if (key != 0)
+	if (key >= 2 && key <= 11)
 	{
-		//printf("%d\n", key);
+		if (key == 2)
+		{
+			activeTool = 9;
+		}
+		else
+		{
+			activeTool = key - 3;
+		}
+		printf("ActiveCell = %d\n", activeTool);
 	}
+
 	if (key == FSKEY_WHEELDOWN)
 	{
 		//printf("Zoom in");
@@ -295,25 +304,6 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
     }
 #endif
     
-    if (cursorLock == 0) // arrowView-control
-	{
-		if (FsGetKeyState(FSKEY_LEFT))
-		{
-			h += YsPi / 240.0;
-		}
-		if (FsGetKeyState(FSKEY_RIGHT))
-		{
-			h -= YsPi / 240.0;
-		}
-		if (FsGetKeyState(FSKEY_UP))
-		{
-			p += YsPi / 240.0;
-		}
-		if (FsGetKeyState(FSKEY_DOWN))
-		{
-			p -= YsPi / 240.0;
-		}
-	}
 	if (!stationary)
 	{
 		std::vector<double> curFV = { 0,0,0 };
@@ -366,11 +356,11 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 		}
 		else // Gravity Off
 		{
-			if (FsGetKeyState(FSKEY_1))
+			if (FsGetKeyState(FSKEY_UP))
 			{
 				dyMove += 1.0;
 			}
-			if (FsGetKeyState(FSKEY_2) && pos[1] >= 0)
+			if (FsGetKeyState(FSKEY_DOWN) && pos[1] >= 0)
 			{
 				dyMove -= 1.0;
 			}

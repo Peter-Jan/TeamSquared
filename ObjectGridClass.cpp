@@ -137,13 +137,8 @@ void Item::Draw(int x0, int y0, int x1, int y1)
 	YsGlDrawFontBitmap6x7(name);
 	glColor3ub(255, 255, 255);
 	glRasterPos2d((double)x1 - 10, (double)y1 - 10);
-#if defined(_WIN32_WINNT)
-    YsGlDrawFontBitmap10x14(itoa(quantity, quant, 9));
-#else
     sprintf(quant,"%d",quantity);
     YsGlDrawFontBitmap10x14(quant);
-#endif
-
 
 	if (highlight)
 	{
@@ -382,6 +377,18 @@ void Grid::Draw(void)
 				auto &elem = *gridVec[index];
 				elem.Draw(x0, y0, x1, y1);
 			}
+			if (index == activeTool)
+			{
+				glLineWidth(5);
+				glBegin(GL_LINE_LOOP);
+				glColor3ub(0, 255, 0);
+				glVertex2i(x0, y0);
+				glVertex2i(x1, y0);
+				glVertex2i(x1, y1);
+				glVertex2i(x0, y1);
+				glEnd();
+				glLineWidth(1);
+			}
 		}
 	}
 	glColor3ubArray(backgroundColor);
@@ -529,7 +536,7 @@ int Grid::CheckClick(int &mx, int &my)
 		transfer = TRUE;
 		return -2;
 	}
-    return -1;
+    return -5; // arbitrary return value
 }
 
 void Grid::AddPermElement(std::map<int,std::unique_ptr<Item>> &itemLib) // always meant to be recipe
@@ -600,6 +607,14 @@ void Button::Draw(int x, int y)
 	glColor3ub(0, 0, 0);
 	glRasterPos2d(x - 20, y + 5);
 	YsGlDrawFontBitmap10x14("CRAFT");
+
+	glColor3ub(200, 200, 200);
+	glBegin(GL_QUADS);
+	glVertex2i(x - 40, y - 20);
+	glVertex2i(x + 40, y - 20);
+	glVertex2i(x + 40, y + 20);
+	glVertex2i(x - 40, y + 20);
+	glEnd();
 }
 
 bool Button::CheckCrafting(Grid &ReqChart)

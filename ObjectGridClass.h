@@ -105,8 +105,10 @@ public:
 	bool open = FALSE;
 	bool transfer = FALSE;
 	int activeCell = -1;
+	int activeTool = -1;
 	int backgroundColor[3] = { 255, 0, 0 };
 	int highlightColor[3] = { 100, 100, 0 };
+	int activeItemHighlight[3] = { 255,0,0 };
 	int tempColor[3] = { 0,0,0 };
 	int xLeft, yTop, xRight, yBottom, rows, cols, border;
 	double cellWidth, cellHeight, xBorder, yBorder;
