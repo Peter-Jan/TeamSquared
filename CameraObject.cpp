@@ -287,8 +287,6 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
     
     if (cursorLock == 1)
     {
-        FsPollDevice();
-        FsGetMouseState(lb, mb, rb, mx, my);
         double dx, dy, dh, dp;
         int wid, hei;
         FsGetWindowSize(wid, hei);

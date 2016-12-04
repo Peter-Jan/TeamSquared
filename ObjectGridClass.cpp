@@ -188,6 +188,11 @@ Material::Material(char perm[],int q)
 	stackable = TRUE;
 }
 
+int Material::Use(void) // returns material type to be placed
+{
+	return classID;
+}
+
 void Material::CleanUp(void)
 {
 }

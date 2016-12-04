@@ -24,6 +24,7 @@
 #include "yspngenc.h"
 #include "ysglfontdata.h"
 #include "MiscFunctions.h"
+//#include "Terrain.h"
 
 class Item
 {
@@ -60,7 +61,7 @@ public:
 	void Increase(int quant);
 	void Decrease(int quant);
 	void Draw(int x0, int y0, int x1, int y1);
-	void virtual Use() {}
+	int virtual Use(void) { return 0; }
 	int numIngredients = 0;
 	std::map<int, int> ingredients; // <item code, quantity>
 	int craftItem; // <item code>
@@ -75,6 +76,7 @@ public:
 	Material(char perm[], int q);
 	//void Use(void);
 	void CleanUp(void);
+	int Use(void);
 };
 
 class Useable : public Item

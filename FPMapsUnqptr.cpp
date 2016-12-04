@@ -103,6 +103,7 @@ int main(void)
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CW); // vertices of any object's front face (aka outside face) should always be specified in CLOCKWISE order
 	glCullFace(GL_BACK); // back 3 sides of each block are automatically removed by this openGL culling function
+	int xGrid, yGrid, zGrid;
 
 	while (0 == terminate)
 	{
@@ -160,8 +161,9 @@ int main(void)
 
 		// 3D drawing from here
 		dasEnemy.drawEnemy();
-		terminate = dasEnemy.chase(camera,worldGrid.blockMap);
-		
+		terminate = dasEnemy.chase(camera, worldGrid.blockMap);
+
+#if defined(_WIN32_WINNT)
 		if (switchCamera)
 		{
 			if (camera2.cursorLock)
@@ -178,10 +180,10 @@ int main(void)
 			}
 			worldGrid.DrawTerrain(camera, reductionMode, key, texturesOn);
 		}
+#endif
 
 		switch (FsGetMouseEvent(lb, mb, rb, mx, my))
 		{
-			int xGrid, yGrid, zGrid;
 		case FSMOUSEEVENT_LBUTTONDOWN:
 			printf("USER CLICKED\n");
 
@@ -320,7 +322,7 @@ int main(void)
 				}
 				break;
 			}
-			else
+			else // use selected item left click
 			{
 				printf("IN LEFT BUTTON\n");
 				if (worldGrid.FindBlock(camera, xGrid, yGrid, zGrid, ADD))
@@ -362,7 +364,26 @@ int main(void)
 			}
 			break;
 		}
-		
+
+#if !defined(_WIN32_WINNT)
+		if (switchCamera)
+		{
+			if (camera2.cursorLock)
+			{
+				camera2.Update(key, worldGrid.blockMap);
+			}
+			worldGrid.DrawTerrain(camera2, reductionMode, key, texturesOn);
+		}
+		else
+		{
+			if (camera.cursorLock)
+			{
+				camera.Update(key, worldGrid.blockMap);
+			}
+			worldGrid.DrawTerrain(camera, reductionMode, key, texturesOn);
+		}
+#endif
+
 		// Set up 2D drawing
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
