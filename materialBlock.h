@@ -21,7 +21,6 @@ public:
 	int getImy() const;
 	std::string getName() const;
 protected:
-	int healthParam, quantParam;
 	int imageX, imageY;
 	std::string name;
 };

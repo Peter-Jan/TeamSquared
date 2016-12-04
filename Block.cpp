@@ -2,6 +2,7 @@
 
 Block::Block()
 {
+	quantity = 0;
 	roomSize = 10;
 	blockSize = 8;
 	int xRand = rand() % roomSize;
@@ -16,6 +17,8 @@ Block::Block()
 
 void Block::copyFrom(const Block &fromBlock)
 {
+	quantity = fromBlock.quantity;
+	health = fromBlock.health;
 	roomSize = fromBlock.roomSize;
 	blockSize = 8;
 	setCoordinate(fromBlock.x, fromBlock.y, fromBlock.z);

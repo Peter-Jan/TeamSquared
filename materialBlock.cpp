@@ -36,7 +36,7 @@ void materialBlock::initialize()
 	setImage(0, 0);
 	health = 0;
 	healthParam = 0;
-	quantParam = 0;
+	quantity = 0;
 	name = "unassigned";
 	//printf("X: %d, Y: %d ", textMapX, textMapY);
 }
@@ -60,12 +60,12 @@ void materialBlock::setColor(int inR, int inG, int inB)
 void materialBlock::setParam(int inHeal, int inQuant)
 {
 	healthParam = inHeal;
-	quantParam = inQuant;
+	quantity = inQuant;
 }
 
-void materialBlock::setName(std::string inStr)
+void materialBlock::setName(std::string inString)
 {
-	name = inStr;
+	name = inString;
 }
 
 void materialBlock::setXYZ(double x, double y, double z)
@@ -78,6 +78,6 @@ int materialBlock::TakeDamage(int wepStr, int wepDmg)
 	if (wepStr >= strength)
 	{
 		health -= wepDmg;
-		return health;
 	}
+	return health;
 }

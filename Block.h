@@ -24,10 +24,7 @@ private:
 	int w, h, l;
 public:
 	int roomSize = 10;
-	int itemCode;
-	int health, strength;
-	//int healthParam, quantParam;
-	int textMapX = 0, textMapY = 0;
+	int itemCode, strength, health, healthParam, quantity, textMapX = 0, textMapY = 0;
 	double x1, xM, y1, yM, z1, zM;
 	double blockSize = 8.0;
 	int materialCode;

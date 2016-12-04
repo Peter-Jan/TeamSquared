@@ -161,17 +161,17 @@ void Item::Draw(int x0, int y0, int x1, int y1)
 
 Material::Material()
 {
-	fgets(name, 255, stdin);
-	for (auto &c : name)
-	{
-		if (c == '\n')
-		{
-			c = 0;
-		}
-	}
-	color[rand() % 3] = (strlen(name) * 10) % 255;
-	quantity = 1;
-	stackable = TRUE;
+	//fgets(name, 255, stdin);
+	//for (auto &c : name)
+	//{
+	//	if (c == '\n')
+	//	{
+	//		c = 0;
+	//	}
+	//}
+	//color[rand() % 3] = (strlen(name) * 10) % 255;
+	//quantity = 1;
+	//stackable = TRUE;
 }
 
 Material::~Material()
@@ -206,28 +206,45 @@ void Grid::CleanUp(void)
 	gridVec.clear();
 }
 
-bool Grid::AddElement(std::map<int, std::unique_ptr<Item>> &itemLibrary, int itemCode)
+bool Grid::AddElement(std::map<int, std::unique_ptr<Item>> &itemLibrary, int itemCode) // add item from environment
 {
+	printf("Trying to Add Element\n");
+	int addQuant = 1;
+	if (itemLibrary[itemCode]->quantity != 0)
+	{
+		addQuant += rand() % itemLibrary[itemCode]->quantity;
+	}
+	
 	for (auto &elem : gridVec)
 	{
 		if (elem == nullptr)
 		{
+			printf("Item Code = %d\n", itemCode);
+			printf("Item ClassType = %d\n", itemLibrary[itemCode]->classType);
 			switch (itemLibrary[itemCode]->classType)
 			{
 			case 0:
-				elem.reset(new Material());
+				printf("Made it\n");
+				elem.reset(new Material);
 				break;
 			case 1:
-				elem.reset(new Weapon());
+				elem.reset(new Weapon);
 				break;
 			case 2:
-				elem.reset(new Useable());
+				elem.reset(new Useable);
 				break;
 			case 3:
-				elem.reset(new Recipe());
+				elem.reset(new Recipe);
 				break;
 			}
+			printf("Adding to empty cell");
 			elem->copyFrom(itemLibrary[itemCode]);
+			elem->quantity = addQuant;
+			return TRUE;
+		}
+		else if (elem->classID == itemCode && elem->stackable)
+		{
+			elem->quantity += addQuant;
 			return TRUE;
 		}
 	}
@@ -453,9 +470,7 @@ void Grid::TryTransfer(int &mx, int &my, Grid &other, int number)
 		transfer = FALSE;
 	}
 	printf("Past");
-	//activeCell = NULLINT;
 	other.activeCell = NULLINT;
-	//transfer = FALSE;
 	other.transfer = FALSE;
 }
 
@@ -482,10 +497,10 @@ int Grid::CheckClick(int &mx, int &my)
 		{
 			if (gridVec[index] == nullptr) // Generate new item (in the game, this should be removed)
 			{
-				printf("Enter new item name >\n");
-				std::unique_ptr<Item> tempP(new Material);
-				AddElement(index, tempP);
-				//return -2;     ------> Will replace above 3 lines in actual game
+				//printf("Enter new item name >\n");
+				//std::unique_ptr<Item> tempP(new Material);
+				//AddElement(index, tempP);
+				return -2;    // ------> Will replace above 3 lines in actual game
 			}
 			else // if the cell is occupied and there is currently no active cell, highlight it
 			{
