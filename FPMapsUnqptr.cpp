@@ -94,6 +94,12 @@ int main(void)
 	tree2.push_back({ 3,   0, 4, 1 });
 	tree2.push_back({ 3,   0, 4, -1 });
 
+	//std::vector<std::vector<int>> stoneBoulder;
+	//stoneBoulder.push_back({ 1,   0, 0, 0 });
+	//stoneBoulder.push_back({ 1,   0, 0, 0 });
+	//stoneBoulder.push_back({ 1,   0, 0, 0 });
+	//stoneBoulder.push_back({ 1,   0, 0, 0 });
+
 	std::vector< std::vector<std::vector<int>>> structureLibrary;
 	structureLibrary.push_back(tree1);
 	structureLibrary.push_back(tree2);
@@ -190,7 +196,7 @@ int main(void)
 
 		// 3D drawing from here
 		dasEnemy.drawEnemy();
-        dasEnemy.chase(camera,worldGrid.blockMap);
+		terminate = dasEnemy.chase(camera, worldGrid.blockMap);
 
 #if defined(_WIN32_WINNT)
 		if (switchCamera)

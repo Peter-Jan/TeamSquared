@@ -5,7 +5,11 @@ GLuint decodePng()
 
 	YsRawPngDecoder png[2];
 	png[0].Decode("emoji.png");
+#if defined(_WIN32_WINNT) // Windows mouse movement routine
+	png[1].Decode("texture.png");
+#else
 	png[1].Decode("/Users/peterjan/GitHub/TeamSquared/texture.png");
+#endif
 
 	GLuint texId;             	// Two unsigned integers for reserving texture identifiers
 
