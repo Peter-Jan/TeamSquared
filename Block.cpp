@@ -208,8 +208,6 @@ void Block::DrawTexture(GLuint texId,double imageX,double imageY)
 {
 	glColor3ub(r, g, b);           	// Current color is solid white
 
-	//glBindTexture(GL_TEXTURE_2D, texId);	// Select the current texture.
-
 	//Left side
 
 	if (sideVisible[0])

@@ -29,22 +29,23 @@ class Item
 {
 public:
 	Item();
-	Item(int ClassType, int classID, char *itemName, int quantity, int texLocation, int weight, double range,
+	Item(int ClassType, int classID, char *itemName, int quantity, double texLocation, int weight, double range,
 		int damage, int health, int str, double speed, bool hitscan, bool stackable, bool highlight,
 		bool outline);
-	Item(int ClassType, int classID, char *itemName, int quantity, int texLocation, int weight, double range,
+	Item(int ClassType, int classID, char *itemName, int quantity, double texLocation, int weight, double range,
 		int damage, int health, int str, double speed, bool hitscan, bool stackable, bool highlight,
 		bool outline, int numberOfIngredients, int itemCodes[], int itemQuants[], int craftedCode, int craftedQuant); // recipes
 	void copyFrom(const Item &fromItem);
 	Item(const std::unique_ptr<Item> &fromPtr);
 	Item &operator=(const std::unique_ptr<Item> &fromPtr);
 	~Item();
+
 	int color[3] = { 0,0,0 };
 	char name[256];
 	int classType;
 	int classID;
 	int quantity = 1;
-	int texLoc;
+	double texLoc;
 	int weight = 0;
 	double range;
 	int damage; // health dmg dealt
@@ -59,7 +60,7 @@ public:
 	void Decrease(void);
 	void Increase(int quant);
 	void Decrease(int quant);
-	void Draw(int x0, int y0, int x1, int y1);
+	void Draw(GLuint texId, int x0, int y0, int x1, int y1);
 
 	//template<class Player, class World>
 	//void Use(Player &player, World &worldGrid, std::vector<std::vector<int>> &materials);
@@ -116,12 +117,13 @@ public:
 	int activeItemHighlight[3] = { 255,0,0 };
 	int tempColor[3] = { 0,0,0 };
 	int xLeft, yTop, xRight, yBottom, rows, cols, border;
+
 	double cellWidth, cellHeight, xBorder, yBorder;
 	Grid();
 	~Grid();
 	Grid(int x0, int y0, int x1, int y1, int numObjects);
 	void CleanUp(void);
-	void Draw(void);
+	void Draw(GLuint texId);
 	bool AddElement(std::map<int, std::unique_ptr<Item>> &itemLibrary, int ClassCode);
 	bool AddElement(std::map<int, std::unique_ptr<Item>> &itemLibrary, std::unique_ptr<Item> &item);
 	bool AddElement(int elemIndex, std::unique_ptr<Item> &item);

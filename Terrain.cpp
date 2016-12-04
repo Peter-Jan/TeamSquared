@@ -190,14 +190,14 @@ void Terrain::GenerateFunctionTerrain(void)
 		PlaceStructure(structList->at(structID), *matList, x, y, z);
 	}
 
-	for (auto &resource : *matList)
+	for (auto &resource : *matList) // Place resource deposits
 	{
-		if (resource[0] < 100)
+		if (resource[0] < 100 && resource[6] > 0)
 		{
 			for (int i = 0; i < (int)sqrt(roomSize) / (1 + resource[6]); i++) // plant resources
 			{
 				int x, y, z;
-				int size = 1 + resource[8];
+				int size = 1 + resource[8]*2;
 				index = rand() % blockNum;
 				printf("Index = %d, Size = %d\n", index, size);
 				IndexToXYZ(roomSize, index, x, y, z);
@@ -418,6 +418,7 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera, bool textures
 	{
 		if (texturesOn) // method only works if you have large group of objects with the same texture
 		{
+			glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, texId);	// Select the current texture.
 		}
 		glBegin(GL_QUADS);
@@ -463,11 +464,16 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera, bool textures
 			}
 		}
 		glEnd();
+		if (texturesOn)
+		{
+			glDisable(GL_TEXTURE_2D);
+		}
 	}
 	else
 	{
 		if (texturesOn) // method only works if you have large group of objects with the same texture
 		{
+			glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, texId);	// Select the current texture.
 		}
 		glBegin(GL_QUADS);
@@ -513,7 +519,10 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera, bool textures
 			}
 		}
 		glEnd();
-
+		if (texturesOn)
+		{
+			glDisable(GL_TEXTURE_2D);
+		}
 	}
 }
 
@@ -547,6 +556,7 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 		{
 			if (texturesOn) // method only works if you have large group of objects with the same texture
 			{
+				glEnable(GL_TEXTURE_2D);
 				glBindTexture(GL_TEXTURE_2D, texId);	// Select the current texture.
 			}
 			glBegin(GL_QUADS);
@@ -562,12 +572,17 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 				}
 			}
 			glEnd();
+			if (texturesOn)
+			{
+				glDisable(GL_TEXTURE_2D);
+			}
 		}
 		else
 		{
 			cameraView.Update(key, blockMap);
 			if (texturesOn) // method only works if you have large group of objects with the same texture
 			{
+				glEnable(GL_TEXTURE_2D);
 				glBindTexture(GL_TEXTURE_2D, texId);	// Select the current texture.
 			}
 			glBegin(GL_QUADS);
@@ -583,6 +598,10 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 				}
 			}
 			glEnd();
+			if (texturesOn)
+			{
+				glDisable(GL_TEXTURE_2D);
+			}
 		}
 	}
 }

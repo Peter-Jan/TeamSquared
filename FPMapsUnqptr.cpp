@@ -17,38 +17,43 @@ int main(void)
 	std::map<int, std::unique_ptr<Item>> itemLibrary;
 	//							 <ClassCode, itemCode, name, quant, texture#, weight, range, damage, health, strength, speed, hitscan, stackable, highlight, outline, numIngedients, matCodes[numIngedients], quantities[numIngedients], craftedItemCode, craftedQuant>
 	// materials,   ClassCode == 0,   0 - 100
-	itemLibrary[0].reset(new Item(0, 0, "Dirt",    3, 0, 1, 8.0, 0,  2, 0, 0.0, true, true, false, false));
-	itemLibrary[1].reset(new Item(0, 1, "Stone",   1, 1, 1, 8.0, 0,  4, 1, 0.0, true, true, false, false));
-	itemLibrary[2].reset(new Item(0, 2, "Steel",   0, 2, 1, 8.0, 0,  6, 2, 0.0, true, true, false, false));
-	itemLibrary[3].reset(new Item(0, 3, "Wood",    2, 3, 1, 8.0, 0,  3, 0, 0.0, true, true, false, false));
-	itemLibrary[4].reset(new Item(0, 4, "Ruby",    0, 4, 1, 8.0, 0, 10, 3, 0.0, true, true, false, false));
-	itemLibrary[5].reset(new Item(0, 5, "Emerald", 0, 5, 1, 8.0, 0,  6, 3, 0.0, true, true, false, false));
+	itemLibrary[0].reset(new Item(0, 0, "Dirt",    3, 0.0, 1, 8.0, 0,  2, 0, 0.0, true, true, false, false));
+	itemLibrary[1].reset(new Item(0, 1, "Stone",   1, 5.0, 1, 8.0, 0,  4, 1, 0.0, true, true, false, false));
+	itemLibrary[2].reset(new Item(0, 2, "Steel",   0, 2.0, 1, 8.0, 0,  6, 2, 0.0, true, true, false, false));
+	itemLibrary[3].reset(new Item(0, 3, "Wood",    2, 7.0, 1, 8.0, 0,  3, 0, 0.0, true, true, false, false));
+	itemLibrary[4].reset(new Item(0, 4, "Ruby",    0, 4.0, 1, 8.0, 0, 10, 3, 0.0, true, true, false, false));
+	itemLibrary[5].reset(new Item(0, 5, "Emerald", 0, 1.0, 1, 8.0, 0,  6, 3, 0.0, true, true, false, false));
+	itemLibrary[7].reset(new Item(0, 7, "Wood",    2, 7.0, 1, 8.0, 0,  3, 0, 0.0, true, true, false, false));
+	itemLibrary[8].reset(new Item(0, 8, "Wood",    2, 7.0, 1, 8.0, 0,  3, 0, 0.0, true, true, false, false));
 
 	// weapons,     ClassCode == 1, 101 - 200
-	itemLibrary[101].reset(new Item(1, 101, "Stick", 1, 101, 1, 4.0, 1, 0,      1, 0.5, true, false, false, false));
-	itemLibrary[102].reset(new Item(1, 102, "RockHammer", 1, 102, 1, 4.0, 1, 0, 2, 0.5, true, false, false, false));
+	itemLibrary[101].reset(new Item(1, 101, "Stick", 1, 1.0, 1, 4.0, 1, 0,      1, 0.5, true, false, false, false));
+	itemLibrary[102].reset(new Item(1, 102, "RockHammer", 1, 102.0, 1, 4.0, 1, 0, 2, 0.5, true, false, false, false));
 
 	// consumables, ClassCode == 2, 201 - 300
-	itemLibrary[201].reset(new Item(2, 201, "Orange",  6, 201, 1, 0.0, 0, 10, 2, 15, true, true, false, false));
+	itemLibrary[201].reset(new Item(2, 201, "Orange",  6, 3.0, 1, 0.0, 0, 10, 2, 15, true, true, false, false));
 
 	// recipes,     ClassCode == 3, 301 - 400
 	int *ingredientCodes = new int[1]{ 3 };
 	int *ingredientQuants = new int[1]{ 1 };
-	itemLibrary[301].reset(new Item(3, 301, "Lv1 Stick", 1, 301, 1, 0.0, 1, 0, 0, 0.5, true, false, false, false, 1, ingredientCodes, ingredientQuants, 101, 1));
+	itemLibrary[301].reset(new Item(3, 301, "Lv1 Stick", 1, 1.0, 1, 0.0, 1, 0, 0, 0.5, true, false, false, false, 1, ingredientCodes, ingredientQuants, 101, 1));
 	delete[] ingredientCodes, ingredientQuants;
 	ingredientCodes = new int[2]{ 3,1 };
 	ingredientQuants = new int[2]{ 3,2 };
-	itemLibrary[302].reset(new Item(3, 302,"Lv1 RockHammer", 1, 302, 1, 0.0, 1, 0, 0, 0.5, true, false, false, false, 2, ingredientCodes, ingredientQuants, 102, 1));
+	itemLibrary[302].reset(new Item(3, 302,"Lv1 RockHammer", 1, 1.0, 1, 0.0, 1, 0, 0, 0.5, true, false, false, false, 2, ingredientCodes, ingredientQuants, 102, 1));
 	delete[] ingredientCodes, ingredientQuants;
 
 	//					<itemCode, texX, texY, r,g,b, strength, health, quant
-	std::vector<int> dirt =    { 0,   0,0,255,255,255, 0,  2, 3 };
-	std::vector<int> stone =   { 1,   5,0,255,255,255, 1,  4, 1 };
-	std::vector<int> steel =   { 2,   2,0,255,255,255, 1,  6, 0 };
-	std::vector<int> wood =    { 3,   1,1,255,255,255, 0,  3, 2 };
-	std::vector<int> ruby =    { 4,   4,0,255,255,255, 2, 10, 0 };
-	std::vector<int> emerald = { 5,   1,0,255,255,255, 2,  6, 0 };
-	std::vector<int> orange =  { 201, 3,0,255,255,255, 0, 10, 6 };
+	std::vector<int> dirt =    { 0,		0,0,255,255,255, 0,  2, 3 };
+	std::vector<int> stone =   { 1,		5,0,255,255,255, 1,  4, 1 };
+	std::vector<int> steel =   { 2,		2,0,255,255,255, 1,  6, 0 };
+	std::vector<int> wood =    { 3,	    1,1,255,255,255, 0,  3, 2 };
+	std::vector<int> ruby =    { 4,		4,0,255,255,255, 2, 10, 0 };
+	std::vector<int> emerald = { 5,		1,0,255,255,255, 2,  6, 0 };
+	std::vector<int> orange =  { 201,   3,0,255,255,255, 0, 10, 6 };
+	std::vector<int> greenLeaf = { 7,   3,1,255,255,255, 0,  3, 2 };
+	std::vector<int> redLeaf = { 8,     4,1,255,255,255, 0,  3, 2 };
+
 
 	std::vector<std::vector<int>> materials;
 	materials.push_back(dirt);
@@ -58,6 +63,8 @@ int main(void)
 	materials.push_back(ruby);
 	materials.push_back(emerald);
 	materials.push_back(orange);
+	materials.push_back(greenLeaf);
+	materials.push_back(redLeaf);
 
 	// structures <itemCode, xGrid, yGrid, zGrid>
 	// Tree type 1
@@ -66,12 +73,12 @@ int main(void)
 	tree1.push_back({ 3,   0, 1, 0 });
 	tree1.push_back({ 3,   0, 2, 0 });
 	tree1.push_back({ 3,   -1, 2, 0 });
-	tree1.push_back({ 3,   1, 2, 0 });
-	tree1.push_back({ 3,   0, 2, 1 });
-	tree1.push_back({ 3,   0, 2, -1 });
+	tree1.push_back({ 7,   1, 2, 0 });
+	tree1.push_back({ 8,   0, 2, 1 });
+	tree1.push_back({ 7,   0, 2, -1 });
 	tree1.push_back({ 6,   0, 3, 0 });
-	tree1.push_back({ 3,   1, 3, 0 });
-	tree1.push_back({ 3,   -1, 3, 0 });
+	tree1.push_back({ 8,   1, 3, 0 });
+	tree1.push_back({ 7,   -1, 3, 0 });
 
 	//Tree Type 2
 	std::vector<std::vector<int>> tree2;
@@ -79,20 +86,20 @@ int main(void)
 	tree2.push_back({ 3,   0, 1, 0 });
 	tree2.push_back({ 3,   0, 2, 0 });
 	tree2.push_back({ 3,   0, 3, 0 });
-	tree2.push_back({ 3,   -1, 3, 0 });
-	tree2.push_back({ 3,   1, 3, 0 });
-	tree2.push_back({ 3,   2, 3, 0 });
-	tree2.push_back({ 3,   -2, 3, 0 });
-	tree2.push_back({ 3,   0, 4, 0 });
-	tree2.push_back({ 3,   -1, 4, 0 });
+	tree2.push_back({ 7,   -1, 3, 0 });
+	tree2.push_back({ 7,   1, 3, 0 });
+	tree2.push_back({ 8,   2, 3, 0 });
+	tree2.push_back({ 7,   -2, 3, 0 });
+	tree2.push_back({ 8,   0, 4, 0 });
+	tree2.push_back({ 7,   -1, 4, 0 });
 	tree2.push_back({ 6,   1, 4, 0 });
 	tree2.push_back({ 3,   0, 5, 0 });
-	tree2.push_back({ 3,   0, 3, -1 });
-	tree2.push_back({ 3,   0, 3, 1 });
-	tree2.push_back({ 3,   0, 3, 2 });
+	tree2.push_back({ 7,   0, 3, -1 });
+	tree2.push_back({ 7,   0, 3, 1 });
+	tree2.push_back({ 8,   0, 3, 2 });
 	tree2.push_back({ 6,   0, 3, -2 });
-	tree2.push_back({ 3,   0, 4, 1 });
-	tree2.push_back({ 3,   0, 4, -1 });
+	tree2.push_back({ 7,   0, 4, 1 });
+	tree2.push_back({ 8,   0, 4, -1 });
 
 	//std::vector<std::vector<int>> stoneBoulder;
 	//stoneBoulder.push_back({ 1,   0, 0, 0 });
@@ -116,7 +123,11 @@ int main(void)
 
 
 	CameraObject camera(roomSize, (double)(roomSize*blockSize/2), (double)(roomSize*blockSize / 2), (double)(roomSize*blockSize / 2)), camera2(worldGrid.roomSize);
+	
 	worldGrid.texId = decodePng();
+	GLuint texId = decodePng();
+
+	glBindTexture(GL_TEXTURE_2D, texId);	// Select the current texture.
 
 	worldGrid.AddBlock(5, 5, 5, orange);
 
@@ -138,6 +149,7 @@ int main(void)
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CW); // vertices of any object's front face (aka outside face) should always be specified in CLOCKWISE order
 	glCullFace(GL_BACK); // back 3 sides of each block are automatically removed by this openGL culling function
+	glBindTexture(GL_TEXTURE_2D, texId);	// Select the current texture.
 	int xGrid, yGrid, zGrid;
 
 	while (0 == terminate)
@@ -489,9 +501,9 @@ int main(void)
 		{ // Draw GUI
 			if (!camera.cursorLock) // draw inventory
 			{
-				inventory.Draw();
-				crafting.Draw();
-				ReqChart.Draw();
+				inventory.Draw(texId);
+				crafting.Draw(texId);
+				ReqChart.Draw(texId);
 				but.Draw(but.x, but.y);
 			}
 			else // draw crosshairs
@@ -519,7 +531,7 @@ int main(void)
 
 			// draw toolbar
 			toolbar.activeTool = camera.activeTool;
-			toolbar.Draw(); // always draw the toolbar
+			toolbar.Draw(texId); // always draw the toolbar
 
 			// draw player health
 			int x0 = 50, y0 = 50;

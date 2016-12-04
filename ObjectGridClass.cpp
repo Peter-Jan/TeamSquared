@@ -12,7 +12,7 @@ Item::Item()
 {
 }
 
-Item::Item(int ClassCode, int classIDIN, char *itemName, int quantIn, int texLocation, int weightIn, double rangeIn,
+Item::Item(int ClassCode, int classIDIN, char *itemName, int quantIn, double texLocation, int weightIn, double rangeIn,
 	int damageIn, int healthIn, int str, double speedIn, bool hitscanIn, bool stackIn, bool high,
 	bool outlineIn)
 {
@@ -33,7 +33,7 @@ Item::Item(int ClassCode, int classIDIN, char *itemName, int quantIn, int texLoc
 	outline = outlineIn;
 }
 
-Item::Item(int ClassCode, int classIDIN, char *itemName, int quantIn, int texLocation, int weightIn, double rangeIn,
+Item::Item(int ClassCode, int classIDIN, char *itemName, int quantIn, double texLocation, int weightIn, double rangeIn,
 	int damageIn, int healthIn, int str, double speedIn, bool hitscanIn, bool stackIn, bool high,
 	bool outlineIn, int numberOfIngredients, int itemCodes[], int itemQuants[], int craftedCode, int craftedQuant)
 {
@@ -129,7 +129,7 @@ void Item::Decrease(int quant)
 	quantity -= quant;
 }
 
-void Item::Draw(int x0, int y0, int x1, int y1)
+void Item::Draw(GLuint texId, int x0, int y0, int x1, int y1)
 {
 	char quant[10];
 	glColor3ub(255, 255, 255);
@@ -151,28 +151,32 @@ void Item::Draw(int x0, int y0, int x1, int y1)
 		glEnd();
 	}
 
-	glColor3ubArray(color);
+	glColor3ub(255, 255, 255); // Current color is solid white
+	
+	double imageX = (int)texLoc % 6;
+	double imageY = (double)((int)texLoc / 6);
+
+	printf("ImgX = %lf, ImgY = %d\n, %lf %lf \n", imageX, imageY, imageX / 6, imageY / 2);
+	//getchar();
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texId);
 	glBegin(GL_QUADS);
-	glVertex2i(x0, y0);
-	glVertex2i(x1, y0);
-	glVertex2i(x1, y1);
-	glVertex2i(x0, y1);
+
+	glTexCoord2d(imageX / 6, (imageY) / 2);
+	glVertex2d(x0, y0);
+	glTexCoord2d((imageX + 1) / 6, (imageY) / 2);
+	glVertex2d(x1, y0);
+	glTexCoord2d((imageX + 1) / 6, (imageY + 1) / 2);
+	glVertex2d(x1, y1);
+	glTexCoord2d(imageX / 6, (imageY + 1) / 2);
+	glVertex2d(x0, y1);
 	glEnd();
+
+	glDisable(GL_TEXTURE_2D);
 }
 
 Material::Material()
 {
-	//fgets(name, 255, stdin);
-	//for (auto &c : name)
-	//{
-	//	if (c == '\n')
-	//	{
-	//		c = 0;
-	//	}
-	//}
-	//color[rand() % 3] = (strlen(name) * 10) % 255;
-	//quantity = 1;
-	//stackable = TRUE;
 }
 
 Material::~Material()
@@ -346,7 +350,7 @@ Grid::Grid(int x0, int y0, int x1, int y1, int numObjects)
 	}
 }
 
-void Grid::Draw(void)
+void Grid::Draw(GLuint texId)
 {
 	int x0, y0, x1, y1, index;
 
@@ -373,7 +377,7 @@ void Grid::Draw(void)
 			else // draw item icon
 			{
 				auto &elem = *gridVec[index];
-				elem.Draw(x0, y0, x1, y1);
+				elem.Draw(texId, x0, y0, x1, y1);
 			}
 			if (index == activeTool)
 			{
@@ -389,6 +393,7 @@ void Grid::Draw(void)
 			}
 		}
 	}
+
 	glColor3ubArray(backgroundColor);
 	glBegin(GL_QUADS);
 
