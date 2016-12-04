@@ -207,6 +207,7 @@ int main(void)
 
 		//Enemy Chase Dynamics
 		int calcHit,damage2Player=0;
+		int bumpCheck = 0;
 		for (int ii = 0; ii < enemyList.size(); ii++)
 		{
 			enemyList[ii].drawEnemy();
@@ -231,23 +232,22 @@ int main(void)
 
 		for (int ii = 0; ii < enemyList.size(); ii++)
 		{
-			if (enemyList[ii].xGrid() != camera.xGrid() || enemyList[ii].yGrid() != camera.yGrid() || enemyList[ii].zGrid() != camera.zGrid())
+			if (enemyList[ii].xGrid() == camera.xGrid() && enemyList[ii].yGrid() == camera.yGrid() && enemyList[ii].zGrid() == camera.zGrid())
 			{
-				if (hitEnable == 1)
-				{
-					calcHit=1;
-				}
+				bumpCheck++;
 			}
 		}
 
-		if (calcHit == 1)
+		if (bumpCheck == 0)
 		{
 			for (int ii = 0; ii < enemyList.size(); ii++)
 			{
 				damage2Player += (enemyList[ii].hitPlayer*enemyList[ii].damage);
+				enemyList[ii].hitPlayer = 0;
 			}
-			calcHit = 0;
+			bumpCheck = 0;
 			hitEnable = 0;
+			
 		}
 
 		camera.health -= damage2Player;

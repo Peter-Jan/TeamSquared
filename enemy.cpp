@@ -115,7 +115,7 @@ void enemy::drawEnemy(void)
 int enemy::chase(CameraObject player, std::map<int, std::unique_ptr<Block>> &blockMap)
 {
 	double magnitude=0;
-	double scale = 1.0;
+	double scale = 2.0;
 
 	magnitude = sqrt(pow(player.x() - pos[0], 2) + pow(player.y() - pos[1], 2) + pow(player.z() - pos[2], 2));
 	chaseVec[0] = (player.x() - (pos[0]+blockSize/2))/(scale*magnitude);
