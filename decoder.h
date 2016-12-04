@@ -5,7 +5,7 @@ GLuint decodePng()
 
 	YsRawPngDecoder png[2];
 	png[0].Decode("emoji.png");
-	png[1].Decode("texture.png");
+	png[1].Decode("/Users/peterjan/GitHub/TeamSquared/texture.png");
 
 	GLuint texId;             	// Two unsigned integers for reserving texture identifiers
 

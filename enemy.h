@@ -9,6 +9,8 @@ public:
 	double vertVel = 0;
 	int roomSize = 0;
 	int index = 0;
+    int planJump =0;
+    int jumps = 0;
 	double dxMove, dyMove, dzMove;
 	int blockSize;
 	std::vector<double> pos = { 0,0,0 };
@@ -37,7 +39,7 @@ public:
 	int zGrid(void);
 
 	int chase(CameraObject player, std::map<int, std::unique_ptr<Block>> &blockMap);
-	void hitCheck(std::map<int, std::unique_ptr<Block>> &blockMap, std::vector<double> curFV);
+	void hitCheck(CameraObject player,std::map<int, std::unique_ptr<Block>> &blockMap, std::vector<double> curFV);
 
 };
 

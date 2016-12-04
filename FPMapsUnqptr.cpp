@@ -150,7 +150,7 @@ int main(void)
 		// 3D drawing from here
 		//dasEnemy.frenemy.DrawTexture((GLuint)1,0,0);
 		dasEnemy.drawEnemy();
-		terminate = dasEnemy.chase(camera,worldGrid.blockMap);
+        dasEnemy.chase(camera,worldGrid.blockMap);
 		
 
 		if (switchCamera)

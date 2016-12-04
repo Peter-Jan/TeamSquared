@@ -86,7 +86,7 @@ void enemy::setPos()
 {
 	pos[0] = posM[0] - blockSize / 2;
 	pos[2] = posM[2] - blockSize / 2;
-	pos[1] = posM[1] - blockSize / 2;
+	pos[1] = posM[1];
 }
 
 
@@ -120,7 +120,7 @@ int enemy::chase(CameraObject player, std::map<int, std::unique_ptr<Block>> &blo
 	//printf("PLAYER: x: %lf,y: %lf,z: %lf \n", player.x(), player.y(), player.z());
 	//printf("PLAYER GRID: x: %d,y: %d,z: %d \n\n", player.xGrid(), player.yGrid(), player.zGrid());
 	frenemy.setPosition(pos[0], pos[1], pos[2]);
-	hitCheck(blockMap, chaseVec);
+	hitCheck(player,blockMap, chaseVec);
 	if (player.xGrid() == xGrid() && player.yGrid() == yGrid() && player.zGrid() == zGrid())
 	{
 		return 1;
@@ -130,26 +130,22 @@ int enemy::chase(CameraObject player, std::map<int, std::unique_ptr<Block>> &blo
 }
 
 
-void enemy::hitCheck(std::map<int, std::unique_ptr<Block>> &blockMap, std::vector<double> chaseVec)
+void enemy::hitCheck(CameraObject player,std::map<int, std::unique_ptr<Block>> &blockMap, std::vector<double> chaseVec)
 {
 	double px0, px1, pz0, pz1, py0, py1;
 	int cx0, cy0, cz0, checkX, checkY, checkZ;
 
 	setPos();
 	dxMove = chaseVec[0];
-	dyMove = chaseVec[1];
 	dzMove = chaseVec[2];
 
 	px1 = posM[0] + chaseVec[0]; // centerblock after move
-	py1 = posM[1] + chaseVec[1];
 	pz1 = posM[2] + chaseVec[2];
 
 	cx0 = ((int)posM[0] % blockSize) / (blockSize / 4);
-	cy0 = pos[1] / blockSize;
 	cz0 = ((int)posM[2] % blockSize) / (blockSize / 4);
 
 	checkX = ((int)px1%blockSize) / (blockSize / 4);
-	checkY = py1 / blockSize;
 	checkZ = ((int)pz1%blockSize) / (blockSize / 4);
 
 	if (dxMove != 0 && cx0 != checkX && checkX == 0 || checkX == 3)
@@ -162,6 +158,7 @@ void enemy::hitCheck(std::map<int, std::unique_ptr<Block>> &blockMap, std::vecto
 		}
 		else
 		{
+            vertVel= .3;//player.jumpVel;
 			if (dxMove > 0)
 			{
 				posM[0] = xGrid()*blockSize + blockSize*3/4;
@@ -189,6 +186,7 @@ void enemy::hitCheck(std::map<int, std::unique_ptr<Block>> &blockMap, std::vecto
 		}
 		else
 		{
+            vertVel= .3; //player.jumpVel;
 			if (dzMove > 0)
 			{
 				posM[2] = zGrid()*blockSize + blockSize*3/4;
@@ -207,21 +205,20 @@ void enemy::hitCheck(std::map<int, std::unique_ptr<Block>> &blockMap, std::vecto
 	}
 	setPos();
 	SetGridLocation();
-
-
-
-	//falling down to ground
-
-	vertVel += GRAV;
-	pos[1] += vertVel;
-	int yIdx = yGrid()-1;
+    vertVel += GRAV;
+    
+    //falling down to ground
+    pos[1] += vertVel;
+    int yIdx = yGrid() + (vertVel < 0 ? -1 : 1);
+    
 	index = xGrid() + zGrid()*roomSize + yIdx*pow(roomSize, 2);
 
-	if (blockMap.find(index) != blockMap.end()) // hit floor
-	{
-		vertVel = 0;
-		pos[1] = yGrid()*blockSize;
-	}
+    
+       	if (blockMap.find(index) != blockMap.end()) // hit floor
+        {
+            vertVel = 0;
+            pos[1] = yGrid()*blockSize;
+        }
 
 }
 
