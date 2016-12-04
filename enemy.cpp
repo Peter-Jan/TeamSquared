@@ -13,12 +13,22 @@ enemy::~enemy()
 
 enemy::enemy(int roomSize)
 {
-	initialize(roomSize, 0.0,0.0,0.0);
+	double xSpawn, ySpawn, zSpawn;
+	xSpawn = rand()% roomSize;
+	ySpawn = rand() % roomSize;
+	zSpawn = rand() % roomSize;
+	printf("xS: %lf, zS: %lf\n",xSpawn,zSpawn);
+
+	health = 20;
+	damage = 10;
+	initialize(roomSize, xSpawn*blockSize,((double)roomSize*8 / 2),zSpawn*blockSize);
 }
 
-enemy::enemy(int roomSize,double startX,double startY,double startZ)
+enemy::enemy(int roomSize,double startX,double startY,double startZ,int healthIn,int damageIn)
 {
 	initialize(roomSize,startX,startY,startZ);
+	health = healthIn;
+	damage = damageIn;
 }
 
 double enemy::x(void)
@@ -114,15 +124,16 @@ int enemy::chase(CameraObject player, std::map<int, std::unique_ptr<Block>> &blo
 
 	setPosM();
 	SetGridLocation();
-	//printf("CHASEVEC: x: %lf,y: %lf,z: %lf \n", chaseVec[0],chaseVec[1],chaseVec[2]);
-	//printf("ENEMY: x: %lf,y: %lf,z: %lf \n", posM[0], posM[1], posM[2]);
-	//printf("ENEMY GRID: x: %d,y: %d,z: %d \n\n", xGrid(), yGrid(), zGrid());
-	//printf("PLAYER: x: %lf,y: %lf,z: %lf \n", player.x(), player.y(), player.z());
-	//printf("PLAYER GRID: x: %d,y: %d,z: %d \n\n", player.xGrid(), player.yGrid(), player.zGrid());
+	printf("CHASEVEC: x: %lf,y: %lf,z: %lf \n", chaseVec[0],chaseVec[1],chaseVec[2]);
+	printf("ENEMY: x: %lf,y: %lf,z: %lf \n", posM[0], posM[1], posM[2]);
+	printf("ENEMY GRID: x: %d,y: %d,z: %d \n\n", xGrid(), yGrid(), zGrid());
+	printf("PLAYER: x: %lf,y: %lf,z: %lf \n", player.x(), player.y(), player.z());
+	printf("PLAYER GRID: x: %d,y: %d,z: %d \n\n", player.xGrid(), player.yGrid(), player.zGrid());
 	frenemy.setPosition(pos[0], pos[1], pos[2]);
 	hitCheck(player,blockMap, chaseVec);
 	if (player.xGrid() == xGrid() && player.yGrid() == yGrid() && player.zGrid() == zGrid())
 	{
+		hitPlayer = 1;
 		return 1;
 	}
 

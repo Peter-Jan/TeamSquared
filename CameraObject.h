@@ -23,7 +23,6 @@
 class CameraObject
 {
 public:
-	//double x, y, z;
 	double grav = 0;
 	int roomSize = 0;
 	int index = 0;
@@ -34,7 +33,7 @@ public:
 	std::vector<double> forwardVector = { 0,0,0 };
 	std::vector<double> pos = { 0,0,0 };
 	std::vector<int> gridLocation = { 0,0,0 };
-	//std::vector<enemy> enemyList;
+	std::vector<double> curFV = { 0,0,0 };
 
 	int blockSize, jumps = 5;
 	int health, maxHealth;
@@ -64,6 +63,7 @@ public:
 	void SetUpCameraProjection(void);
 	void SetUpCameraTransformation(void);
 	void DrawCamera(void);
+	int findEnemy(int range,const int x,const int y,const int z);
 	void hitCheck(std::map<int, std::unique_ptr<Block>> &blockMap, std::vector<double> &curFV);
 	Block playerBlock;
 

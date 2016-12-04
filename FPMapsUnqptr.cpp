@@ -6,14 +6,16 @@
 
 int main(void)
 {
+	srand((int)time(nullptr));
 	FsOpenWindow(800, 100, WINWID, WINHEI, 1);
-
 	int terminate = 0;
 	int lb, mb, rb, mx, my, mouseEvent, key = 0;
 	int drawCount = 0;
 	int roomSize = 50;
-	// texX, texY, bgColor[3], health, quantity
-
+	int gotHit = 0;
+	int hitCounter = 0;
+	int hitEnemy = 0;
+	int hitEnable = 0;
 	std::map<int, std::unique_ptr<Item>> itemLibrary;
 	//							 <ClassCode, itemCode, name, quant, texture#, weight, range, damage, health, strength, speed, hitscan, stackable, highlight, outline, numIngedients, matCodes[numIngedients], quantities[numIngedients], craftedItemCode, craftedQuant>
 	// materials,   ClassCode == 0,   0 - 100
@@ -41,7 +43,7 @@ int main(void)
 	itemLibrary[302].reset(new Item(3, 302,"Lv1 RockHammer", 1, 302, 1, 0.0, 1, 0, 0, 0.5, true, false, false, false, 2, ingredientCodes, ingredientQuants, 102, 1));
 	delete[] ingredientCodes, ingredientQuants;
 
-	//					<itemCode, texX, texY, r,g,b, strength, health, quant
+	//	<itemCode, texX, texY, r,g,b, strength, health, quant>
 	std::vector<int> dirt =    { 0,   0,0,255,255,255, 0,  2, 3 };
 	std::vector<int> stone =   { 1,   5,0,255,255,255, 1,  4, 1 };
 	std::vector<int> steel =   { 2,   2,0,255,255,255, 1,  6, 0 };
@@ -120,7 +122,13 @@ int main(void)
 
 	worldGrid.AddBlock(5, 5, 5, orange);
 
-	enemy dasEnemy(worldGrid.roomSize,21*8,21*8,21*8);
+	//Generate Enemies
+	int numEnemy = 2;
+	std::vector<enemy> enemyList;
+	for (int ii = 0; ii < numEnemy; ii++)
+	{
+		enemyList.push_back(enemy(roomSize));
+	}
 
 	camera.playerBlock.roomSize = worldGrid.roomSize;
 	camera2.playerBlock.roomSize = worldGrid.roomSize;
@@ -163,6 +171,9 @@ int main(void)
 		case FSKEY_G:
 			camera.gravityOn = !camera.gravityOn;
 			break;
+		case FSKEY_P:
+			enemyList.push_back(enemy(roomSize));
+			break;
 		case FSKEY_T:
 			texturesOn = !texturesOn;
 			if (texturesOn)
@@ -194,9 +205,55 @@ int main(void)
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1, 1);
 
-		// 3D drawing from here
-		dasEnemy.drawEnemy();
-		terminate = dasEnemy.chase(camera, worldGrid.blockMap);
+		//Enemy Chase Dynamics
+		int calcHit,damage2Player=0;
+		for (int ii = 0; ii < enemyList.size(); ii++)
+		{
+			enemyList[ii].drawEnemy();
+			gotHit = enemyList[ii].chase(camera, worldGrid.blockMap);
+			if (enemyList[ii].health <= 0)
+			{
+				printf("DELETING ENEMY\n");
+				enemyList.erase(enemyList.begin() + ii);
+			}
+		}
+
+
+		if (gotHit == 1)
+		{
+			hitEnable = 1;
+		}
+
+		if (hitEnable == 1)
+		{
+			camera.vertVel = 0.5;		//enemy bump function here
+		}
+
+		for (int ii = 0; ii < enemyList.size(); ii++)
+		{
+			if (enemyList[ii].xGrid() != camera.xGrid() || enemyList[ii].yGrid() != camera.yGrid() || enemyList[ii].zGrid() != camera.zGrid())
+			{
+				if (hitEnable == 1)
+				{
+					calcHit=1;
+				}
+			}
+		}
+
+		if (calcHit == 1)
+		{
+			for (int ii = 0; ii < enemyList.size(); ii++)
+			{
+				damage2Player += (enemyList[ii].hitPlayer*enemyList[ii].damage);
+			}
+			calcHit = 0;
+			hitEnable = 0;
+		}
+
+		camera.health -= damage2Player;
+		damage2Player = 0;
+
+
 
 #if defined(_WIN32_WINNT)
 		if (switchCamera)
@@ -454,6 +511,20 @@ int main(void)
 				else
 				{
 					printf("Did Not Find");
+				}
+				break;
+
+			case FSMOUSEEVENT_MBUTTONDOWN:
+
+				for (int ii = 0; ii < enemyList.size(); ii++)
+				{
+					hitEnemy = camera.findEnemy(16, enemyList[ii].xGrid(), enemyList[ii].yGrid(), enemyList[ii].zGrid());
+					printf("hitEnemy: %d\n", hitEnemy);
+					if (hitEnemy == 1)
+					{
+						printf("HITTING ENEMY\n");
+						enemyList[ii].health -= 10;
+					}
 				}
 				break;
 			}

@@ -519,6 +519,37 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera, bool textures
 
 void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key, bool texturesOn)
 {
+	//Draw Bounding Box
+	glColor3ub(135, 206, 250);
+
+	glBegin(GL_QUADS);
+	glVertex3d(0, 0, roomSize*blockSize);
+	glVertex3d(0, roomSize*blockSize, roomSize*blockSize);
+	glVertex3d(0, roomSize*blockSize, 0);
+	glVertex3d(0, 0, 0);	
+
+	glVertex3d(roomSize*blockSize, 0, 0);
+	glVertex3d(roomSize*blockSize, roomSize*blockSize, 0);
+	glVertex3d(roomSize*blockSize, roomSize*blockSize, roomSize*blockSize);
+	glVertex3d(roomSize*blockSize, 0, roomSize*blockSize);
+
+	glVertex3d(0, 0, 0);
+	glVertex3d(0, roomSize*blockSize, 0);
+	glVertex3d(roomSize*blockSize, roomSize*blockSize, 0);
+	glVertex3d(roomSize*blockSize, 0, 0);
+
+	glVertex3d(roomSize*blockSize, 0, roomSize*blockSize);
+	glVertex3d(roomSize*blockSize, roomSize*blockSize, roomSize*blockSize);
+	glVertex3d(0, roomSize*blockSize, roomSize*blockSize);
+	glVertex3d(0, 0, roomSize*blockSize);
+
+	glVertex3d(0, roomSize*blockSize, roomSize*blockSize);
+	glVertex3d(roomSize*blockSize, roomSize*blockSize, roomSize*blockSize);
+	glVertex3d(roomSize*blockSize, roomSize*blockSize, 0);
+	glVertex3d(0, roomSize*blockSize, 0);
+	glEnd();
+
+
 	// Draw ground lattice
 	glColor3ub(0, 0, 255);
 	glBegin(GL_LINES);

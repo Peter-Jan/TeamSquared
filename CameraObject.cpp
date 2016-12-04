@@ -75,7 +75,8 @@ void CameraObject::Initialize(int roomSizeIn, double startX, double startY, doub
 	jumps = 5;
 	blockSize = 8;
 	maxHealth = 100;
-	health = maxHealth - 50;
+	health = maxHealth;
+
 
 	jumpVel = sqrt(3.0 * (double)blockSize*-GRAV);
 	printf("JumpVel = %lf\n", jumpVel);
@@ -306,7 +307,6 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
     
 	if (!stationary)
 	{
-		std::vector<double> curFV = { 0,0,0 };
 		SetVec(curFV, forwardVector);
 		if (gravityOn)
 		{
@@ -527,4 +527,31 @@ void CameraObject::hitCheck(std::map<int, std::unique_ptr<Block>> &blockMap, std
 			pos[1] += dyMove;
 		}
 	}
+}
+
+int CameraObject::findEnemy(int range, int enemyX, int enemyY, int enemyZ)
+{
+	int i = 0; int x, y, z;
+	std::vector<double> location = { playerBlock.xM, playerBlock.pos[1] + camHeight, playerBlock.zM };
+	index = (int)location[0] / blockSize + (int)location[2] / blockSize * roomSize + (int)location[1] / blockSize * pow(roomSize, 2);
+
+	while (i <= blockSize*range)
+	{
+		VecPlus(location, forwardVector); // increment location by camera's forward Vector
+		x = (int)location[0] / blockSize;
+		y = (int)location[1] / blockSize;
+		z = (int)location[2] / blockSize;
+		index = x + z*roomSize + y*pow(roomSize, 2);
+
+
+		if (x == enemyX && y == enemyY && z == enemyZ)
+		{
+			return 1;
+		}
+
+		i++;
+	}
+
+	return 0;
+
 }

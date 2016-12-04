@@ -2,15 +2,20 @@
 #define ENEMY
 #include "MiscFunctions.h"
 #include "CameraObject.h"
+#include <time.h>
+
 
 class enemy
 {
 public:
+	int health = 0;
+	int damage = 0;
 	double vertVel = 0;
 	int roomSize = 0;
 	int index = 0;
     int planJump =0;
     int jumps = 0;
+	int hitPlayer = 0;
 	double dxMove, dyMove, dzMove;
 	int blockSize;
 	std::vector<double> pos = { 0,0,0 };
@@ -22,7 +27,7 @@ public:
 
 	enemy();
 	enemy(int roomSize);
-	enemy(int roomSize, double xLoc, double yLoc, double zLoc);
+	enemy(int roomSize, double xLoc, double yLoc, double zLoc, int healthIn, int damageIn);
 	~enemy();
 
 	void initialize(int roomSize, double startX, double startY, double startZ);
