@@ -37,7 +37,7 @@ public:
 	int zGrid(void);
 
 	int chase(CameraObject player, std::map<int, std::unique_ptr<Block>> &blockMap);
-	void enemy::hitCheck(std::map<int, std::unique_ptr<Block>> &blockMap, std::vector<double> curFV);
+	void hitCheck(std::map<int, std::unique_ptr<Block>> &blockMap, std::vector<double> curFV);
 
 };
 
