@@ -146,17 +146,17 @@ void Terrain::GenerateFunctionTerrain(void)
 	int stepSize = roomSize / 10;
 	srand((int)time(nullptr));
 
-	int xScalar = rand() % (roomSize / 10 + 1) + 1;
-	int zScalar = rand() % (roomSize / 10 + 1) + 1;
-	double xFreq = rand() % 10 + 1;
-	double zFreq = rand() % 10 + 1;
+	int xScalar = rand() % 3 + 5;
+	int zScalar = rand() % 3 + 5;
+	double xFreq = rand() % 4 + 1;
+	double zFreq = rand() % 4 + 1;
 
 	int index;
 	for (int x = 0; x < roomSize; x++)
 	{
 		for (int z = 0; z < roomSize; z++)
 		{
-			y = (int)(sin(x*xFreq*DEGTORAD + z*zFreq*DEGTORAD)*cos(x*DEGTORAD)*xScalar / 2.0 + sin(x*zFreq*DEGTORAD*z*xFreq*DEGTORAD / 2.0)*cos(z*DEGTORAD)*zScalar / 2.0) + roomSize / 10;
+			y = (int)(sin(x*xFreq*DEGTORAD + z*zFreq*DEGTORAD)*cos(x*DEGTORAD)*xScalar + sin(x*zFreq*DEGTORAD*z*xFreq*DEGTORAD / 2.0)*cos(z*DEGTORAD)*zScalar) + roomSize / 10;
 
 			while (y >= 0)
 			{

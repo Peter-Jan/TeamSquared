@@ -11,7 +11,7 @@ int main(void)
 	int terminate = 0;
 	int lb, mb, rb, mx, my, mouseEvent, key = 0;
 	int drawCount = 0;
-	int roomSize = 100;
+	int roomSize = 30;
 	int gotHit = 0;
 	int hitCounter = 0;
 	int enemyDist = 0;
@@ -30,8 +30,9 @@ int main(void)
 	itemLibrary[8].reset(new Item(0, 8, "Wood",    2, 7.0, 1, 8.0, 0,  3, 0, 0.0, true, true, false, false));
 
 	// weapons,     ClassCode == 1, 101 - 200
-	itemLibrary[101].reset(new Item(1, 101, "Stick", 1, 1.0, 1, 4.0, 1, 0,      1, 0.5, true, false, false, false));
-	itemLibrary[102].reset(new Item(1, 102, "RockHammer", 1, 102.0, 1, 4.0, 1, 0, 2, 0.5, true, false, false, false));
+	itemLibrary[101].reset(new Item(1, 101, "Stick", 1,       11.0, 2, 4.0, 1, 0,      1, 0.5, true, false, false, false));
+	itemLibrary[102].reset(new Item(1, 102, "RockHammer", 1, 102.0, 3, 4.0, 1, 0, 2, 0.5, true, false, false, false));
+
 
 	// consumables, ClassCode == 2, 201 - 300
 	itemLibrary[201].reset(new Item(2, 201, "Orange",  6, 3.0, 1, 0.0, 0, 10, 2, 15, true, true, false, false));
@@ -213,19 +214,23 @@ int main(void)
 		//Enemy Chase Dynamics
 		int calcHit,damage2Player=0;
 		int bumpCheck = 0;
-		int i = 0;
+		int enemyNum = 0;
 		for (auto &enemy : enemyList)
 		{
-			enemy.drawEnemy();
 			gotHit = enemy.chase(camera, worldGrid.blockMap);
 			if (enemy.frenemy.health <= 0)
 			{
 				printf("DELETING ENEMY\n");
-				enemyList.erase(enemyList.begin() + i);
+				enemyList.erase(enemyList.begin() + enemyNum);
+				break;
 			}
-			i++;
+			enemyNum++;
 		}
 
+		for (auto &enemy : enemyList)
+		{
+			enemy.drawEnemy();
+		}
 
 		if (gotHit == 1)
 		{
@@ -237,9 +242,9 @@ int main(void)
 			camera.vertVel = 0.5;		//enemy bump function here
 		}
 
-		for (int ii = 0; ii < enemyList.size(); ii++)
+		for (auto &enemy : enemyList)
 		{
-			if (enemyList[ii].xGrid() == camera.xGrid() && enemyList[ii].yGrid() == camera.yGrid() && enemyList[ii].zGrid() == camera.zGrid())
+			if (enemy.xGrid() == camera.xGrid() && enemy.yGrid() == camera.yGrid() && enemy.zGrid() == camera.zGrid())
 			{
 				bumpCheck++;
 			}
@@ -247,14 +252,13 @@ int main(void)
 
 		if (bumpCheck == 0)
 		{
-			for (int ii = 0; ii < enemyList.size(); ii++)
+			for (auto &enemy : enemyList)
 			{
-				damage2Player += (enemyList[ii].hitPlayer*enemyList[ii].damage);
-				enemyList[ii].hitPlayer = 0;
+				damage2Player += (enemy.hitPlayer*enemy.damage);
+				enemy.hitPlayer = 0;
 			}
 			bumpCheck = 0;
 			hitEnable = 0;
-			
 		}
 
 		camera.health -= damage2Player;
@@ -526,7 +530,7 @@ int main(void)
 						else // if no block in between
 						{
 							printf("HITTING ENEMY\n");
-							enemy.frenemy.health -= 10;
+							enemy.frenemy.health -= 5*damage;
 							goto end;
 						}
 					}
