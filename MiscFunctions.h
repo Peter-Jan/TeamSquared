@@ -76,6 +76,4 @@ void SetVec(std::vector<NumType> &first, NumType i1, NumType i2, NumType i3) // 
 	first[1] = i2;
 	first[2] = i3;
 }
-
-
 #endif // !MISC_FUNCTIONS

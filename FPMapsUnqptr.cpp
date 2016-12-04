@@ -11,7 +11,7 @@ int main(void)
 	int terminate = 0;
 	int lb, mb, rb, mx, my, mouseEvent, key = 0;
 	int drawCount = 0;
-
+	int roomSize = 50;
 	// texX, texY, bgColor[3], health, quantity
 
 	std::map<int, std::unique_ptr<Item>> itemLibrary;
@@ -19,14 +19,14 @@ int main(void)
 	// materials,   ClassCode == 0,   0 - 100
 	itemLibrary[0].reset(new Item(0, 0, "Dirt",    3, 0, 1, 8.0, 0,  2, 0, 0.0, true, true, false, false));
 	itemLibrary[1].reset(new Item(0, 1, "Stone",   1, 1, 1, 8.0, 0,  4, 1, 0.0, true, true, false, false));
-	itemLibrary[2].reset(new Item(0, 2, "Steel",   0, 2, 1, 8.0, 0,  6, 1, 0.0, true, true, false, false));
+	itemLibrary[2].reset(new Item(0, 2, "Steel",   0, 2, 1, 8.0, 0,  6, 2, 0.0, true, true, false, false));
 	itemLibrary[3].reset(new Item(0, 3, "Wood",    2, 3, 1, 8.0, 0,  3, 0, 0.0, true, true, false, false));
-	itemLibrary[4].reset(new Item(0, 4, "Ruby",    0, 4, 1, 8.0, 0, 10, 2, 0.0, true, true, false, false));
-	itemLibrary[5].reset(new Item(0, 5, "Emerald", 0, 5, 1, 8.0, 0,  6, 2, 0.0, true, true, false, false));
+	itemLibrary[4].reset(new Item(0, 4, "Ruby",    0, 4, 1, 8.0, 0, 10, 3, 0.0, true, true, false, false));
+	itemLibrary[5].reset(new Item(0, 5, "Emerald", 0, 5, 1, 8.0, 0,  6, 3, 0.0, true, true, false, false));
 
 	// weapons,     ClassCode == 1, 101 - 200
-	itemLibrary[101].reset(new Item(1, 101, "Stick", 1, 101, 1, 4.0, 1, 0, 0, 0.5, true, false, false, false));
-	itemLibrary[102].reset(new Item(1, 102, "RockHammer", 1, 102, 1, 4.0, 1, 0, 0, 0.5, true, false, false, false));
+	itemLibrary[101].reset(new Item(1, 101, "Stick", 1, 101, 1, 4.0, 1, 0,      1, 0.5, true, false, false, false));
+	itemLibrary[102].reset(new Item(1, 102, "RockHammer", 1, 102, 1, 4.0, 1, 0, 2, 0.5, true, false, false, false));
 
 	// consumables, ClassCode == 2, 201 - 300
 	itemLibrary[201].reset(new Item(2, 201, "Orange",  6, 201, 1, 0.0, 0, 10, 2, 15, true, true, false, false));
@@ -60,14 +60,43 @@ int main(void)
 	materials.push_back(orange);
 
 	// structures <itemCode, xGrid, yGrid, zGrid>
-	//std::vector<int[4]> indices;
-	//indices.push_back({  0, 0, 0 });
-	//indices.push_back({  0, 1, 0});
-	//indices.push_back({  0, 2, 0});
-	//indices.push_back({ -1, 2, 0});
-	//indices.push_back({  1, 2, 0});
-	//indices.push_back({  0, 2,-1});
-	//indices.push_back({  0, 2, 1});
+	// Tree type 1
+	std::vector<std::vector<int>> tree1;
+	tree1.push_back({ 3,   0, 0, 0 });
+	tree1.push_back({ 3,   0, 1, 0 });
+	tree1.push_back({ 3,   0, 2, 0 });
+	tree1.push_back({ 3,   -1, 2, 0 });
+	tree1.push_back({ 3,   1, 2, 0 });
+	tree1.push_back({ 3,   0, 2, 1 });
+	tree1.push_back({ 3,   0, 2, -1 });
+	tree1.push_back({ 6,   0, 3, 0 });
+	tree1.push_back({ 3,   1, 3, 0 });
+	tree1.push_back({ 3,   -1, 3, 0 });
+
+	//Tree Type 2
+	std::vector<std::vector<int>> tree2;
+	tree2.push_back({ 3,   0, 0, 0 });
+	tree2.push_back({ 3,   0, 1, 0 });
+	tree2.push_back({ 3,   0, 2, 0 });
+	tree2.push_back({ 3,   0, 3, 0 });
+	tree2.push_back({ 3,   -1, 3, 0 });
+	tree2.push_back({ 3,   1, 3, 0 });
+	tree2.push_back({ 3,   2, 3, 0 });
+	tree2.push_back({ 3,   -2, 3, 0 });
+	tree2.push_back({ 3,   0, 4, 0 });
+	tree2.push_back({ 3,   -1, 4, 0 });
+	tree2.push_back({ 6,   1, 4, 0 });
+	tree2.push_back({ 3,   0, 5, 0 });
+	tree2.push_back({ 3,   0, 3, -1 });
+	tree2.push_back({ 3,   0, 3, 1 });
+	tree2.push_back({ 3,   0, 3, 2 });
+	tree2.push_back({ 6,   0, 3, -2 });
+	tree2.push_back({ 3,   0, 4, 1 });
+	tree2.push_back({ 3,   0, 4, -1 });
+
+	std::vector< std::vector<std::vector<int>>> structureLibrary;
+	structureLibrary.push_back(tree1);
+	structureLibrary.push_back(tree2);
 
 	Grid inventory(20, 20, 350, 500, 20);
 	Grid toolbar(100, 500, 700, 600, 10);
@@ -77,21 +106,19 @@ int main(void)
 
 	crafting.AddPermElement(itemLibrary);
 
-	Terrain worldGrid(30, 2, materials);
+	Terrain worldGrid(roomSize, 2, materials, structureLibrary);
 
 
-	CameraObject camera(worldGrid.roomSize), camera2(worldGrid.roomSize);
+	CameraObject camera(roomSize, (double)(roomSize*blockSize/2), (double)(roomSize*blockSize / 2), (double)(roomSize*blockSize / 2)), camera2(worldGrid.roomSize);
 	worldGrid.texId = decodePng();
 
 	worldGrid.AddBlock(5, 5, 5, orange);
+
 	enemy dasEnemy(worldGrid.roomSize,21*8,21*8,21*8);
 
 	camera.playerBlock.roomSize = worldGrid.roomSize;
 	camera2.playerBlock.roomSize = worldGrid.roomSize;
 
-	camera.pos[0] = 200.0;
-	camera.pos[1] = 50.0;
-	camera.pos[2] =  20.0;
 	camera2.pos[0] += worldGrid.roomSize / 2 * camera2.blockSize;
 	camera2.pos[1] += worldGrid.roomSize / 2 * camera2.blockSize;
 	camera2.pos[2] += worldGrid.roomSize / 2 * camera2.blockSize;
@@ -184,13 +211,12 @@ int main(void)
 		}
 #endif
 
-		switch (FsGetMouseEvent(lb, mb, rb, mx, my))
+		if (!camera.cursorLock)
 		{
-		case FSMOUSEEVENT_LBUTTONDOWN:
-			printf("USER CLICKED\n");
-
-			if (!camera.cursorLock)
+			switch (FsGetMouseEvent(lb, mb, rb, mx, my))
 			{
+			case FSMOUSEEVENT_LBUTTONDOWN:
+				printf("USER CLICKED\n");
 				if (but.ClickCheck(mx, my) == 1)
 				{
 					printf("\nInside the Button!");
@@ -323,46 +349,96 @@ int main(void)
 				{
 				}
 				break;
-			}
-			else // use selected item left click
+
+			case FSMOUSEEVENT_RBUTTONDOWN:
 			{
+				// do nothing
+			}
+			break;
+			}
+		}
+		else
+		{
+			printf("USER CLICKED IN WORLD\n");
+			int damage = 1, strength = 0, range = 8;
+			switch (FsGetMouseEvent(lb, mb, rb, mx, my))
+			{
+			case FSMOUSEEVENT_LBUTTONDOWN:
 				printf("IN LEFT BUTTON\n");
-				if (camera.activeTool == NULLINT || toolbar.gridVec[toolbar.activeCell] == nullptr)
+				if (camera.activeTool == NULLINT || toolbar.gridVec[toolbar.activeTool] == nullptr) // no item selected
 				{
 					// do nothing
-				}
-				else
-				{
-					//toolbar.gridVec[toolbar.activeCell]->Use(camera, worldGrid, materials);
-					if (worldGrid.FindBlock(camera, xGrid, yGrid, zGrid, ADD))
+					if (camera.activeTool == 9)
 					{
-						if (xGrid != camera.xGrid() || (yGrid != camera.yGrid() && yGrid != camera.yGrid() + 1) || zGrid != camera.zGrid())
+						if (worldGrid.FindBlock(camera, range, xGrid, yGrid, zGrid, ADD))
 						{
-							//printf("Found one at %d %d %d\n", xGrid, yGrid, zGrid);
-							int blockType = rand() % 7; // select random block
-							worldGrid.AddBlock(xGrid, yGrid, zGrid, materials[blockType]);		//right now default add dirt blocks
+							if (xGrid != camera.xGrid() || (yGrid != camera.yGrid() && yGrid != camera.yGrid() + 1) || zGrid != camera.zGrid())
+							{
+								//printf("Found one at %d %d %d\n", xGrid, yGrid, zGrid);
+								int blockType = rand() % 7; // select random block
+								worldGrid.AddBlock(xGrid, yGrid, zGrid, materials[blockType]);		//right now default add dirt blocks
+							}
+						}
+						else
+						{
+							printf("Did Not Find");
 						}
 					}
-					else
+					break;
+				}
+				else // item is selected
+				{
+					switch (toolbar.gridVec[toolbar.activeTool]->classType)
 					{
-						//printf("Did Not Find");
+					case 0: // material
+						range = toolbar.gridVec[toolbar.activeTool]->range;
+						if (worldGrid.FindBlock(camera, range, xGrid, yGrid, zGrid, ADD))
+						{
+							if (xGrid != camera.xGrid() || (yGrid != camera.yGrid() && yGrid != camera.yGrid() + 1) || zGrid != camera.zGrid())
+							{
+								//printf("Found one at %d %d %d\n", xGrid, yGrid, zGrid);
+								worldGrid.AddBlock(xGrid, yGrid, zGrid, materials[toolbar.gridVec[toolbar.activeTool]->classID]);		//right now default add dirt blocks
+								toolbar.gridVec[toolbar.activeTool]->quantity--;
+								if (toolbar.gridVec[toolbar.activeTool]->quantity == 0)
+								{
+									toolbar.gridVec[toolbar.activeTool].reset();
+								}
+							}
+						}
+						break;
+					case 1: // weapons (changes damage, strength, and range of attack)
+						damage = toolbar.gridVec[toolbar.activeTool]->damage;
+						strength = toolbar.gridVec[toolbar.activeTool]->strength;
+						range = toolbar.gridVec[toolbar.activeTool]->range;
+						goto ATTACK;
+					case 2: // consumables (HP)
+						if (camera.health != camera.maxHealth)
+						{
+							camera.health += toolbar.gridVec[toolbar.activeTool]->health;
+							if (camera.health > camera.maxHealth)
+							{
+								camera.health = camera.maxHealth;
+							}
+							toolbar.gridVec[toolbar.activeTool]->quantity--;
+							if (toolbar.gridVec[toolbar.activeTool]->quantity == 0)
+							{
+								toolbar.gridVec[toolbar.activeTool].reset();
+							}
+						}
+						break;
 					}
 				}
-				//int itemCode = toolbar.gridVec[toolbar.activeCell]->Use();
-				
 				break;
-			}
-		case FSMOUSEEVENT_RBUTTONDOWN:
-			if (camera.cursorLock)
-			{
+			case FSMOUSEEVENT_RBUTTONDOWN:
+			ATTACK:
 				printf("IN RIGHT BUTTON\n");
-				if (worldGrid.FindBlock(camera, xGrid, yGrid, zGrid, REMOVE))
+				if (worldGrid.FindBlock(camera, range, xGrid, yGrid, zGrid, REMOVE))
 				{
 					if (xGrid != camera.xGrid() || yGrid != camera.yGrid() || zGrid != camera.zGrid())
 					{
 						int idx = xGrid + zGrid*worldGrid.roomSize + yGrid*pow(worldGrid.roomSize, 2);
 						//printf("Found one at %d %d %d\n", xGrid, yGrid, zGrid);
-						int blockHealth = worldGrid.blockMap[idx]->TakeDamage(2, 1);
+						int blockHealth = worldGrid.blockMap[idx]->TakeDamage(strength, damage);
 						if (blockHealth <= 0)
 						{
 							worldGrid.RemoveBlock(itemLibrary, inventory, xGrid, yGrid, zGrid);
@@ -373,8 +449,8 @@ int main(void)
 				{
 					printf("Did Not Find");
 				}
+				break;
 			}
-			break;
 		}
 
 #if !defined(_WIN32_WINNT)
@@ -404,37 +480,63 @@ int main(void)
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 
-		if (!camera.cursorLock)
-		{
-			inventory.Draw();
-			crafting.Draw();
-			ReqChart.Draw();
-			but.Draw(but.x, but.y);
-		}
+		{ // Draw GUI
+			if (!camera.cursorLock) // draw inventory
+			{
+				inventory.Draw();
+				crafting.Draw();
+				ReqChart.Draw();
+				but.Draw(but.x, but.y);
+			}
+			else // draw crosshairs
+			{
+				glLineWidth(1);
+				glBegin(GL_LINES);
+				glLineWidth(5);
+				glColor3ub(255, 255, 255);
+				glVertex2i(wid / 2 - 10, hei / 2);
+				glVertex2i(wid / 2 + 10, hei / 2);
+				glVertex2i(wid / 2, hei / 2 - 10);
+				glVertex2i(wid / 2, hei / 2 + 10);
+				glEnd();
 
-		toolbar.activeTool = camera.activeTool;
-		toolbar.Draw(); // always draw the toolbar
+				glLineWidth(5);
+				glBegin(GL_LINES);
+				glColor3ub(0, 0, 0);
+				glVertex2i(wid / 2 - 12, hei / 2);
+				glVertex2i(wid / 2 + 12, hei / 2);
+				glVertex2i(wid / 2, hei / 2 - 12);
+				glVertex2i(wid / 2, hei / 2 + 12);
+				glEnd();
+				glLineWidth(1);
+			}
 
-		{ // draw crosshairs
-			glLineWidth(1);
-			glBegin(GL_LINES);
-			glLineWidth(5);
-			glColor3ub(255, 255, 255);
-			glVertex2i(wid / 2 - 10, hei / 2);
-			glVertex2i(wid / 2 + 10, hei / 2);
-			glVertex2i(wid / 2, hei / 2 - 10);
-			glVertex2i(wid / 2, hei / 2 + 10);
-			glEnd();
+			// draw toolbar
+			toolbar.activeTool = camera.activeTool;
+			toolbar.Draw(); // always draw the toolbar
 
-			glLineWidth(5);
-			glBegin(GL_LINES);
+			// draw player health
+			int x0 = 50, y0 = 50;
 			glColor3ub(0, 0, 0);
-			glVertex2i(wid / 2 - 12, hei / 2);
-			glVertex2i(wid / 2 + 12, hei / 2);
-			glVertex2i(wid / 2, hei / 2 - 12);
-			glVertex2i(wid / 2, hei / 2 + 12);
+			glRasterPos2d(x0, y0);
+			char playerHealth[20];
+			sprintf(playerHealth, "Player Health = %2d / %2d", camera.health, camera.maxHealth);
+			YsGlDrawFontBitmap20x32(playerHealth);
+
+			glBegin(GL_QUADS);
+			glColor3ub(0, 255, 0);
+			glVertex2i(x0 - 10, y0 + 8);
+			glVertex2i(x0 - 10, y0 - 8 - 32);
+			glVertex2i(x0 + 20 * strlen(playerHealth)*(double)camera.health / (double)camera.maxHealth + 10, y0 - 8 - 32);
+			glVertex2i(x0 + 20 * strlen(playerHealth)*(double)camera.health / (double)camera.maxHealth + 10, y0 + 8);
+
+			glColor3ub(255, 0, 0);
+			glVertex2i(x0 - 10, y0 + 8);
+			glVertex2i(x0 - 10, y0 - 8 - 32);
+			glVertex2i(x0 + 20 * strlen(playerHealth) + 10, y0 - 8 - 32);
+			glVertex2i(x0 + 20 * strlen(playerHealth) + 10, y0 + 8);
+			
 			glEnd();
-			glLineWidth(1);
 		}
 
 		glDisable(GL_DEPTH_TEST);

@@ -188,11 +188,6 @@ Material::Material(char perm[],int q)
 	stackable = TRUE;
 }
 
-//void Material::Use(CameraObject &player, Terrain &worldGrid, std::vector<std::vector<int>> &materials);
-//{
-//	return classID;
-//}
-
 void Material::CleanUp(void)
 {
 }
@@ -317,10 +312,8 @@ Grid::Grid(int x0, int y0, int x1, int y1, int numObjects)
 	printf("%d, %d\n", rows, cols);
 	for (;;)
 	{
-		//printf("%d, %d\n", rows, cols);
 		cellX = (double)(gridWidth - (cols + 1)*border) / (double)cols;
 		cellY = (double)(gridHeight - (rows + 1)*border) / (double)rows;
-		//printf("cellWidth = %lf, cellHeight = %lf\n", cellX, cellY);
 
 		cellWidth = fmin(cellX, cellY);
 		cellHeight = cellWidth;
@@ -466,9 +459,7 @@ void Grid::TryTransfer(int &mx, int &my, Grid &other)
 		activeCell = NULLINT;
 		transfer = FALSE;
 	}
-	//activeCell = NULLINT;
 	other.activeCell = NULLINT;
-	//transfer = FALSE;
 	other.transfer = FALSE;
 }
 
@@ -516,9 +507,6 @@ int Grid::CheckClick(int &mx, int &my)
 		{
 			if (gridVec[index] == nullptr) // Generate new item (in the game, this should be removed)
 			{
-				//printf("Enter new item name >\n");
-				//std::unique_ptr<Item> tempP(new Material);
-				//AddElement(index, tempP);
 				return -2;    // ------> Will replace above 3 lines in actual game
 			}
 			else // if the cell is occupied and there is currently no active cell, highlight it

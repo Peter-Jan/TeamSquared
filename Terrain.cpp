@@ -1,10 +1,47 @@
 #include "Terrain.h"
 
-std::vector<std::vector<int>> defaultMatList = { {0,0,0,0,0} };
-
 int BlockDist(const Block &block1, const Block &block2)
 {
 	return abs(block1.getX() - block2.getX()) + abs(block1.getY() - block2.getY()) + abs(block1.getZ() - block2.getZ());
+}
+
+int ValidIndex(int roomSize, int xLoc, int yLoc, int zLoc)
+{
+	int index = xLoc + zLoc*roomSize + yLoc*pow(roomSize, 2);
+	if (index >= 0 && index < pow(roomSize, 3))
+	{
+		return index;
+	}
+	else
+	{
+		return NULLINT;
+	}
+}
+
+int IndexDist(std::vector<int> loc1, std::vector<int> loc2)
+{
+	return abs(loc1[0] - loc2[0]) + abs(loc1[1] - loc2[1]) + abs(loc1[2] - loc2[2]);
+}
+
+bool IndicesAdjacent(int roomSize, int idx1, int idx2)
+{
+	std::vector<int> loc1 = { idx1%roomSize, (idx1 / roomSize) % roomSize, idx1 / (int)pow(roomSize,2) };
+	std::vector<int> loc2 = { idx2%roomSize, (idx2 / roomSize) % roomSize, idx2 / (int)pow(roomSize,2) };
+	if (IndexDist(loc1, loc2) == 1)
+	{
+		return TRUE;
+	}
+	else
+	{
+		return FALSE;
+	}
+}
+
+void IndexToXYZ(int roomSize, int index, int &x, int &y, int &z)
+{
+	x = index%roomSize;
+	y = index / (int)pow(roomSize, 2);
+	z = (index / roomSize) % roomSize;
 }
 
 Terrain::Terrain()
@@ -13,17 +50,19 @@ Terrain::Terrain()
 	Initialize(0);
 }
 
-Terrain::Terrain(int size, std::vector<std::vector<int>> &materialList)
+Terrain::Terrain(int size, std::vector<std::vector<int>> &materialList, std::vector<std::vector<std::vector<int>>> &structureList)
 {
 	roomSize = size;
 	matList = &materialList;
+	structList = &structureList;
 	Initialize(0);
 }
 
-Terrain::Terrain(int size, int randomVsOrdered, std::vector<std::vector<int>> &materialList) // 0 = random, 1 = linear, 2 = Terrain generator
+Terrain::Terrain(int size, int randomVsOrdered, std::vector<std::vector<int>> &materialList, std::vector<std::vector<std::vector<int>>> &structureList) // 0 = random, 1 = linear, 2 = Terrain generator
 {
 	roomSize = size;
 	matList = &materialList;
+	structList = &structureList;
 	Initialize(randomVsOrdered);
 }
 
@@ -46,7 +85,56 @@ void Terrain::Initialize(int randomVsOrdered) // 0 = random, 1 = linear
 		GenerateFunctionTerrain();
 	}
 	HideSides();
+}
 
+void Terrain::PlaceStructure(std::vector<std::vector<int>> &structure, std::vector<std::vector<int>> &materials, int xLoc, int yLoc, int zLoc)
+{
+	int index;
+	for (;;)
+	{
+		index = xLoc + roomSize*zLoc + yLoc*pow(roomSize, 2);
+		if (blockMap.find(index) != blockMap.end())
+		{
+			yLoc++;
+		}
+		else
+		{
+			//for (int i = 0;i<5;i++)// (auto &temp : structure)
+			for (auto &blockLoc : structure)
+			{
+				AddBlock(xLoc + blockLoc[1], yLoc + blockLoc[2], zLoc + blockLoc[3], materials[blockLoc[0]]);
+
+			}
+			break;
+		}
+	}
+}
+
+void Terrain::CreateResourceDeposit(std::vector<int> &resource, int size, int xLoc, int yLoc, int zLoc)
+{
+	int x, y, z, newIndex;
+	int curIndex = ValidIndex(roomSize, xLoc, yLoc, zLoc);
+	for (auto &i : indexCheck)
+	{
+		newIndex = curIndex + i;
+		printf("CurIndex = %d || New Index = %d\n", curIndex, newIndex);
+		if (IndicesAdjacent(roomSize, newIndex, curIndex))
+		{
+			if (blockMap.find(newIndex) == blockMap.end() || blockMap[newIndex]->itemCode != blockMap[curIndex]->itemCode)
+			{
+				IndexToXYZ(roomSize, newIndex, x, y, z);
+				std::unique_ptr<materialBlock> newPtr;
+
+				newPtr.reset(new materialBlock(roomSize, x, y, z, resource));
+				blockMap[newIndex] = std::move(newPtr);
+				size--;
+				if (size >= 0)
+				{
+					CreateResourceDeposit(resource, size, x, y, z);
+				}
+			}
+		}
+	}
 }
 
 void Terrain::GenerateFunctionTerrain(void)
@@ -56,7 +144,7 @@ void Terrain::GenerateFunctionTerrain(void)
 	blockNum = 0;
 
 	int stepSize = roomSize / 10;
-	//srand((int)time(nullptr));
+	srand((int)time(nullptr));
 
 	int xScalar = rand() % (roomSize / 10 + 1) + 1;
 	int zScalar = rand() % (roomSize / 10 + 1) + 1;
@@ -85,13 +173,39 @@ void Terrain::GenerateFunctionTerrain(void)
 				blockMap[index] = std::move(newPtr);
 
 				//blockMap[index].reset(new materialBlock(roomSize, x, y, z, matList[0]));
-				printf("Block itemCode = %d, quantity = %d\n", blockMap[index]->itemCode, blockMap[index]->quantity);
+				//printf("Block itemCode = %d, quantity = %d\n", blockMap[index]->itemCode, blockMap[index]->quantity);
 				y--;
 				blockNum++;
 			}
 		}
 	}
 
+	for (int i = 0; i < (int)sqrt(roomSize); i++) // plant trees
+	{
+		int x, z, structID;
+		x = rand() % roomSize;
+		z = rand() % roomSize;
+		structID = rand() % structList->size();
+		int y = 0;
+		PlaceStructure(structList->at(structID), *matList, x, y, z);
+	}
+
+	for (auto &resource : *matList)
+	{
+		if (resource[0] < 100)
+		{
+			for (int i = 0; i < (int)sqrt(roomSize) / (1 + resource[6]); i++) // plant resources
+			{
+				int x, y, z;
+				int size = 1 + resource[8];
+				index = rand() % blockNum;
+				printf("Index = %d, Size = %d\n", index, size);
+				IndexToXYZ(roomSize, index, x, y, z);
+
+				CreateResourceDeposit(resource, size, x, y, z);
+			}
+		}
+	}
 	printf("World Initialized\n");
 }
 
@@ -243,15 +357,9 @@ void Terrain::AddBlock(int x, int y, int z, std::vector<int> matVec)
 	if (blockMap.find(newLocation) == blockMap.end()) // free spot
 	{
 		std::unique_ptr<materialBlock> newPtr;
-		//printf("BEFORE %d %d %d\n", x, y, z);
-
-		//printf("BEFORE x = %d, y = %d, z = %d\n", newPtr->getX(), newPtr->getY(), newPtr->getZ());
 		newPtr.reset(new materialBlock(roomSize, x, y, z, matVec));
 
-		//printf("AFTER x = %d, y = %d, z = %d\n", newPtr->getX(), newPtr->getY(), newPtr->getZ());
 		blockMap[newLocation] = std::move(newPtr);
-		//printf("AFTER2 x = %d, y = %d, z = %d\n", blockMap[newLocation]->getX(), blockMap[newLocation]->getY(), blockMap[newLocation]->getZ());
-		//printf("Index = %d, BlockLocationIndex = %d\n", newLocation, blockMap[newLocation]->index);
 		blockNum++;
 
 		HideSingleBlockSides(newLocation);
@@ -282,10 +390,7 @@ void Terrain::RemoveBlock(std::map<int, std::unique_ptr<Item>> &itemLibrary, Gri
 	}
 	else
 	{
-		//blockMap.erase(blockMap[newLocation].index);
-		//printf("Out of Bounds \n");
 	}
-	//printf("AFTER renderMap size = %d, blockMap size = %d\n", renderMap.size(), blockMap.size());
 }
 
 double VecLen(std::vector<double> const &vec)
@@ -482,7 +587,7 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 	}
 }
 
-bool Terrain::FindBlock(CameraObject &camera, int &x, int &y, int &z, int ADDORREMOVE) // #DEFINE ADD = 1 #DEFINE REMOVE = 0
+bool Terrain::FindBlock(CameraObject &camera, int range, int &x, int &y, int &z, int ADDORREMOVE) // #DEFINE ADD = 1 #DEFINE REMOVE = 0
 {
 	int i = 0;
 	int blockSize = camera.blockSize;
@@ -493,7 +598,7 @@ bool Terrain::FindBlock(CameraObject &camera, int &x, int &y, int &z, int ADDORR
 	//SetVec(location, camera.pos);
 	index = (int)location[0] / blockSize + (int)location[2] / blockSize * roomSize + (int)location[1] / blockSize * pow(roomSize, 2);
 
-	while (i <= blockSize * 8)
+	while (i <= blockSize * range)
 	{
 		VecPlus(location, camera.forwardVector); // increment location by camera's forward Vector
 		x = (int)location[0] / blockSize;

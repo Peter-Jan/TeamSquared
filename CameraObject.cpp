@@ -74,6 +74,8 @@ void CameraObject::Initialize(int roomSizeIn, double startX, double startY, doub
 	vertVel = 0.0;
 	jumps = 5;
 	blockSize = 8;
+	maxHealth = 100;
+	health = maxHealth - 50;
 
 	jumpVel = sqrt(3.0 * (double)blockSize*-GRAV);
 	printf("JumpVel = %lf\n", jumpVel);
@@ -470,7 +472,7 @@ void CameraObject::hitCheck(std::map<int, std::unique_ptr<Block>> &blockMap, std
 		index = xGrid() + zGrid()*roomSize + yIdx*pow(roomSize, 2);
 		if (dyMove <= 0) // falling or standing
 		{
-			if (blockMap.find(index) != blockMap.end()) // hit floor
+			if (index < 0 || blockMap.find(index) != blockMap.end()) // hit floor
 			{
 				jumps = 5;
 				vertVel = 0;
