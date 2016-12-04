@@ -13,12 +13,24 @@ enemy::~enemy()
 
 enemy::enemy(int roomSize)
 {
-	initialize(roomSize, 0.0,0.0,0.0);
+	double xSpawn, ySpawn, zSpawn;
+	xSpawn = rand()% roomSize;
+	ySpawn = rand() % roomSize;
+	zSpawn = rand() % roomSize;
+	printf("xS: %lf, zS: %lf\n",xSpawn,zSpawn);
+
+	frenemy.healthParam = 20;
+	frenemy.health = frenemy.healthParam;
+	damage = 10;
+	initialize(roomSize, xSpawn*blockSize,((double)roomSize*8 / 2),zSpawn*blockSize);
 }
 
-enemy::enemy(int roomSize,double startX,double startY,double startZ)
+enemy::enemy(int roomSize,double startX,double startY,double startZ,int healthIn,int damageIn)
 {
 	initialize(roomSize,startX,startY,startZ);
+	frenemy.healthParam = 20;
+	frenemy.health = frenemy.healthParam;
+	damage = damageIn;
 }
 
 double enemy::x(void)
@@ -63,8 +75,6 @@ void enemy::initialize(int roomSizeIn, double startX, double startY, double star
 	dxMove = 0; dyMove = 0; dzMove = 0;
 	blockSize = 8;
 	//printf("FRENEMY x: %lf, y: %lf, z: %lf\n", frenemy.pos[0], frenemy.pos[1], frenemy.pos[2]);
-
-
 }
 
 void inline enemy::SetGridLocation(void)
@@ -89,23 +99,22 @@ void enemy::setPos()
 	pos[1] = posM[1];
 }
 
-
 void enemy::drawEnemy(void)
 {
 	//printf("DRAWING\n");
 	frenemy.setColor(255, 255, 255);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, (GLuint)1);
 	glBegin(GL_QUADS);
 	frenemy.DrawTexture((GLuint)1,2.0,1.0);
 	glEnd();
-	//glBegin(GL_QUADS);
-	//frenemy.DrawEdges();
-	//glEnd();
+	glDisable(GL_TEXTURE_2D);
 }
 
 int enemy::chase(CameraObject player, std::map<int, std::unique_ptr<Block>> &blockMap)
 {
 	double magnitude=0;
-	double scale = 1.0;
+	double scale = 2.0;
 
 	magnitude = sqrt(pow(player.x() - pos[0], 2) + pow(player.y() - pos[1], 2) + pow(player.z() - pos[2], 2));
 	chaseVec[0] = (player.x() - (pos[0]+blockSize/2))/(scale*magnitude);
@@ -123,6 +132,7 @@ int enemy::chase(CameraObject player, std::map<int, std::unique_ptr<Block>> &blo
 	hitCheck(player,blockMap, chaseVec);
 	if (player.xGrid() == xGrid() && player.yGrid() == yGrid() && player.zGrid() == zGrid())
 	{
+		hitPlayer = 1;
 		return 1;
 	}
 

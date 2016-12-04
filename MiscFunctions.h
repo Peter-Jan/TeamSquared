@@ -76,4 +76,11 @@ void SetVec(std::vector<NumType> &first, NumType i1, NumType i2, NumType i3) // 
 	first[1] = i2;
 	first[2] = i3;
 }
+
+template <class NumType>
+double VecDist(const std::vector<NumType> &first, const std::vector<NumType> &second) // add second vec to first
+{
+	return sqrt(pow(first[0] - second[0], 2) + pow(first[1] - second[1], 2) + pow(first[2] - second[2], 2));
+}
+
 #endif // !MISC_FUNCTIONS

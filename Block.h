@@ -53,6 +53,7 @@ public:
 	void setPosition(double xLoc, double yLoc, double zLoc);
 	void setDimension(const int win, const int hin, const int lin);
 	void setColor(const int rin, const int gin, const int bin);
+	double BlockDist(const Block &otherBlock);
 	void DrawSolid(void);
 	void DrawEdges(void);
 	void DrawTexture(GLuint texId, double imageX, double imageY);

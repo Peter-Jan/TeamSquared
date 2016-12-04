@@ -156,7 +156,7 @@ void Item::Draw(GLuint texId, int x0, int y0, int x1, int y1)
 	double imageX = (int)texLoc % 6;
 	double imageY = (double)((int)texLoc / 6);
 
-	printf("ImgX = %lf, ImgY = %d\n, %lf %lf \n", imageX, imageY, imageX / 6, imageY / 2);
+	//printf("ImgX = %lf, ImgY = %d\n, %lf %lf \n", imageX, imageY, imageX / 6, imageY / 2);
 	//getchar();
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, texId);

@@ -6,13 +6,16 @@
 
 int main(void)
 {
+	srand((int)time(nullptr));
 	FsOpenWindow(800, 100, WINWID, WINHEI, 1);
-
 	int terminate = 0;
 	int lb, mb, rb, mx, my, mouseEvent, key = 0;
 	int drawCount = 0;
-	int roomSize = 50;
-	// texX, texY, bgColor[3], health, quantity
+	int roomSize = 100;
+	int gotHit = 0;
+	int hitCounter = 0;
+	int enemyDist = 0;
+	int hitEnable = 0;
 
 	std::map<int, std::unique_ptr<Item>> itemLibrary;
 	//							 <ClassCode, itemCode, name, quant, texture#, weight, range, damage, health, strength, speed, hitscan, stackable, highlight, outline, numIngedients, matCodes[numIngedients], quantities[numIngedients], craftedItemCode, craftedQuant>
@@ -53,7 +56,6 @@ int main(void)
 	std::vector<int> orange =  { 201,   3,0,255,255,255, 0, 10, 6 };
 	std::vector<int> greenLeaf = { 7,   3,1,255,255,255, 0,  3, 2 };
 	std::vector<int> redLeaf = { 8,     4,1,255,255,255, 0,  3, 2 };
-
 
 	std::vector<std::vector<int>> materials;
 	materials.push_back(dirt);
@@ -101,12 +103,6 @@ int main(void)
 	tree2.push_back({ 7,   0, 4, 1 });
 	tree2.push_back({ 8,   0, 4, -1 });
 
-	//std::vector<std::vector<int>> stoneBoulder;
-	//stoneBoulder.push_back({ 1,   0, 0, 0 });
-	//stoneBoulder.push_back({ 1,   0, 0, 0 });
-	//stoneBoulder.push_back({ 1,   0, 0, 0 });
-	//stoneBoulder.push_back({ 1,   0, 0, 0 });
-
 	std::vector< std::vector<std::vector<int>>> structureLibrary;
 	structureLibrary.push_back(tree1);
 	structureLibrary.push_back(tree2);
@@ -121,7 +117,6 @@ int main(void)
 
 	Terrain worldGrid(roomSize, 2, materials, structureLibrary);
 
-
 	CameraObject camera(roomSize, (double)(roomSize*blockSize/2), (double)(roomSize*blockSize / 2), (double)(roomSize*blockSize / 2)), camera2(worldGrid.roomSize);
 	
 	worldGrid.texId = decodePng();
@@ -131,7 +126,13 @@ int main(void)
 
 	worldGrid.AddBlock(5, 5, 5, orange);
 
-	enemy dasEnemy(worldGrid.roomSize,21*8,21*8,21*8);
+	//Generate Enemies
+	int numEnemy = 2;
+	std::vector<enemy> enemyList;
+	for (int ii = 0; ii < numEnemy; ii++)
+	{
+		enemyList.push_back(enemy(roomSize));
+	}
 
 	camera.playerBlock.roomSize = worldGrid.roomSize;
 	camera2.playerBlock.roomSize = worldGrid.roomSize;
@@ -175,6 +176,9 @@ int main(void)
 		case FSKEY_G:
 			camera.gravityOn = !camera.gravityOn;
 			break;
+		case FSKEY_P:
+			enemyList.push_back(enemy(roomSize));
+			break;
 		case FSKEY_T:
 			texturesOn = !texturesOn;
 			if (texturesOn)
@@ -206,9 +210,55 @@ int main(void)
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1, 1);
 
-		// 3D drawing from here
-		dasEnemy.drawEnemy();
-		terminate = dasEnemy.chase(camera, worldGrid.blockMap);
+		//Enemy Chase Dynamics
+		int calcHit,damage2Player=0;
+		int bumpCheck = 0;
+		int i = 0;
+		for (auto &enemy : enemyList)
+		{
+			enemy.drawEnemy();
+			gotHit = enemy.chase(camera, worldGrid.blockMap);
+			if (enemy.frenemy.health <= 0)
+			{
+				printf("DELETING ENEMY\n");
+				enemyList.erase(enemyList.begin() + i);
+			}
+			i++;
+		}
+
+
+		if (gotHit == 1)
+		{
+			hitEnable = 1;
+		}
+
+		if (hitEnable == 1)
+		{
+			camera.vertVel = 0.5;		//enemy bump function here
+		}
+
+		for (int ii = 0; ii < enemyList.size(); ii++)
+		{
+			if (enemyList[ii].xGrid() == camera.xGrid() && enemyList[ii].yGrid() == camera.yGrid() && enemyList[ii].zGrid() == camera.zGrid())
+			{
+				bumpCheck++;
+			}
+		}
+
+		if (bumpCheck == 0)
+		{
+			for (int ii = 0; ii < enemyList.size(); ii++)
+			{
+				damage2Player += (enemyList[ii].hitPlayer*enemyList[ii].damage);
+				enemyList[ii].hitPlayer = 0;
+			}
+			bumpCheck = 0;
+			hitEnable = 0;
+			
+		}
+
+		camera.health -= damage2Player;
+		damage2Player = 0;
 
 #if defined(_WIN32_WINNT)
 		if (switchCamera)
@@ -377,12 +427,12 @@ int main(void)
 		}
 		else
 		{
-			printf("USER CLICKED IN WORLD\n");
+			//printf("USER CLICKED IN WORLD\n");
 			int damage = 1, strength = 0, range = 8;
 			switch (FsGetMouseEvent(lb, mb, rb, mx, my))
 			{
 			case FSMOUSEEVENT_LBUTTONDOWN:
-				printf("IN LEFT BUTTON\n");
+				printf("WORLD LEFT BUTTON\n");
 				if (camera.activeTool == NULLINT || toolbar.gridVec[toolbar.activeTool] == nullptr) // no item selected
 				{
 					// do nothing
@@ -447,10 +497,43 @@ int main(void)
 					}
 				}
 				break;
+			//case FSMOUSEEVENT_MBUTTONDOWN:
+				
 			case FSMOUSEEVENT_RBUTTONDOWN:
 			ATTACK:
-				printf("IN RIGHT BUTTON\n");
-				if (worldGrid.FindBlock(camera, range, xGrid, yGrid, zGrid, REMOVE))
+				printf("WORLD RIGHT BUTTON\n");
+				int i = 0;
+				for (auto &enemy : enemyList) // check all enemies first
+				{
+					enemyDist = camera.findEnemy(16, enemy.frenemy);
+					printf("hitEnemy %d, enemy is %d away\n", i, enemyDist);
+					if (enemyDist != NULLINT) // enemy found in the distance
+					{
+						if (worldGrid.FindBlock(camera, enemyDist/blockSize, xGrid, yGrid, zGrid, REMOVE)) // checkForBlocks between enemy and player
+						{
+							if (xGrid != camera.xGrid() || yGrid != camera.yGrid() || zGrid != camera.zGrid())
+							{
+								int idx = xGrid + zGrid*worldGrid.roomSize + yGrid*pow(worldGrid.roomSize, 2);
+								//printf("Found one at %d %d %d\n", xGrid, yGrid, zGrid);
+								int blockHealth = worldGrid.blockMap[idx]->TakeDamage(strength, damage);
+								if (blockHealth <= 0)
+								{
+									worldGrid.RemoveBlock(itemLibrary, inventory, xGrid, yGrid, zGrid);
+									goto end;
+								}
+							}
+						}
+						else // if no block in between
+						{
+							printf("HITTING ENEMY\n");
+							enemy.frenemy.health -= 10;
+							goto end;
+						}
+					}
+					i++;
+				}
+
+				if (worldGrid.FindBlock(camera, range, xGrid, yGrid, zGrid, REMOVE)) // no enemies hit, try hitting block
 				{
 					if (xGrid != camera.xGrid() || yGrid != camera.yGrid() || zGrid != camera.zGrid())
 					{
@@ -467,7 +550,8 @@ int main(void)
 				{
 					printf("Did Not Find");
 				}
-				break;
+				end: // hitting an enemy or block in the enemy check jumps to here
+					break;
 			}
 		}
 

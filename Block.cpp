@@ -144,6 +144,11 @@ void Block::setColor(const int rin, const int gin, const int bin)
 	b = bin;
 }
 
+double Block::BlockDist(const Block &otherBlock)
+{
+	return abs(pos[0] - otherBlock.pos[0]) + abs(pos[1] - otherBlock.pos[1]) + abs(pos[2] - otherBlock.pos[2]);
+}
+
 void Block::DrawSolid(void)
 {
 	// Left Side
@@ -206,7 +211,8 @@ void Block::DrawSolid(void)
 
 void Block::DrawTexture(GLuint texId,double imageX,double imageY)
 {
-	glColor3ub(r, g, b);           	// Current color is solid white
+
+	glColor3d(health / (double)healthParam, health/(double)healthParam, health/ (double)healthParam);           	// Current color is solid white
 
 	//Left side
 

@@ -160,20 +160,10 @@ void Terrain::GenerateFunctionTerrain(void)
 
 			while (y >= 0)
 			{
-				//matListPtr
 				index = x + roomSize*z + pow(roomSize, 2)*y;
-
 				std::unique_ptr<materialBlock> newPtr;
-
-				//auto &b = matList->at(0);
-
 				newPtr.reset(new materialBlock(roomSize, x, y, z, matList->at(0)));
-
-				//printf("AFTER x = %d, y = %d, z = %d\n", newPtr->getX(), newPtr->getY(), newPtr->getZ());
 				blockMap[index] = std::move(newPtr);
-
-				//blockMap[index].reset(new materialBlock(roomSize, x, y, z, matList[0]));
-				//printf("Block itemCode = %d, quantity = %d\n", blockMap[index]->itemCode, blockMap[index]->quantity);
 				y--;
 				blockNum++;
 			}
@@ -197,7 +187,7 @@ void Terrain::GenerateFunctionTerrain(void)
 			for (int i = 0; i < (int)sqrt(roomSize) / (1 + resource[6]); i++) // plant resources
 			{
 				int x, y, z;
-				int size = 1 + resource[8]*2;
+				int size = (1 + resource[8])*2;
 				index = rand() % blockNum;
 				printf("Index = %d, Size = %d\n", index, size);
 				IndexToXYZ(roomSize, index, x, y, z);
@@ -289,8 +279,15 @@ void Terrain::HideSingleBlockSides(int i) // for block i in the block-Vector, ch
 			auto &b1 = blockMap[idx];
 			if (BlockDist(b, b1) == 1)
 			{
-				b->sideVisible[e] = 0;
-				b1->sideVisible[eReverse] = 0;
+				if (b->strength == 0)
+				{
+					b->sideVisible[e] = 0;
+
+				}
+				if (b1->strength == 0)
+				{
+					b1->sideVisible[eReverse] = 0;
+				}
 			}
 			else if ((b->getX() % roomSize == 0 || (b->getY() / roomSize) % roomSize == 0) || b1->getX() % roomSize == 0 || (b1->getZ() / roomSize) % roomSize)
 			{
@@ -528,6 +525,37 @@ void Terrain::DrawOffsetMode(int &drawCount, CameraObject &camera, bool textures
 
 void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key, bool texturesOn)
 {
+	//Draw Bounding Box
+	glColor3ub(135, 206, 250);
+
+	glBegin(GL_QUADS);
+	glVertex3d(0, 0, roomSize*blockSize);
+	glVertex3d(0, roomSize*blockSize, roomSize*blockSize);
+	glVertex3d(0, roomSize*blockSize, 0);
+	glVertex3d(0, 0, 0);	
+
+	glVertex3d(roomSize*blockSize, 0, 0);
+	glVertex3d(roomSize*blockSize, roomSize*blockSize, 0);
+	glVertex3d(roomSize*blockSize, roomSize*blockSize, roomSize*blockSize);
+	glVertex3d(roomSize*blockSize, 0, roomSize*blockSize);
+
+	glVertex3d(0, 0, 0);
+	glVertex3d(0, roomSize*blockSize, 0);
+	glVertex3d(roomSize*blockSize, roomSize*blockSize, 0);
+	glVertex3d(roomSize*blockSize, 0, 0);
+
+	glVertex3d(roomSize*blockSize, 0, roomSize*blockSize);
+	glVertex3d(roomSize*blockSize, roomSize*blockSize, roomSize*blockSize);
+	glVertex3d(0, roomSize*blockSize, roomSize*blockSize);
+	glVertex3d(0, 0, roomSize*blockSize);
+
+	glVertex3d(0, roomSize*blockSize, roomSize*blockSize);
+	glVertex3d(roomSize*blockSize, roomSize*blockSize, roomSize*blockSize);
+	glVertex3d(roomSize*blockSize, roomSize*blockSize, 0);
+	glVertex3d(0, roomSize*blockSize, 0);
+	glEnd();
+
+
 	// Draw ground lattice
 	glColor3ub(0, 0, 255);
 	glBegin(GL_LINES);
@@ -612,8 +640,8 @@ bool Terrain::FindBlock(CameraObject &camera, int range, int &x, int &y, int &z,
 	int blockSize = camera.blockSize;
 	int index;
 	std::vector<double> location = { camera.playerBlock.xM, camera.playerBlock.pos[1] + camera.camHeight, camera.playerBlock.zM };
-	printf("Camera Position = %lf, %lf, %lf\n", location[0], location[1], location[2]);
-	printf("Forward Vector = %lf, %lf, %lf\n", camera.forwardVector[0], camera.forwardVector[1], camera.forwardVector[2]);
+	//printf("Camera Position = %lf, %lf, %lf\n", location[0], location[1], location[2]);
+	//printf("Forward Vector = %lf, %lf, %lf\n", camera.forwardVector[0], camera.forwardVector[1], camera.forwardVector[2]);
 	//SetVec(location, camera.pos);
 	index = (int)location[0] / blockSize + (int)location[2] / blockSize * roomSize + (int)location[1] / blockSize * pow(roomSize, 2);
 
@@ -623,7 +651,7 @@ bool Terrain::FindBlock(CameraObject &camera, int range, int &x, int &y, int &z,
 		x = (int)location[0] / blockSize;
 		y = (int)location[1] / blockSize;
 		z = (int)location[2] / blockSize;
-		printf("%d %d %d\n", x, y, z);
+		//printf("%d %d %d\n", x, y, z);
 		index = x + z*roomSize + y*pow(roomSize, 2);
 		if (this->blockMap.find(index) != this->blockMap.end()) // found potential block
 		{
