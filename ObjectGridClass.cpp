@@ -137,13 +137,8 @@ void Item::Draw(int x0, int y0, int x1, int y1)
 	YsGlDrawFontBitmap6x7(name);
 	glColor3ub(255, 255, 255);
 	glRasterPos2d((double)x1 - 10, (double)y1 - 10);
-#if defined(_WIN32_WINNT)
-    YsGlDrawFontBitmap10x14(itoa(quantity, quant, 9));
-#else
     sprintf(quant,"%d",quantity);
     YsGlDrawFontBitmap10x14(quant);
-#endif
-
 
 	if (highlight)
 	{
@@ -167,17 +162,17 @@ void Item::Draw(int x0, int y0, int x1, int y1)
 
 Material::Material()
 {
-	fgets(name, 255, stdin);
-	for (auto &c : name)
-	{
-		if (c == '\n')
-		{
-			c = 0;
-		}
-	}
-	color[rand() % 3] = (strlen(name) * 10) % 255;
-	quantity = 1;
-	stackable = TRUE;
+	//fgets(name, 255, stdin);
+	//for (auto &c : name)
+	//{
+	//	if (c == '\n')
+	//	{
+	//		c = 0;
+	//	}
+	//}
+	//color[rand() % 3] = (strlen(name) * 10) % 255;
+	//quantity = 1;
+	//stackable = TRUE;
 }
 
 Material::~Material()
@@ -192,6 +187,11 @@ Material::Material(char perm[],int q)
 	quantity = q;
 	stackable = TRUE;
 }
+
+//void Material::Use(CameraObject &player, Terrain &worldGrid, std::vector<std::vector<int>> &materials);
+//{
+//	return classID;
+//}
 
 void Material::CleanUp(void)
 {
@@ -212,28 +212,45 @@ void Grid::CleanUp(void)
 	gridVec.clear();
 }
 
-bool Grid::AddElement(std::map<int, std::unique_ptr<Item>> &itemLibrary, int itemCode)
+bool Grid::AddElement(std::map<int, std::unique_ptr<Item>> &itemLibrary, int itemCode) // add item from environment
 {
+	printf("Trying to Add Element\n");
+	int addQuant = 1;
+	if (itemLibrary[itemCode]->quantity != 0)
+	{
+		addQuant += rand() % itemLibrary[itemCode]->quantity;
+	}
+	
 	for (auto &elem : gridVec)
 	{
 		if (elem == nullptr)
 		{
+			printf("Item Code = %d\n", itemCode);
+			printf("Item ClassType = %d\n", itemLibrary[itemCode]->classType);
 			switch (itemLibrary[itemCode]->classType)
 			{
 			case 0:
-				elem.reset(new Material());
+				printf("Made it\n");
+				elem.reset(new Material);
 				break;
 			case 1:
-				elem.reset(new Weapon());
+				elem.reset(new Weapon);
 				break;
 			case 2:
-				elem.reset(new Useable());
+				elem.reset(new Useable);
 				break;
 			case 3:
-				elem.reset(new Recipe());
+				elem.reset(new Recipe);
 				break;
 			}
+			printf("Adding to empty cell");
 			elem->copyFrom(itemLibrary[itemCode]);
+			elem->quantity = addQuant;
+			return TRUE;
+		}
+		else if (elem->classID == itemCode && elem->stackable)
+		{
+			elem->quantity += addQuant;
 			return TRUE;
 		}
 	}
@@ -365,6 +382,18 @@ void Grid::Draw(void)
 				auto &elem = *gridVec[index];
 				elem.Draw(x0, y0, x1, y1);
 			}
+			if (index == activeTool)
+			{
+				glLineWidth(5);
+				glBegin(GL_LINE_LOOP);
+				glColor3ub(0, 255, 0);
+				glVertex2i(x0, y0);
+				glVertex2i(x1, y0);
+				glVertex2i(x1, y1);
+				glVertex2i(x0, y1);
+				glEnd();
+				glLineWidth(1);
+			}
 		}
 	}
 	glColor3ubArray(backgroundColor);
@@ -460,9 +489,7 @@ void Grid::TryTransfer(int &mx, int &my, Grid &other, int number)
 		transfer = FALSE;
 	}
 	printf("Past");
-	//activeCell = NULLINT;
 	other.activeCell = NULLINT;
-	//transfer = FALSE;
 	other.transfer = FALSE;
 }
 
@@ -489,10 +516,10 @@ int Grid::CheckClick(int &mx, int &my)
 		{
 			if (gridVec[index] == nullptr) // Generate new item (in the game, this should be removed)
 			{
-				printf("Enter new item name >\n");
-				std::unique_ptr<Item> tempP(new Material);
-				AddElement(index, tempP);
-				//return -2;     ------> Will replace above 3 lines in actual game
+				//printf("Enter new item name >\n");
+				//std::unique_ptr<Item> tempP(new Material);
+				//AddElement(index, tempP);
+				return -2;    // ------> Will replace above 3 lines in actual game
 			}
 			else // if the cell is occupied and there is currently no active cell, highlight it
 			{
@@ -514,7 +541,7 @@ int Grid::CheckClick(int &mx, int &my)
 		transfer = TRUE;
 		return -2;
 	}
-    return -1;
+    return -5; // arbitrary return value
 }
 
 void Grid::AddPermElement(std::map<int,std::unique_ptr<Item>> &itemLib) // always meant to be recipe
@@ -585,6 +612,14 @@ void Button::Draw(int x, int y)
 	glColor3ub(0, 0, 0);
 	glRasterPos2d(x - 20, y + 5);
 	YsGlDrawFontBitmap10x14("CRAFT");
+
+	glColor3ub(200, 200, 200);
+	glBegin(GL_QUADS);
+	glVertex2i(x - 40, y - 20);
+	glVertex2i(x + 40, y - 20);
+	glVertex2i(x + 40, y + 20);
+	glVertex2i(x - 40, y + 20);
+	glEnd();
 }
 
 bool Button::CheckCrafting(Grid &ReqChart)

@@ -17,19 +17,19 @@ int main(void)
 	std::map<int, std::unique_ptr<Item>> itemLibrary;
 	//							 <ClassCode, itemCode, name, quant, texture#, weight, range, damage, health, strength, speed, hitscan, stackable, highlight, outline, numIngedients, matCodes[numIngedients], quantities[numIngedients], craftedItemCode, craftedQuant>
 	// materials,   ClassCode == 0,   0 - 100
-	itemLibrary[0].reset(new Item(0, 0, "Dirt",    1, 0, 1, 8.0, 0,  2, 0, 0.0, true, true, false, false));
+	itemLibrary[0].reset(new Item(0, 0, "Dirt",    3, 0, 1, 8.0, 0,  2, 0, 0.0, true, true, false, false));
 	itemLibrary[1].reset(new Item(0, 1, "Stone",   1, 1, 1, 8.0, 0,  4, 1, 0.0, true, true, false, false));
-	itemLibrary[2].reset(new Item(0, 2, "Steel",   1, 2, 1, 8.0, 0,  6, 1, 0.0, true, true, false, false));
-	itemLibrary[3].reset(new Item(0, 3, "Wood",    1, 3, 1, 8.0, 0,  3, 0, 0.0, true, true, false, false));
-	itemLibrary[4].reset(new Item(0, 4, "Ruby",    1, 4, 1, 8.0, 0, 10, 2, 0.0, true, true, false, false));
-	itemLibrary[5].reset(new Item(0, 5, "Emerald", 1, 5, 1, 8.0, 0,  6, 2, 0.0, true, true, false, false));
+	itemLibrary[2].reset(new Item(0, 2, "Steel",   0, 2, 1, 8.0, 0,  6, 1, 0.0, true, true, false, false));
+	itemLibrary[3].reset(new Item(0, 3, "Wood",    2, 3, 1, 8.0, 0,  3, 0, 0.0, true, true, false, false));
+	itemLibrary[4].reset(new Item(0, 4, "Ruby",    0, 4, 1, 8.0, 0, 10, 2, 0.0, true, true, false, false));
+	itemLibrary[5].reset(new Item(0, 5, "Emerald", 0, 5, 1, 8.0, 0,  6, 2, 0.0, true, true, false, false));
 
 	// weapons,     ClassCode == 1, 101 - 200
 	itemLibrary[101].reset(new Item(1, 101, "Stick", 1, 101, 1, 4.0, 1, 0, 0, 0.5, true, false, false, false));
 	itemLibrary[102].reset(new Item(1, 102, "RockHammer", 1, 102, 1, 4.0, 1, 0, 0, 0.5, true, false, false, false));
 
 	// consumables, ClassCode == 2, 201 - 300
-	itemLibrary[201].reset(new Item(2, 201, "Orange",  1, 201, 1, 0.0, 0, 10, 2, 15, true, true, false, false));
+	itemLibrary[201].reset(new Item(2, 201, "Orange",  6, 201, 1, 0.0, 0, 10, 2, 15, true, true, false, false));
 
 	// recipes,     ClassCode == 3, 301 - 400
 	int *ingredientCodes = new int[1]{ 3 };
@@ -59,6 +59,16 @@ int main(void)
 	materials.push_back(emerald);
 	materials.push_back(orange);
 
+	// structures <itemCode, xGrid, yGrid, zGrid>
+	//std::vector<int[4]> indices;
+	//indices.push_back({  0, 0, 0 });
+	//indices.push_back({  0, 1, 0});
+	//indices.push_back({  0, 2, 0});
+	//indices.push_back({ -1, 2, 0});
+	//indices.push_back({  1, 2, 0});
+	//indices.push_back({  0, 2,-1});
+	//indices.push_back({  0, 2, 1});
+
 	Grid inventory(20, 20, 350, 500, 20);
 	Grid toolbar(100, 500, 700, 600, 10);
 	Grid crafting(400, 20, 700, 240, 10);
@@ -67,7 +77,9 @@ int main(void)
 
 	crafting.AddPermElement(itemLibrary);
 
-	Terrain worldGrid(30, 2, materials[0]);
+	Terrain worldGrid(30, 2, materials);
+
+
 	CameraObject camera(worldGrid.roomSize), camera2(worldGrid.roomSize);
 	worldGrid.texId = decodePng();
 
@@ -93,6 +105,7 @@ int main(void)
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CW); // vertices of any object's front face (aka outside face) should always be specified in CLOCKWISE order
 	glCullFace(GL_BACK); // back 3 sides of each block are automatically removed by this openGL culling function
+	int xGrid, yGrid, zGrid;
 
 	while (0 == terminate)
 	{
@@ -102,6 +115,7 @@ int main(void)
 		FsGetWindowSize(wid, hei);
 
 		key = FsInkey();
+
 		switch (key)
 		{
 		case FSKEY_ESC:
@@ -113,14 +127,14 @@ int main(void)
 		case FSKEY_C:
 			switchCamera = !switchCamera;
 			break;
-		case FSKEY_3:
+		case FSKEY_G:
 			camera.gravityOn = !camera.gravityOn;
 			break;
 		case FSKEY_T:
 			texturesOn = !texturesOn;
 			if (texturesOn)
 			{
-				glEnable(GL_TEXTURE_2D);		// Turn on the texture mapping 
+				glEnable(GL_TEXTURE_2D); // Turn on the texture mapping
 			}
 			else
 			{
@@ -148,11 +162,10 @@ int main(void)
 		glPolygonOffset(1, 1);
 
 		// 3D drawing from here
-		//dasEnemy.frenemy.DrawTexture((GLuint)1,0,0);
 		dasEnemy.drawEnemy();
         dasEnemy.chase(camera,worldGrid.blockMap);
-		
 
+#if defined(_WIN32_WINNT)
 		if (switchCamera)
 		{
 			if (camera2.cursorLock)
@@ -169,10 +182,10 @@ int main(void)
 			}
 			worldGrid.DrawTerrain(camera, reductionMode, key, texturesOn);
 		}
+#endif
 
 		switch (FsGetMouseEvent(lb, mb, rb, mx, my))
 		{
-			int xGrid, yGrid, zGrid;
 		case FSMOUSEEVENT_LBUTTONDOWN:
 			printf("USER CLICKED\n");
 
@@ -311,22 +324,32 @@ int main(void)
 				}
 				break;
 			}
-			else
+			else // use selected item left click
 			{
 				printf("IN LEFT BUTTON\n");
-				if (worldGrid.FindBlock(camera, xGrid, yGrid, zGrid, ADD))
+				if (camera.activeTool == NULLINT || toolbar.gridVec[toolbar.activeCell] == nullptr)
 				{
-					if (xGrid != camera.xGrid() || (yGrid != camera.yGrid() && yGrid != camera.yGrid() + 1) || zGrid != camera.zGrid())
-					{
-						//printf("Found one at %d %d %d\n", xGrid, yGrid, zGrid);
-						int blockType = rand() % 7; // select random block
-						worldGrid.AddBlock(xGrid, yGrid, zGrid, materials[blockType]);		//right now default add dirt blocks
-					}
+					// do nothing
 				}
 				else
 				{
-					//printf("Did Not Find");
+					//toolbar.gridVec[toolbar.activeCell]->Use(camera, worldGrid, materials);
+					if (worldGrid.FindBlock(camera, xGrid, yGrid, zGrid, ADD))
+					{
+						if (xGrid != camera.xGrid() || (yGrid != camera.yGrid() && yGrid != camera.yGrid() + 1) || zGrid != camera.zGrid())
+						{
+							//printf("Found one at %d %d %d\n", xGrid, yGrid, zGrid);
+							int blockType = rand() % 7; // select random block
+							worldGrid.AddBlock(xGrid, yGrid, zGrid, materials[blockType]);		//right now default add dirt blocks
+						}
+					}
+					else
+					{
+						//printf("Did Not Find");
+					}
 				}
+				//int itemCode = toolbar.gridVec[toolbar.activeCell]->Use();
+				
 				break;
 			}
 		case FSMOUSEEVENT_RBUTTONDOWN:
@@ -339,21 +362,40 @@ int main(void)
 					{
 						int idx = xGrid + zGrid*worldGrid.roomSize + yGrid*pow(worldGrid.roomSize, 2);
 						//printf("Found one at %d %d %d\n", xGrid, yGrid, zGrid);
-						int blockHealth = worldGrid.blockMap[idx]->TakeDamage(0, 1);
+						int blockHealth = worldGrid.blockMap[idx]->TakeDamage(2, 1);
 						if (blockHealth <= 0)
 						{
-							worldGrid.RemoveBlock(inventory, xGrid, yGrid, zGrid);
+							worldGrid.RemoveBlock(itemLibrary, inventory, xGrid, yGrid, zGrid);
 						}
 					}
 				}
 				else
 				{
-					//printf("Did Not Find");
+					printf("Did Not Find");
 				}
 			}
 			break;
 		}
-			
+
+#if !defined(_WIN32_WINNT)
+		if (switchCamera)
+		{
+			if (camera2.cursorLock)
+			{
+				camera2.Update(key, worldGrid.blockMap);
+			}
+			worldGrid.DrawTerrain(camera2, reductionMode, key, texturesOn);
+		}
+		else
+		{
+			if (camera.cursorLock)
+			{
+				camera.Update(key, worldGrid.blockMap);
+			}
+			worldGrid.DrawTerrain(camera, reductionMode, key, texturesOn);
+		}
+#endif
+
 		// Set up 2D drawing
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
@@ -370,6 +412,7 @@ int main(void)
 			but.Draw(but.x, but.y);
 		}
 
+		toolbar.activeTool = camera.activeTool;
 		toolbar.Draw(); // always draw the toolbar
 
 		{ // draw crosshairs

@@ -1,5 +1,7 @@
 #include "Terrain.h"
 
+std::vector<std::vector<int>> defaultMatList = { {0,0,0,0,0} };
+
 int BlockDist(const Block &block1, const Block &block2)
 {
 	return abs(block1.getX() - block2.getX()) + abs(block1.getY() - block2.getY()) + abs(block1.getZ() - block2.getZ());
@@ -8,24 +10,24 @@ int BlockDist(const Block &block1, const Block &block2)
 Terrain::Terrain()
 {
 	roomSize = 10; // default
-	std::vector<int> standIn = { 0 };
-	Initialize(0, standIn);
+	Initialize(0);
 }
 
-Terrain::Terrain(int size)
+Terrain::Terrain(int size, std::vector<std::vector<int>> &materialList)
 {
 	roomSize = size;
-	std::vector<int> standIn = { 0 };
-	Initialize(0, standIn);
+	matList = &materialList;
+	Initialize(0);
 }
 
-Terrain::Terrain(int size, int randomVsOrdered, std::vector<int> &matVec) // 0 = random, 1 = linear, 2 = Terrain generator
+Terrain::Terrain(int size, int randomVsOrdered, std::vector<std::vector<int>> &materialList) // 0 = random, 1 = linear, 2 = Terrain generator
 {
 	roomSize = size;
-	Initialize(randomVsOrdered, matVec);
+	matList = &materialList;
+	Initialize(randomVsOrdered);
 }
 
-void Terrain::Initialize(int randomVsOrdered, std::vector<int> &matVec) // 0 = random, 1 = linear
+void Terrain::Initialize(int randomVsOrdered) // 0 = random, 1 = linear
 {
 	indexCheck[0] = -1; indexCheck[1] = 1; indexCheck[2] = -roomSize; indexCheck[3] = roomSize;
 	indexCheck[4] = -pow(roomSize, 2); indexCheck[5] = pow(roomSize, 2); // left, right, back, front, bottom, top
@@ -41,13 +43,13 @@ void Terrain::Initialize(int randomVsOrdered, std::vector<int> &matVec) // 0 = r
 	}
 	else
 	{
-		GenerateFunctionTerrain(matVec);
+		GenerateFunctionTerrain();
 	}
 	HideSides();
 
 }
 
-void Terrain::GenerateFunctionTerrain(std::vector<int> &matVec)
+void Terrain::GenerateFunctionTerrain(void)
 {
 	int y = 0;
 
@@ -70,8 +72,20 @@ void Terrain::GenerateFunctionTerrain(std::vector<int> &matVec)
 
 			while (y >= 0)
 			{
+				//matListPtr
 				index = x + roomSize*z + pow(roomSize, 2)*y;
-				blockMap[index].reset(new materialBlock(roomSize, x, y, z, matVec));
+
+				std::unique_ptr<materialBlock> newPtr;
+
+				//auto &b = matList->at(0);
+
+				newPtr.reset(new materialBlock(roomSize, x, y, z, matList->at(0)));
+
+				//printf("AFTER x = %d, y = %d, z = %d\n", newPtr->getX(), newPtr->getY(), newPtr->getZ());
+				blockMap[index] = std::move(newPtr);
+
+				//blockMap[index].reset(new materialBlock(roomSize, x, y, z, matList[0]));
+				printf("Block itemCode = %d, quantity = %d\n", blockMap[index]->itemCode, blockMap[index]->quantity);
 				y--;
 				blockNum++;
 			}
@@ -79,11 +93,6 @@ void Terrain::GenerateFunctionTerrain(std::vector<int> &matVec)
 	}
 
 	printf("World Initialized\n");
-}
-
-void Terrain::GenerateMaterial(materialBlock matBlock)
-{
-	int matR, matG, matB;
 }
 
 Terrain::~Terrain()
@@ -254,7 +263,7 @@ void Terrain::AddBlock(int x, int y, int z, std::vector<int> matVec)
 	}
 }
 
-void Terrain::RemoveBlock(Grid &inventory, int x, int y, int z)
+void Terrain::RemoveBlock(std::map<int, std::unique_ptr<Item>> &itemLibrary, Grid &inventory, int x, int y, int z)
 {
 	int newLocation = x + z*roomSize + y*roomSize*roomSize;
 	//printf("newLocation = %d\n", newLocation);
@@ -267,7 +276,7 @@ void Terrain::RemoveBlock(Grid &inventory, int x, int y, int z)
 		{
 			renderMap.erase(newLocation);
 		}
-		//inventory.AddElement()
+		inventory.AddElement(itemLibrary, blockMap[newLocation]->itemCode);
 		blockMap.erase(newLocation);
 		//printf("renderMap size = %d, blockMap size = %d\n", renderMap.size(), blockMap.size());
 	}
