@@ -80,4 +80,5 @@ int materialBlock::TakeDamage(int wepStr, int wepDmg)
 		health -= wepDmg;
 		return health;
 	}
+    return health;
 }

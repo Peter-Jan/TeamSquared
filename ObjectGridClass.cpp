@@ -143,7 +143,7 @@ void Item::Draw(int x0, int y0, int x1, int y1)
     sprintf(quant,"%d",quantity);
     YsGlDrawFontBitmap10x14(quant);
 #endif
-	YsGlDrawFontBitmap10x14(itoa(quantity, quant, 9));
+
 
 	if (highlight)
 	{
@@ -305,7 +305,7 @@ Grid::Grid(int x0, int y0, int x1, int y1, int numObjects)
 		cellY = (double)(gridHeight - (rows + 1)*border) / (double)rows;
 		//printf("cellWidth = %lf, cellHeight = %lf\n", cellX, cellY);
 
-		cellWidth = min(cellX, cellY);
+		cellWidth = fmin(cellX, cellY);
 		cellHeight = cellWidth;
 
 		xBorder = (gridWidth - cellWidth*cols - border*(cols - 1)) / 2;
@@ -417,6 +417,7 @@ int Grid::MoveCell(std::unique_ptr<Item> &origin, std::unique_ptr<Item> &destina
 		//return 0;
 	}
 	activeCell = NULLINT;    //    cell in grid that calls movecell is empty
+    return -2;
 }
 
 bool Grid::InsideBounds(int &mx, int &my)
@@ -513,6 +514,7 @@ int Grid::CheckClick(int &mx, int &my)
 		transfer = TRUE;
 		return -2;
 	}
+    return -1;
 }
 
 void Grid::AddPermElement(std::map<int,std::unique_ptr<Item>> &itemLib) // always meant to be recipe
@@ -604,6 +606,7 @@ bool Button::CheckCrafting(Grid &ReqChart)
 		}
 		count++;
 	}
+    return false;
 }
 
 int Button::ClickCheck(int &mx, int &my)

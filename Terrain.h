@@ -32,7 +32,7 @@ public:
 	void Initialize(int randomVsOrdered, std::vector<int> &matVec);
 
 	void inline GenerateRandom(void);
-	void inline Terrain::GenerateOrdered(void);
+	void inline GenerateOrdered(void);
 	void GenerateFunctionTerrain(std::vector<int> &matVec);
 
 	void GenerateMaterial(materialBlock matBlock);

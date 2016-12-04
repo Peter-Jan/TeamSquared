@@ -163,8 +163,12 @@ void CameraObject::Update(int &key, std::map<int, std::unique_ptr<Block>> &block
 {
 	FsPollDevice();
 	mouseEvent = FsGetMouseEvent(lb, mb, rb, mx, my);
-	FsGetWindowPosition(winx0, winy0, winx1, winy1);
-	FsGetWindowSize(wid, hei);
+#if defined(_WIN32_WINNT) // Windows mouse movement routine
+    FsGetWindowPosition(winx0, winy0, winx1, winy1);
+#else
+    FsGetWindowPosition(winx0, winy0);
+#endif
+    FsGetWindowSize(wid, hei);
 	mouseOffsetX = (winx1 - winx0 - wid) / 2;
 	mouseOffsetY = (winy1 - winy0 - hei) - mouseOffsetX;
 	//printf("MouseOffX = %d, MouseOffY = %d\n", mouseOffsetX, mouseOffsetY);
