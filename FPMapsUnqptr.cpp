@@ -78,6 +78,8 @@ int main(void)
 	crafting.AddPermElement(itemLibrary);
 
 	Terrain worldGrid(30, 2, materials);
+
+
 	CameraObject camera(worldGrid.roomSize), camera2(worldGrid.roomSize);
 	worldGrid.texId = decodePng();
 
@@ -325,19 +327,29 @@ int main(void)
 			else // use selected item left click
 			{
 				printf("IN LEFT BUTTON\n");
-				if (worldGrid.FindBlock(camera, xGrid, yGrid, zGrid, ADD))
+				if (camera.activeTool == NULLINT || toolbar.gridVec[toolbar.activeCell] == nullptr)
 				{
-					if (xGrid != camera.xGrid() || (yGrid != camera.yGrid() && yGrid != camera.yGrid() + 1) || zGrid != camera.zGrid())
-					{
-						//printf("Found one at %d %d %d\n", xGrid, yGrid, zGrid);
-						int blockType = rand() % 7; // select random block
-						worldGrid.AddBlock(xGrid, yGrid, zGrid, materials[blockType]);		//right now default add dirt blocks
-					}
+					// do nothing
 				}
 				else
 				{
-					//printf("Did Not Find");
+					//toolbar.gridVec[toolbar.activeCell]->Use(camera, worldGrid, materials);
+					if (worldGrid.FindBlock(camera, xGrid, yGrid, zGrid, ADD))
+					{
+						if (xGrid != camera.xGrid() || (yGrid != camera.yGrid() && yGrid != camera.yGrid() + 1) || zGrid != camera.zGrid())
+						{
+							//printf("Found one at %d %d %d\n", xGrid, yGrid, zGrid);
+							int blockType = rand() % 7; // select random block
+							worldGrid.AddBlock(xGrid, yGrid, zGrid, materials[blockType]);		//right now default add dirt blocks
+						}
+					}
+					else
+					{
+						//printf("Did Not Find");
+					}
 				}
+				//int itemCode = toolbar.gridVec[toolbar.activeCell]->Use();
+				
 				break;
 			}
 		case FSMOUSEEVENT_RBUTTONDOWN:
