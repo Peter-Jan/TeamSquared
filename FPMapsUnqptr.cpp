@@ -11,7 +11,7 @@ int main(void)
 	int terminate = 0;
 	int lb, mb, rb, mx, my, mouseEvent, key = 0;
 	int drawCount = 0;
-	int roomSize = 100;
+	int roomSize = 40;
 	int gotHit = 0;
 	int hitCounter = 0;
 	int enemyDist = 0;
@@ -22,68 +22,63 @@ int main(void)
 	// materials,   ClassCode == 0,   0 - 100
 	itemLibrary[0].reset(new Item(0, 0, "Dirt",    3, 0.0, 1, 8.0, 0,  2, 0, 0.0, true, true, false, false));
 	itemLibrary[1].reset(new Item(0, 1, "Stone",   1, 5.0, 1, 8.0, 0,  4, 1, 0.0, true, true, false, false));
-	itemLibrary[2].reset(new Item(0, 2, "Steel",   0, 2.0, 1, 8.0, 0,  6, 2, 0.0, true, true, false, false));
+	itemLibrary[2].reset(new Item(0, 2, "Steel",   1, 2.0, 1, 8.0, 0,  6, 2, 0.0, true, true, false, false));
 	itemLibrary[3].reset(new Item(0, 3, "Wood",    2, 7.0, 1, 8.0, 0,  3, 0, 0.0, true, true, false, false));
-	itemLibrary[4].reset(new Item(0, 4, "Ruby",    0, 4.0, 1, 8.0, 0, 10, 3, 0.0, true, true, false, false));
-	itemLibrary[5].reset(new Item(0, 5, "Emerald", 0, 1.0, 1, 8.0, 0,  6, 3, 0.0, true, true, false, false));
+	itemLibrary[4].reset(new Item(0, 4, "Ruby",    1, 4.0, 1, 8.0, 0, 10, 2, 0.0, true, true, false, false));
+	itemLibrary[5].reset(new Item(0, 5, "Emerald", 1, 1.0, 1, 8.0, 0,  6, 2, 0.0, true, true, false, false));
 	itemLibrary[7].reset(new Item(0, 7, "Wood",    2, 7.0, 1, 8.0, 0,  3, 0, 0.0, true, true, false, false));
 	itemLibrary[8].reset(new Item(0, 8, "Wood",    2, 7.0, 1, 8.0, 0,  3, 0, 0.0, true, true, false, false));
 	itemLibrary[9].reset(new Item(0, 9, "Indestructible", 2, 2.0, 1, 8.0, 0, 3, 20, 0.0, true, true, false, false));
 
 	// weapons,     ClassCode == 1, 101 - 200
-	itemLibrary[101].reset(new Item(1, 101, "Stick", 1, 11.0, 2, 4.0, 1, 0,      1, 0.5, true, false, false, false));
-	itemLibrary[102].reset(new Item(1, 102, "RockHammer", 1, 15.0, 2,4.0, 1, 0, 2, 0.5, true, false, false, false));
-    itemLibrary[103].reset(new Item(1, 103, "Gun", 1, 12.0,1.0,80.0,20,0.0,0.0,0.0,true,false,false,false));
-    itemLibrary[104].reset(new Item(1,104,"Bomb",1,14.0,1.0,5.0,40.0,0.0,0.0,0.0,true,true,false,false));
+	itemLibrary[101].reset(new Item(1, 101, "Stick", 1,       11.0, 2, 4.0, 1, 0,      1, 0.5, true, false, false, false));
+	itemLibrary[102].reset(new Item(1, 102, "RockHammer", 1, 15.0, 3, 4.0, 2, 0, 2, 0.5, true, false, false, false));
+	itemLibrary[103].reset(new Item(1, 103, "Sword", 1, 13.0, 3, 8.0, 1, 0, 2, 0.5, true, false, false, false));
+	itemLibrary[104].reset(new Item(1, 104, "Gun", 1, 12.0, 3, 50.0, 1, 0, 1, 0.5, true, false, false, false));
 
 	// consumables, ClassCode == 2, 201 - 300
 	itemLibrary[201].reset(new Item(2, 201, "Orange",  6, 3.0, 1, 0.0, 0, 10, 2, 15, true, true, false, false));
 
 	// recipes,     ClassCode == 3, 301 - 400
 	int *ingredientCodes = new int[1]{ 3 };
-	int *ingredientQuants = new int[1]{ 1 };
-	itemLibrary[301].reset(new Item(3, 301, "Lv1 Stick", 1, 1.0, 1, 0.0, 1, 0, 0, 0.5, true, false, false, false, 1, ingredientCodes, ingredientQuants, 101, 1));
+	int *ingredientQuants = new int[1]{ 5 };
+	itemLibrary[301].reset(new Item(3, 301, "Lv1 Stick", 1, 11.0, 1, 0.0, 1, 0, 0, 0.5, true, false, false, false, 1, ingredientCodes, ingredientQuants, 101, 1));
 	delete[] ingredientCodes, ingredientQuants;
 	ingredientCodes = new int[2]{ 3,1 };
-	ingredientQuants = new int[2]{ 3,2 };
-	itemLibrary[302].reset(new Item(3, 302,"Lv1 RockHammer", 1, 1.0, 1, 0.0, 1, 0, 0, 0.5, true, false, false, false, 2, ingredientCodes, ingredientQuants, 102, 1));
+	ingredientQuants = new int[2]{ 10,15 };
+	itemLibrary[302].reset(new Item(3, 302,"Lv1 RockHammer", 1, 15.0, 1, 0.0, 1, 0, 0, 0.5, true, false, false, false, 2, ingredientCodes, ingredientQuants, 102, 1));
 	delete[] ingredientCodes, ingredientQuants;
-<<<<<<< HEAD
+	ingredientCodes = new int[3]{ 3,1,2 };
+	ingredientQuants = new int[3]{ 5,10,15 };
+	itemLibrary[303].reset(new Item(3, 303, "Lv1 Sword", 1, 13.0, 1, 0.0, 1, 0, 0, 0.5, true, false, false, false, 3, ingredientCodes, ingredientQuants, 103, 1));
+	delete[] ingredientCodes, ingredientQuants;
 	ingredientCodes = new int[2]{ 0,3 };
 	ingredientQuants = new int[2]{ 20, 5 };
-	itemLibrary[304].reset(new Item(3, 304, "Wood Armor", 1, 1.0, 5, 0.0, 1, 0, 2, 1.0, true, false, false, false, 2, ingredientCodes, ingredientQuants, 401, 1));
+	itemLibrary[304].reset(new Item(3, 304, "Wood Armor", 1, 21.0, 5, 0.0, 1, 0, 2, 1.0, true, false, false, false, 2, ingredientCodes, ingredientQuants, 401, 1));
 	delete[] ingredientCodes, ingredientQuants;
 	ingredientCodes = new int[2]{ 3, 1 };
 	ingredientQuants = new int[2]{ 10, 5 };
-	itemLibrary[305].reset(new Item(3, 305, "Rock Armor", 1, 1.0, 4, 0.0, 1, 0, 4, 0.9, true, false, false, false, 2, ingredientCodes, ingredientQuants, 402, 1));
+	itemLibrary[305].reset(new Item(3, 305, "Rock Armor", 1, 20.0, 4, 0.0, 1, 0, 4, 0.9, true, false, false, false, 2, ingredientCodes, ingredientQuants, 402, 1));
 	delete[] ingredientCodes, ingredientQuants;
-	ingredientCodes = new int[2]{ 3, 1 };
-	ingredientQuants = new int[2]{ 10, 5 };
-	itemLibrary[306].reset(new Item(3, 306, "Steel Armor", 1, 1.0, 3, 0.0, 1, 0, 6, 0.8, true, false, false, false, 2, ingredientCodes, ingredientQuants, 403, 1));
+	ingredientCodes = new int[3]{ 3, 1, 2 };
+	ingredientQuants = new int[3]{ 10, 5, 10 };
+	itemLibrary[306].reset(new Item(3, 306, "Steel Armor", 1, 19.0, 3, 0.0, 1, 0, 6, 0.8, true, false, false, false, 3, ingredientCodes, ingredientQuants, 403, 1));
+	delete[] ingredientCodes, ingredientQuants;
+	ingredientCodes = new int[4]{ 3,  1, 5, 4 };
+	ingredientQuants = new int[4]{ 20, 15, 4, 2 };
+	itemLibrary[307].reset(new Item(3, 307, "Gemstone Armor", 1, 18.0, 10, 0.0, 1, 0, 6, 1.1, true, false, false, false, 4, ingredientCodes, ingredientQuants, 404, 1));
 	delete[] ingredientCodes, ingredientQuants;
 	ingredientCodes = new int[4]{ 3, 1, 5, 4 };
-	ingredientQuants = new int[4]{ 20, 15, 4, 2 };
-	itemLibrary[307].reset(new Item(3, 307, "Gemstone Armor", 1, 1.0, 10, 0.0, 1, 0, 6, 1.1, true, false, false, false, 4, ingredientCodes, ingredientQuants, 404, 1));
+	ingredientQuants = new int[4]{ 35, 20, 10, 5 };
+	itemLibrary[308].reset(new Item(3, 308, "Gun", 1, 12.0, 10, 0.0, 1, 0, 1, 0.5, true, false, false, false, 4, ingredientCodes, ingredientQuants, 104, 1));
 	delete[] ingredientCodes, ingredientQuants;
 
 	// armor,	    ClassCode == 4, 401 - 500
-	itemLibrary[401].reset(new Item(4, 401, "Wood Armor",     1, 102.0, 4,  0.0, 0, 1, 2, 1.0, true, false, false, false));
-	itemLibrary[402].reset(new Item(4, 402, "Rock Armor",     1, 102.0, 3,  0.0, 0, 3, 4, 0.9, true, false, false, false));
-	itemLibrary[403].reset(new Item(4, 403, "Steel Armor",    1, 102.0, 2,  0.0, 0, 6, 6, 0.8, true, false, false, false));
-	itemLibrary[404].reset(new Item(4, 404, "Gemstone Armor", 1, 102.0, 10, 0.0, 0, 6, 10, 1.1, true, false, false, false));
+	itemLibrary[401].reset(new Item(4, 401, "Wood Armor",     1, 21.0, 1,  0.0, 0, 1, 2,  1.0, true, false, false, false));
+	itemLibrary[402].reset(new Item(4, 402, "Rock Armor",     1, 20.0, 1,  0.0, 0, 3, 4,  0.9, true, false, false, false));
+	itemLibrary[403].reset(new Item(4, 403, "Steel Armor",    1, 19.0, 1,  0.0, 0, 6, 6,  0.8, true, false, false, false));
+	itemLibrary[404].reset(new Item(4, 404, "Gemstone Armor", 1, 18.0, 1,  0.0, 0, 6, 10, 1.1, true, false, false, false));
 
-=======
-    ingredientCodes=new int[3]{2,3,4};
-    ingredientQuants=new int[3]{5,5,1};
-    itemLibrary[303].reset(new Item(3, 303,"Lv1 Gun",1,1.0,1,0.0,1,1,1,1,true,false,false,false,3,ingredientCodes,ingredientQuants,103,1));
-    delete[] ingredientCodes, ingredientQuants;
-    
-    
-
-    //projectile,   ClassCode == 4, 401-500
-//    itemLibrary[401].reset(new Item(4,401,"Bullet",1,0.0,1.0,1.0,) )
-    
->>>>>>> 7ac1e24a8487a0e2c735a9dffab300c823280f6f
 	//					<itemCode, texX, texY, r,g,b, strength, health, quant
 	std::vector<int> dirt =      { 0,		0,0,255,255,255,  0,  2, 3 };
 	std::vector<int> stone =     { 1,		5,0,255,255,255,  1,  4, 1 };
@@ -229,12 +224,11 @@ int main(void)
 	worldGrid.AddBlock(5, 5, 5, orange);
 
 	//Generate Enemies
-	int numEnemy = 10;
+	int numEnemy = 2;
 	std::vector<enemy> enemyList;
 	for (int ii = 0; ii < numEnemy; ii++)
 	{
 		enemyList.push_back(enemy(roomSize));
-        
 	}
 
 	camera.playerBlock.roomSize = worldGrid.roomSize;
@@ -282,7 +276,7 @@ int main(void)
 			camera.gravityOn = !camera.gravityOn;
 			break;
 		case FSKEY_P:
-                enemyList.push_back(enemy(roomSize,rand()%roomSize,(rand()%roomSize)/2,rand()%roomSize,100,50,4,2,1.0));
+			enemyList.push_back(enemy(roomSize));
 			break;
 		case FSKEY_T:
 			texturesOn = !texturesOn;
@@ -316,14 +310,7 @@ int main(void)
 		glPolygonOffset(1, 1);
 
 		//Enemy Chase Dynamics
-<<<<<<< HEAD
 		if (camera.cursorLock)
-=======
-		int damage2Player=0;
-		int bumpCheck = 0;
-		int enemyNum = 0;
-		for (auto &enemy : enemyList)
->>>>>>> 7ac1e24a8487a0e2c735a9dffab300c823280f6f
 		{
 			int calcHit, damage2Player = 0;
 			int bumpCheck = 0;
@@ -368,25 +355,15 @@ int main(void)
 				hitEnable = 0;
 			}
 
-			camera.health -= damage2Player;
+			camera.health -= (int)(damage2Player / (double)camera.armor);
 			damage2Player = 0;
 		}
 
-<<<<<<< HEAD
 		// draw enemies
 		for (auto &enemy : enemyList)
 		{
 			enemy.drawEnemy();
 		}
-=======
-		camera.health -= damage2Player;
-		damage2Player = 0;
-        
-        if(camera.health<=0)
-        {
-            terminate = 1;
-        }
->>>>>>> 7ac1e24a8487a0e2c735a9dffab300c823280f6f
 
 #if defined(_WIN32_WINNT)
 		if (switchCamera)
@@ -532,7 +509,7 @@ int main(void)
 					{
 						if (crafting.gridVec[crafting.activeCell] != nullptr) // if clicked cell has a recipe
 						{
-							printf("Inside crafting table, activeCell == %d", crafting.activeCell);
+							//printf("Inside crafting table, activeCell == %d", crafting.activeCell);
 							crafting.Tellinfo(itemLibrary, mx, my, ReqChart);
 							//crafting.activeCell = NULLINT;
 						}
@@ -931,6 +908,14 @@ int main(void)
 			sprintf(guiText, "Jumps = %d", camera.jumps);
 			YsGlDrawFontBitmap12x16(guiText);
 			delete[] guiText;
+
+			glColor4ub(200, 200, 200, 1);
+			glBegin(GL_QUADS);
+			glVertex2i(45, 45);
+			glVertex2i(270, 45);
+			glVertex2i(270, 250);
+			glVertex2i(45, 250);
+			glEnd();
 		}
 
 		glDisable(GL_DEPTH_TEST);

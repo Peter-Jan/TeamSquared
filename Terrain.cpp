@@ -118,23 +118,20 @@ void Terrain::CreateResourceDeposit(std::vector<int> &resource, int size, int xL
 	{
 		IndexToXYZ(roomSize, curIndex + i, x, y, z);
 		newIndex = ValidIndex(roomSize, x, y, z);
-		printf("CurIndex = %d || New Index = %d\n", curIndex, newIndex);
-		if (IndicesAdjacent(roomSize, newIndex, curIndex) && blockMap.find(newIndex) == blockMap.end())
+		//printf("CurIndex = %d || New Index = %d\n", curIndex, newIndex);
+		if (IndicesAdjacent(roomSize, newIndex, curIndex))
 		{
-			if (blockMap.find(newIndex) == blockMap.end() || blockMap[newIndex]->itemCode != blockMap[curIndex]->itemCode)
+			IndexToXYZ(roomSize, newIndex, x, y, z);
+
+			std::unique_ptr<materialBlock> newPtr;
+			newPtr.reset(new materialBlock(roomSize, x, y, z, resource));
+
+			//printf("Places at %d %d %d\n", x, y, z);
+			blockMap[newIndex] = std::move(newPtr);
+			size--;
+			if (size == 0)
 			{
-				IndexToXYZ(roomSize, newIndex, x, y, z);
-
-				std::unique_ptr<materialBlock> newPtr;
-				newPtr.reset(new materialBlock(roomSize, x, y, z, resource));
-
-				printf("Places at %d %d %d\n", x, y, z);
-				blockMap[newIndex] = std::move(newPtr);
-				size--;
-				if (size == 0)
-				{
-					CreateResourceDeposit(resource, size, x, y, z);
-				}
+				CreateResourceDeposit(resource, size, x, y, z);
 			}
 		}
 		else
@@ -162,7 +159,7 @@ void Terrain::GenerateFunctionTerrain(void)
 	{
 		for (int z = 0; z < roomSize; z++)
 		{
-			y = (int)(sin(x*xFreq*DEGTORAD + z*zFreq*DEGTORAD)*cos(x*DEGTORAD)*xScalar + sin(x*zFreq*DEGTORAD*z*xFreq*DEGTORAD / 2.0)*cos(z*DEGTORAD)*zScalar) + roomSize / 10;
+			y = (int)(sin(x*xFreq*DEGTORAD + z*zFreq*DEGTORAD)*cos(x*DEGTORAD)*xScalar + sin(x*zFreq*DEGTORAD*z*xFreq*DEGTORAD / 2.0)*cos(z*DEGTORAD)*zScalar) + (int)sqrt(roomSize);
 
 			while (y >= 0)
 			{
@@ -205,7 +202,7 @@ void Terrain::GenerateFunctionTerrain(void)
 				int x, y, z;
 				int size = 5;
 				index = rand() % (int)pow(roomSize,3)/2;
-				printf("Index = %d, Size = %d\n", index, size);
+				//printf("Index = %d, Size = %d\n", index, size);
 				IndexToXYZ(roomSize, index, x, y, z);
 
 				CreateResourceDeposit(resource, size, x, y, z);
@@ -244,7 +241,7 @@ void inline Terrain::GenerateOrdered(void) // ordered blocks (starts at "y=0" pl
 				std::unique_ptr<Block> newPtr;
 				newPtr.reset(new Block(roomSize, x, y, z));
 				blockMap[tempBlock.index] = std::move(newPtr);
-				printf("Index = %d, BlockLocationIndex = %d\n", x + roomSize*z + roomSize*roomSize*y, blockMap[x + roomSize*z + roomSize*roomSize*y]->index);
+				//printf("Index = %d, BlockLocationIndex = %d\n", x + roomSize*z + roomSize*roomSize*y, blockMap[x + roomSize*z + roomSize*roomSize*y]->index);
 				blockNum++;
 			}
 		}
@@ -305,7 +302,7 @@ void Terrain::HideSingleBlockSides(int i) // for block i in the block-Vector, ch
 			{
 				if (renderMap.find(idx) != renderMap.end())
 				{
-					printf("Add block %d\n", idx);
+					//printf("Add block %d\n", idx);
 					renderMap[idx] = idx;
 				}
 				b->renderable = TRUE;
@@ -320,7 +317,7 @@ void Terrain::HideSingleBlockSides(int i) // for block i in the block-Vector, ch
 
 void Terrain::ShowSingleBlockSides(int i) // for block i in the block-Vector, check the 6 surrounding sides and show any unshared faces
 {
-	printf("Show Blocks around index = %d\n", i);
+	//printf("Show Blocks around index = %d\n", i);
 	int idx;
 	auto &&b = blockMap[i];
 	b->renderable = FALSE;
@@ -328,7 +325,7 @@ void Terrain::ShowSingleBlockSides(int i) // for block i in the block-Vector, ch
 	for (int e = 0; e < 6; e++)
 	{
 		eReverse = e + (e % 2 == 0 ? 1 : -1);
-		printf("eRev = %d\n", eReverse);
+		//printf("eRev = %d\n", eReverse);
 		idx = b->index + indexCheck[e];
 
 		if (blockMap.find(idx) != blockMap.end())
@@ -342,7 +339,7 @@ void Terrain::ShowSingleBlockSides(int i) // for block i in the block-Vector, ch
 				b->renderable = TRUE;
 				if (renderMap.find(idx) == renderMap.end()) // block not current present
 				{
-					printf("Add block %d\n", idx);
+					//printf("Add block %d\n", idx);
 					renderMap[idx] = idx; // add block
 				}
 			}

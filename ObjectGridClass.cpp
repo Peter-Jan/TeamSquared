@@ -39,6 +39,7 @@ Item::Item(int ClassCode, int classIDIN, char *itemName, int quantIn, double tex
 	classType = ClassCode;
 	classID = classIDIN;
 	sprintf(name, itemName);
+	printf("creating %s\n", itemName);
 	quantity = quantIn;
 	texLoc = texLocation;
 	weight = weightIn;
@@ -52,11 +53,13 @@ Item::Item(int ClassCode, int classIDIN, char *itemName, int quantIn, double tex
 	highlight = high;
 	outline = outlineIn;
 	numIngredients = numberOfIngredients;
+	printf("creating %d\n", numberOfIngredients);
 	if (numberOfIngredients != 0)
 	{
 		for (int i = 0; i < numberOfIngredients; i++)
 		{
 			ingredients[itemCodes[i]] = itemQuants[i];
+			printf("code %d | quant %d\n", itemCodes[i], itemQuants[i]);
 		}
 		craftItem = craftedCode;
 		craftQuantity = craftedQuant;
@@ -161,13 +164,13 @@ void Item::Draw(GLuint texId, int x0, int y0, int x1, int y1)
 	glBindTexture(GL_TEXTURE_2D, texId);
 	glBegin(GL_QUADS);
 
-	glTexCoord2d(imageX / 6, (imageY) / 2);
+	glTexCoord2d(imageX / 6, (imageY) / 4);
 	glVertex2d(x0, y0);
-	glTexCoord2d((imageX + 1) / 6, (imageY) / 2);
+	glTexCoord2d((imageX + 1) / 6, (imageY) / 4);
 	glVertex2d(x1, y0);
-	glTexCoord2d((imageX + 1) / 6, (imageY + 1) / 2);
+	glTexCoord2d((imageX + 1) / 6, (imageY + 1) / 4);
 	glVertex2d(x1, y1);
-	glTexCoord2d(imageX / 6, (imageY + 1) / 2);
+	glTexCoord2d(imageX / 6, (imageY + 1) / 4);
 	glVertex2d(x0, y1);
 	glEnd();
 
@@ -261,10 +264,9 @@ bool Grid::AddElement(std::map<int, std::unique_ptr<Item>> &itemLibrary, int ite
 
 bool Grid::AddElement(std::map<int, std::unique_ptr<Item>> &itemLibrary, std::unique_ptr<Item> &item)
 {
-	printf("Something Very Amiss");
 	for (auto &elem : gridVec)
 	{
-		printf("Something Amiss");
+
 		if (elem == nullptr) // empty spot
 		{
 			switch (itemLibrary[item->craftItem]->classType)
@@ -334,7 +336,7 @@ Grid::Grid(int x0, int y0, int x1, int y1, int numObjects)
 	rows = round(sqrt((double)numObjects / crRatio));
 	cols = floor((double)numObjects / (double)rows);
 	int cellX, cellY;
-	printf("%d, %d\n", rows, cols);
+	//printf("%d, %d\n", rows, cols);
 	for (;;)
 	{
 		cellX = (double)(gridWidth - (cols + 1)*border) / (double)cols;
@@ -345,7 +347,7 @@ Grid::Grid(int x0, int y0, int x1, int y1, int numObjects)
 
 		xBorder = (gridWidth - cellWidth*cols - border*(cols - 1)) / 2;
 		yBorder = (gridHeight - cellHeight*rows - border*(rows - 1)) / 2;
-		printf("xBorder = %lf, yBorder = %lf\n", xBorder, yBorder);
+		//printf("xBorder = %lf, yBorder = %lf\n", xBorder, yBorder);
 		if (rows*cols < numObjects)
 		{
 			if (xBorder > yBorder)
@@ -582,12 +584,13 @@ void Grid::Tellinfo(std::map<int, std::unique_ptr<Item>> &itemLib, int &mx, int 
 {
 	printf("Telling Info\n");
 	gridVec[activeCell]->highlight = FALSE;
-	printf("%d Active Cell\n", activeCell);
+	//printf("%d Active Cell\n", activeCell);
 	int i = 0;
-	printf("Number of Items = %d\n", gridVec[activeCell]->numIngredients);
+	//printf("Number of Items = %d\n", gridVec[activeCell]->numIngredients);
+	//printf("12345\n");
 	for (auto &itemCodeQuant : gridVec[activeCell]->ingredients)
 	{
-		switch (itemCodeQuant.first)
+		switch (itemLib[itemCodeQuant.first]->classType)
 		{
 		case 0:
 			other.gridVec[i].reset(new Material);
@@ -605,11 +608,12 @@ void Grid::Tellinfo(std::map<int, std::unique_ptr<Item>> &itemLib, int &mx, int 
 			other.gridVec[i].reset(new Armor);
 			break;
 		}
+		//printf("Item Code %d || Item Quant %d\n", itemCodeQuant.first, itemCodeQuant.second);
 		other.gridVec[i]->copyFrom(itemLib[itemCodeQuant.first]);
 		other.gridVec[i]->quantity = itemCodeQuant.second;
 		i++;
 	}
-	printf("Done with Items\n");
+	//printf("Done with Items\n");
 }
 
 Button::Button()
