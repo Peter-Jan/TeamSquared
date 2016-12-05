@@ -233,7 +233,8 @@ int main(void)
     
 	Terrain worldGrid(roomSize, 2, materials, structureLibrary);
 
-	CameraObject camera(roomSize, (double)(roomSize*blockSize/2), (double)(roomSize*blockSize / 2), (double)(roomSize*blockSize / 2)), camera2(worldGrid.roomSize);
+	CameraObject camera(roomSize, (double)(roomSize*blockSize / 2), (double)(roomSize*blockSize / 2), (double)(roomSize*blockSize / 2));
+	CameraObject camera2(roomSize, (double)(roomSize*blockSize / 2), (double)(roomSize*blockSize / 2), (double)(roomSize*blockSize / 2));
 	
 	worldGrid.texId = decodePng();
 	GLuint texId = decodePng();

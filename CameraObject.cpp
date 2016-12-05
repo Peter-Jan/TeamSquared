@@ -86,8 +86,8 @@ void CameraObject::Initialize(int roomSizeIn, double startX, double startY, doub
 
 	fov = YsPi / 6.0;  // 30 degree
 	nearZ = 1;
-	farZ = 1000.0;
-	viewRadius = 1000;
+	farZ = 2000.0;
+	viewRadius = 2000;
 	zoom = 0.0;
 
 	sensitivity = 1.0 / 5.0;
