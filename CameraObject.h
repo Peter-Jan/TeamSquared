@@ -23,13 +23,13 @@
 class CameraObject
 {
 public:
-	double grav = 0;
 	int roomSize = 0;
-	int index = 0;
+	int index = 0, index2 = 0;
 	double h, p, b;
 	double dxMove, dyMove, dzMove;
+	double fric = 0.05, maxVel = 1.5, stopThresh = 0.02;
+	double horzVel, velRatio, pWid, xVel, yVel, zVel;
 	double accel = 0.5;
-	double velLimit = 5.0;
 	double jumpVel;
 	double vertVel, camHeight, zoom, viewRadius, sensitivity, fov, nearZ, farZ, coneAngle;
 	std::vector<double> forwardVector = { 0,0,0 };

@@ -22,7 +22,7 @@ int main(void)
 	int terminate = 0;
 	int lb, mb, rb, mx, my, mouseEvent, key = 0;
 	int drawCount = 0;
-	int roomSize = 100;
+	int roomSize = 128;
 	int gotHit = 0;
 	int hitCounter = 0;
 	int enemyDist = 0;
@@ -50,9 +50,9 @@ int main(void)
 
 	// weapons,     ClassCode == 1, 101 - 200
 	itemLibrary[101].reset(new Item(1, 101, "Stick", 1,       11.0, 2, 4.0, 1, 0,      1, 0.5, true, false, false, false));
-	itemLibrary[102].reset(new Item(1, 102, "RockHammer", 1, 15.0, 3, 4.0, 2, 0, 2, 0.5, true, false, false, false));
-	itemLibrary[103].reset(new Item(1, 103, "Sword", 1, 13.0, 3, 8.0, 1, 0, 2, 0.5, true, false, false, false));
-	itemLibrary[104].reset(new Item(1, 104, "Gun", 1, 12.0, 3, 50.0, 1, 0, 1, 0.5, true, false, false, false));
+	itemLibrary[102].reset(new Item(1, 102, "RockHammer", 1, 15.0, 3, 4.0, 1, 0, 2, 0.5, true, false, false, false));
+	itemLibrary[103].reset(new Item(1, 103, "Sword", 1, 13.0, 3, 8.0, 2, 0, 2, 0.5, true, false, false, false));
+	itemLibrary[104].reset(new Item(1, 104, "Gun", 1, 12.0, 3, 80.0, 1, 0, 1, 0.5, true, false, false, false));
 
 	// consumables, ClassCode == 2, 201 - 300
 	itemLibrary[201].reset(new Item(2, 201, "Orange",  6, 3.0, 1, 0.0, 0, 10, 2, 15, true, true, false, false));
@@ -92,7 +92,7 @@ int main(void)
 	delete[] ingredientCodes, ingredientQuants;
 
 	// armor,	    ClassCode == 4, 401 - 500
-	itemLibrary[401].reset(new Item(4, 401, "Wood Armor",     1, 21.0, 1,  0.0, 0, 1, 2,  1.0, true, false, false, false));
+	itemLibrary[401].reset(new Item(4, 401, "Wood Armor",     1, 21.0, 1,  0.0, 0, 2, 2,  1.0, true, false, false, false));
 	itemLibrary[402].reset(new Item(4, 402, "Rock Armor",     1, 20.0, 1,  0.0, 0, 3, 4,  0.9, true, false, false, false));
 	itemLibrary[403].reset(new Item(4, 403, "Steel Armor",    1, 19.0, 1,  0.0, 0, 6, 6,  0.8, true, false, false, false));
 	itemLibrary[404].reset(new Item(4, 404, "Gemstone Armor", 1, 18.0, 1,  0.0, 0, 6, 10, 1.1, true, false, false, false));
@@ -374,57 +374,59 @@ int main(void)
 
 		//Enemy Chase Dynamics
 		if (camera.cursorLock)
-        
-        int calcHit,damage2Player=0;
-		int bumpCheck = 0;
-		int enemyNum = 0;
-		for (auto &enemy : enemyList)
 		{
 			int calcHit, damage2Player = 0;
 			int bumpCheck = 0;
 			int enemyNum = 0;
 			for (auto &enemy : enemyList)
 			{
-				gotHit = enemy.chase(camera, worldGrid.blockMap);
-				if (enemy.frenemy.health <= 0)
+				int calcHit, damage2Player = 0;
+				int bumpCheck = 0;
+				int enemyNum = 0;
+
+				if (enemy.frenemy.health <= 0) // remove enemy if it died
 				{
 					printf("DELETING ENEMY\n");
 					enemyList.erase(enemyList.begin() + enemyNum);
-					break;
 				}
-			}
 
-			if (gotHit == 1)
-			{
-				hitEnable = 1;
-			}
-
-			if (hitEnable == 1)
-			{
-				camera.vertVel = 0.5;		//enemy bump function here
-			}
-
-			for (auto &enemy : enemyList)
-			{
-				if (enemy.xGrid() == camera.xGrid() && enemy.yGrid() == camera.yGrid() && enemy.zGrid() == camera.zGrid())
+				for (auto &enemy : enemyList) // environment collision
 				{
-					bumpCheck++;
+					gotHit = enemy.chase(camera, worldGrid.blockMap);
 				}
-			}
 
-			if (bumpCheck == 0)
-			{
+				if (gotHit == 1)
+				{
+					hitEnable = 1;
+				}
+
+				if (hitEnable == 1)
+				{
+					camera.vertVel = 2;		//enemy bump function here
+				}
+
 				for (auto &enemy : enemyList)
 				{
-					damage2Player += (enemy.hitPlayer*enemy.damage);
-					enemy.hitPlayer = 0;
+					if (enemy.xGrid() == camera.xGrid() && enemy.yGrid() == camera.yGrid() && enemy.zGrid() == camera.zGrid())
+					{
+						bumpCheck++;
+					}
 				}
-				bumpCheck = 0;
-				hitEnable = 0;
-			}
 
-			camera.health -= (int)(damage2Player / (double)camera.armor);
-			damage2Player = 0;
+				if (bumpCheck == 0)
+				{
+					for (auto &enemy : enemyList)
+					{
+						damage2Player += (enemy.hitPlayer*enemy.damage);
+						enemy.hitPlayer = 0;
+					}
+					bumpCheck = 0;
+					hitEnable = 0;
+				}
+
+				camera.health -= (int)(damage2Player / (double)camera.armor);
+				damage2Player = 0;
+			}
 		}
 
 		// draw enemies

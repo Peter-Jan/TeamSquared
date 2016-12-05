@@ -110,6 +110,35 @@ void Terrain::PlaceStructure(std::vector<std::vector<int>> &structure, std::vect
 	}
 }
 
+void Terrain::CreateCave(int size, int xLoc, int yLoc, int zLoc)
+{
+	int x, y, z, newIndex;
+	int curIndex = ValidIndex(roomSize, xLoc, yLoc, zLoc);
+	for (auto &i : indexCheck)
+	{
+		IndexToXYZ(roomSize, curIndex + i, x, y, z);
+		newIndex = ValidIndex(roomSize, x, y, z);
+		//printf("CurIndex = %d || New Index = %d\n", curIndex, newIndex);
+		if (IndicesAdjacent(roomSize, newIndex, curIndex))
+		{
+			IndexToXYZ(roomSize, newIndex, x, y, z);
+
+			if (blockMap.find(newIndex) != blockMap.end() && blockMap[newIndex]->itemCode != 9) // if block is found and isn't indestructible
+			{
+				blockMap.erase(newIndex);
+			}
+			if (size != 0)
+			{
+				size--;
+				CreateCave(size, x, y, z);
+			}
+		}
+		else
+		{
+		}
+	}
+}
+
 void Terrain::CreateResourceDeposit(std::vector<int> &resource, int size, int xLoc, int yLoc, int zLoc)
 {
 	int x, y, z, newIndex;
@@ -128,9 +157,9 @@ void Terrain::CreateResourceDeposit(std::vector<int> &resource, int size, int xL
 
 			//printf("Places at %d %d %d\n", x, y, z);
 			blockMap[newIndex] = std::move(newPtr);
-			size--;
-			if (size == 0)
+			if (size != 0)
 			{
+				size--;
 				CreateResourceDeposit(resource, size, x, y, z);
 			}
 		}
@@ -159,7 +188,7 @@ void Terrain::GenerateFunctionTerrain(void)
 	{
 		for (int z = 0; z < roomSize; z++)
 		{
-			y = (int)(sin(x*xFreq*DEGTORAD + z*zFreq*DEGTORAD)*cos(x*DEGTORAD)*xScalar + sin(x*zFreq*DEGTORAD*z*xFreq*DEGTORAD / 2.0)*cos(z*DEGTORAD)*zScalar) + (int)sqrt(roomSize);
+			y = (int)(sin(x*xFreq*DEGTORAD + z*zFreq*DEGTORAD)*cos(x*DEGTORAD)*xScalar + sin(x*zFreq*DEGTORAD*z*xFreq*DEGTORAD / 2.0)*cos(z*DEGTORAD)*zScalar) + (int)(sqrt(roomSize)*1.5);
 
 			while (y >= 0)
 			{
@@ -174,12 +203,13 @@ void Terrain::GenerateFunctionTerrain(void)
 					newPtr.reset(new materialBlock(roomSize, x, y, z, matList->at(0)));
 				}
 				blockMap[index] = std::move(newPtr);
-				y--;
 				blockNum++;
+				y--;
 			}
 		}
 	}
 
+	//place topside structures
 	for (int s = 0; s < structList->size(); s++)
 	{
 		for (int i = 0; i < (int)sqrt(roomSize); i++) // plant trees
@@ -192,24 +222,42 @@ void Terrain::GenerateFunctionTerrain(void)
 			PlaceStructure(structList->at(s), *matList, x, y, z);
 		}
 	}
+
+	//create voids
+	for (int i = 0; i < sqrt(roomSize); i++)
+	{
+		int x, y, z, size;
+		x = rand() % roomSize;
+		z = rand() % roomSize;
+		y = rand() % (int)(sqrt(roomSize));
+		size = roomSize/10;
+		printf("size = %d\n", size);
+		CreateCave(size, x, y, z);
+	}
 	
+	HideSides(); // generate renderMap
+
 	for (auto &resource : *matList) // Place resource deposits
 	{
-		if (resource[0] < 100 && resource[6] > 0)
+		printf("trying resource\n");
+		if (resource[0] < 100 && resource[8] <= 1) // semi-rare material
 		{
-			for (int i = 0; i < (int)sqrt(roomSize/(1.0+(double)resource[6])); i++) // plant resources
+			printf("semi-rare resource\n");
+			for (int i = 0; i < (int)(sqrt(roomSize)); i++) // plant resources
 			{
-				int x, y, z;
-				int size = 5;
-				index = rand() % (int)pow(roomSize,3)/2;
-				//printf("Index = %d, Size = %d\n", index, size);
-				IndexToXYZ(roomSize, index, x, y, z);
-
+				int x, y, z, randIndex;
+				int size = 1 + resource[8];
+				auto randKeyVal = renderMap.begin();
+				std::advance(randKeyVal, rand() % renderMap.size());
+				randIndex = randKeyVal->first;
+				IndexToXYZ(roomSize, randIndex, x, y, z);
 				CreateResourceDeposit(resource, size, x, y, z);
 			}
 		}
 	}
 	printf("World Initialized\n");
+
+	blockNum = blockMap.size();
 }
 
 Terrain::~Terrain()
@@ -310,6 +358,15 @@ void Terrain::HideSingleBlockSides(int i) // for block i in the block-Vector, ch
 		}
 		else if (b->getY() != 0) // don't draw the floor, saves a bunch of blocks being rendered if the roomSize gets large
 		{
+			b->renderable = TRUE;
+		}
+		else if (b->getY() == 0 && b->sideVisible[5] == TRUE) // unless it's top face is showing
+		{
+			b->sideVisible[0] = FALSE;
+			b->sideVisible[1] = FALSE;
+			b->sideVisible[2] = FALSE;
+			b->sideVisible[3] = FALSE;
+			b->sideVisible[4] = FALSE;
 			b->renderable = TRUE;
 		}
 	}

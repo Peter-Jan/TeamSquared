@@ -23,7 +23,7 @@ const double YsPi = 3.1415927;
 #define REMOVE 0
 const int WINWID = 1200, WINHEI = 800;
 const int dt = 5;
-const double GRAV = -1*(double)dt/1000.0;
+const double GRAV = -5*(double)dt/1000.0;
 const int blockSize = 8;
 
 template <class NumType>

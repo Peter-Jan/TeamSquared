@@ -48,6 +48,7 @@ public:
 	void DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key, bool texturesOn);
 	void DrawOffsetMode(int &drawCount, CameraObject &camera, bool texturesOn);
 	void PlaceStructure(std::vector<std::vector<int>> &structure, std::vector<std::vector<int>> &materials, int xLoc, int yLoc, int zLoc);
+	void CreateCave(int size, int x, int y, int z);
 	void CreateResourceDeposit(std::vector<int> &resource, int size, int xLoc, int yLoc, int zLoc);
 };
 

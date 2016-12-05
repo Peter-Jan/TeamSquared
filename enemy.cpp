@@ -171,7 +171,7 @@ void enemy::hitCheck(CameraObject player,std::map<int, std::unique_ptr<Block>> &
 		}
 		else
 		{
-            vertVel= .3;//player.jumpVel;
+            vertVel = player.jumpVel / 2.0;
 			if (dxMove > 0)
 			{
 				posM[0] = xGrid()*blockSize + blockSize*3/4;
@@ -199,7 +199,7 @@ void enemy::hitCheck(CameraObject player,std::map<int, std::unique_ptr<Block>> &
 		}
 		else
 		{
-            vertVel= .3; //player.jumpVel;
+			vertVel = player.jumpVel / 2.0;
 			if (dzMove > 0)
 			{
 				posM[2] = zGrid()*blockSize + blockSize*3/4;

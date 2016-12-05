@@ -8,14 +8,17 @@
 class enemy
 {
 public:
-    double scale = 0.7;
+    double scale = 2;
 	int health = 0;
 	int damage = 0;
 	double vertVel = 0;
+	double xVel = 0;
+	double yVel = 0;
 	int roomSize = 0;
 	int index = 0;
     int planJump =0;
     int jumps = 0;
+	double jumpVel = sqrt(3.0 * (double)blockSize*-GRAV);
 	int hitPlayer = 0;
 	double dxMove, dyMove, dzMove;
 	int blockSize;
