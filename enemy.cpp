@@ -20,9 +20,9 @@ enemy::enemy(int roomSize)
 	printf("xS: %lf, zS: %lf\n",xSpawn,zSpawn);
     frenemy.textMapX = 2;
     frenemy.textMapY=1;
-	frenemy.healthParam = 20;
+	frenemy.healthParam = 10;
 	frenemy.health = frenemy.healthParam;
-	damage = 10;
+	damage = 5;
 	initialize(roomSize, xSpawn*blockSize,((double)roomSize*8 / 2),zSpawn*blockSize);
 }
 
