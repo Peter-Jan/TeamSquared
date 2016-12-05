@@ -18,7 +18,8 @@ enemy::enemy(int roomSize)
 	ySpawn = rand() % roomSize;
 	zSpawn = rand() % roomSize;
 	printf("xS: %lf, zS: %lf\n",xSpawn,zSpawn);
-
+    frenemy.textMapX = 2;
+    frenemy.textMapY=1;
 	frenemy.healthParam = 20;
 	frenemy.health = frenemy.healthParam;
 	damage = 10;
@@ -27,13 +28,13 @@ enemy::enemy(int roomSize)
 
 enemy::enemy(int roomSize, double startX, double startY, double startZ, int healthIn, int damageIn, int texX, int texY, double speedScaler) 
 {
-	initialize(roomSize,startX,startY,startZ);
 	frenemy.healthParam = healthIn;
 	frenemy.health = frenemy.healthParam;
     frenemy.textMapX=texX;
     frenemy.textMapY=texY;
 	damage = damageIn;
     scale = speedScaler;
+    initialize(roomSize,startX*blockSize,startY*blockSize,startZ*blockSize );
 }
 
 double enemy::x(void)
@@ -109,7 +110,7 @@ void enemy::drawEnemy(void)
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, (GLuint)1);
 	glBegin(GL_QUADS);
-	frenemy.DrawTexture((GLuint)1,2.0,1.0);
+	frenemy.DrawTexture((GLuint)1,frenemy.textMapX,frenemy.textMapY);
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
 }

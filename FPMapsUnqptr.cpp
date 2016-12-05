@@ -302,9 +302,7 @@ int main(void)
         {
             for (int ii = 0; ii < waveCount*numEnemy; ii++)
             {
-                enemyList.push_back(enemy(roomSize));
-
-                
+                enemyList.push_back(enemy(roomSize));                
             }
             if(waveCount%3==0)
             {
