@@ -209,7 +209,7 @@ int main(void)
         deltaT = time4assWhoop -initTime;
 
         
-        if(deltaT>=120)
+        if(deltaT>=10)
         {
             initTime =hour*3600+min*60+sec;
             deltaT =0;
