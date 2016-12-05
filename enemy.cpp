@@ -130,7 +130,7 @@ int enemy::chase(CameraObject player, std::map<int, std::unique_ptr<Block>> &blo
 	//printf("PLAYER GRID: x: %d,y: %d,z: %d \n\n", player.xGrid(), player.yGrid(), player.zGrid());
 	frenemy.setPosition(pos[0], pos[1], pos[2]);
 	hitCheck(player,blockMap, chaseVec);
-	if (player.xGrid() == xGrid() && player.yGrid() == yGrid() && player.zGrid() == zGrid())
+	if (player.playerBlock.BlockDist(frenemy) < blockSize)
 	{
 		hitPlayer = 1;
 		return 1;
@@ -138,7 +138,6 @@ int enemy::chase(CameraObject player, std::map<int, std::unique_ptr<Block>> &blo
 
 	return 0;
 }
-
 
 void enemy::hitCheck(CameraObject player,std::map<int, std::unique_ptr<Block>> &blockMap, std::vector<double> chaseVec)
 {

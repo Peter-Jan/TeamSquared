@@ -28,6 +28,8 @@ public:
 	int index = 0;
 	double h, p, b;
 	double dxMove, dyMove, dzMove;
+	double accel = 0.5;
+	double velLimit = 5.0;
 	double jumpVel;
 	double vertVel, camHeight, zoom, viewRadius, sensitivity, fov, nearZ, farZ, coneAngle;
 	std::vector<double> forwardVector = { 0,0,0 };
@@ -36,7 +38,11 @@ public:
 	std::vector<double> curFV = { 0,0,0 };
 
 	int blockSize, jumps = 5;
+	int maxJump = 5;
+	int baseMaxHealth = 100;
 	int health, maxHealth;
+	int armor = 1;
+	double speedMult = 1.0;
 	int lb, mb, rb, mx, my, mouseEvent, key, wid, hei, winx0, winy0, winx1, winy1;
 	int mouseOffsetX = 0, mouseOffsetY = 0;
 	int activeTool = NULLINT;

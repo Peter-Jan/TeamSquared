@@ -1,6 +1,5 @@
 #include "ObjectGridClass.h"
 
-//const int WINWID = 800, WINHEI = 600;
 #define NULLINT -1
 
 void glColor3ubArray(int colorArray[3])
@@ -241,6 +240,9 @@ bool Grid::AddElement(std::map<int, std::unique_ptr<Item>> &itemLibrary, int ite
 			case 3:
 				elem.reset(new Recipe);
 				break;
+			case 4:
+				elem.reset(new Armor);
+				break;
 			}
 			printf("Adding to empty cell");
 			elem->copyFrom(itemLibrary[itemCode]);
@@ -279,6 +281,9 @@ bool Grid::AddElement(std::map<int, std::unique_ptr<Item>> &itemLibrary, std::un
 			case 3:
 				elem.reset(new Recipe);
 				break;
+			case 4:
+				elem.reset(new Armor);
+				break;
 			}
 			elem->copyFrom(itemLibrary[item->craftItem]);
 			elem->quantity = item->craftQuantity;
@@ -301,10 +306,26 @@ bool Grid::AddElement(int elemIndex, std::unique_ptr<Item> &item)
 	return TRUE;
 }
 
+void Grid::UpdateWepBarSize(int screenWidth, int screenHeight)
+{
+	xLeft = (int)((25));
+	xRight = (int)((gridWidth + 25));
+	yTop = (int)((screenHeight - 300));
+	yBottom = (int)((screenHeight - 300 + gridHeight));
+}
+
+void Grid::UpdateToolbarSize(int screenWidth, int screenHeight)
+{
+	xLeft = (int)((screenWidth - gridWidth) / 2.0);
+	xRight = (int)((screenWidth + gridWidth) / 2.0);
+	yTop = (int)((screenHeight - 100));
+	yBottom = (int)((screenHeight - 100 + gridHeight));
+}
+
 Grid::Grid(int x0, int y0, int x1, int y1, int numObjects)
 {
-	double gridWidth = abs(x1 - x0);
-	double gridHeight = abs(y1 - y0);
+	gridWidth = abs(x1 - x0);
+	gridHeight = abs(y1 - y0);
 	//printf("%d, %d\n", gridWidth, gridHeight);
 	double crRatio = gridWidth / gridHeight;
 	border = 5;
@@ -542,7 +563,7 @@ void Grid::AddPermElement(std::map<int,std::unique_ptr<Item>> &itemLib) // alway
 	printf("Made it\n");
 	for (auto &item : itemLib)
 	{
-		if (item.first > 300)
+		if (item.first > 300 && item.first <= 400)
 		{
 			for (auto &elem : gridVec)
 			{
@@ -579,6 +600,9 @@ void Grid::Tellinfo(std::map<int, std::unique_ptr<Item>> &itemLib, int &mx, int 
 			break;
 		case 3:
 			other.gridVec[i].reset(new Recipe);
+			break;
+		case 4:
+			other.gridVec[i].reset(new Armor);
 			break;
 		}
 		other.gridVec[i]->copyFrom(itemLib[itemCodeQuant.first]);

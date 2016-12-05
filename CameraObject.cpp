@@ -74,9 +74,8 @@ void CameraObject::Initialize(int roomSizeIn, double startX, double startY, doub
 	vertVel = 0.0;
 	jumps = 5;
 	blockSize = 8;
-	maxHealth = 100;
+	maxHealth = baseMaxHealth;
 	health = maxHealth;
-
 
 	jumpVel = sqrt(3.0 * (double)blockSize*-GRAV);
 	printf("JumpVel = %lf\n", jumpVel);
@@ -404,19 +403,19 @@ void CameraObject::hitCheck(std::map<int, std::unique_ptr<Block>> &blockMap, std
 	double px0, px1, pz0, pz1, py0, py1;
 	int cx0, cy0, cz0, checkX, checkY, checkZ;
 
-	px1 = pos[0] + dxMove; // centerblock after move
-	py1 = pos[1] + dyMove;
-	pz1 = pos[2] + dzMove;
-
-	cx0 = ((int)pos[0] % blockSize) / (blockSize / 4);
+	cx0 = ((int)playerBlock.centerPos[0] % blockSize) / (blockSize / 4);
 	cy0 = pos[1] / blockSize;
-	cz0 = ((int)pos[2] % blockSize) / (blockSize / 4);
+	cz0 = ((int)playerBlock.centerPos[2] % blockSize) / (blockSize / 4);
 
-	checkX = ((int)px1%blockSize) / (blockSize / 4);
+	px1 = playerBlock.centerPos[0] + dxMove; // centerblock after move
+	py1 = pos[1] + dyMove;
+	pz1 = playerBlock.centerPos[2] + dzMove;
+
+	checkX = ((int)px1 % blockSize) / (blockSize / 4);
 	checkY = py1 / blockSize;
 	checkZ = ((int)pz1%blockSize) / (blockSize / 4);
 
-	if (dxMove != 0 && cx0 != checkX && checkX == 0 || checkX == 3)
+	if (dxMove != 0 && cx0 != checkX && checkX == 0 || checkX == 3) // dx must be non-zero
 	{
 		int xIdx = xGrid() + (dxMove < 0 ? -1 : 1);
 		index = xIdx + zGrid()*roomSize + yGrid()*pow(roomSize, 2);
@@ -428,12 +427,12 @@ void CameraObject::hitCheck(std::map<int, std::unique_ptr<Block>> &blockMap, std
 			}
 			else
 			{
-				pos[0] = xGrid()*blockSize + (dxMove < 0 ? +blockSize / 4.0 : blockSize*3.0 / 4.0);
+				pos[0] = xGrid()*blockSize + (dxMove < 0 ? (blockSize / 2.0) : blockSize*3.0 / 4.0);
 			}
 		}
 		else
 		{
-			pos[0] = xGrid()*blockSize + (dxMove < 0 ? +blockSize / 4.0 : blockSize*3.0 / 4.0);
+			pos[0] = xGrid()*blockSize + (dxMove < 0 ? (blockSize / 2.0) : blockSize*3.0 / 4.0);
 		}
 	}
 	else
@@ -474,7 +473,7 @@ void CameraObject::hitCheck(std::map<int, std::unique_ptr<Block>> &blockMap, std
 		{
 			if (index < 0 || blockMap.find(index) != blockMap.end()) // hit floor
 			{
-				jumps = 5;
+				jumps = maxJump;
 				vertVel = 0;
 				pos[1] = yGrid()*blockSize;
 			}

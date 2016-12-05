@@ -11,7 +11,7 @@ int main(void)
 	int terminate = 0;
 	int lb, mb, rb, mx, my, mouseEvent, key = 0;
 	int drawCount = 0;
-	int roomSize = 30;
+	int roomSize = 100;
 	int gotHit = 0;
 	int hitCounter = 0;
 	int enemyDist = 0;
@@ -28,6 +28,7 @@ int main(void)
 	itemLibrary[5].reset(new Item(0, 5, "Emerald", 0, 1.0, 1, 8.0, 0,  6, 3, 0.0, true, true, false, false));
 	itemLibrary[7].reset(new Item(0, 7, "Wood",    2, 7.0, 1, 8.0, 0,  3, 0, 0.0, true, true, false, false));
 	itemLibrary[8].reset(new Item(0, 8, "Wood",    2, 7.0, 1, 8.0, 0,  3, 0, 0.0, true, true, false, false));
+	itemLibrary[9].reset(new Item(0, 9, "Indestructible", 2, 2.0, 1, 8.0, 0, 3, 20, 0.0, true, true, false, false));
 
 	// weapons,     ClassCode == 1, 101 - 200
 	itemLibrary[101].reset(new Item(1, 101, "Stick", 1,       11.0, 2, 4.0, 1, 0,      1, 0.5, true, false, false, false));
@@ -46,17 +47,40 @@ int main(void)
 	ingredientQuants = new int[2]{ 3,2 };
 	itemLibrary[302].reset(new Item(3, 302,"Lv1 RockHammer", 1, 1.0, 1, 0.0, 1, 0, 0, 0.5, true, false, false, false, 2, ingredientCodes, ingredientQuants, 102, 1));
 	delete[] ingredientCodes, ingredientQuants;
+	ingredientCodes = new int[2]{ 0,3 };
+	ingredientQuants = new int[2]{ 20, 5 };
+	itemLibrary[304].reset(new Item(3, 304, "Wood Armor", 1, 1.0, 5, 0.0, 1, 0, 2, 1.0, true, false, false, false, 2, ingredientCodes, ingredientQuants, 401, 1));
+	delete[] ingredientCodes, ingredientQuants;
+	ingredientCodes = new int[2]{ 3, 1 };
+	ingredientQuants = new int[2]{ 10, 5 };
+	itemLibrary[305].reset(new Item(3, 305, "Rock Armor", 1, 1.0, 4, 0.0, 1, 0, 4, 0.9, true, false, false, false, 2, ingredientCodes, ingredientQuants, 402, 1));
+	delete[] ingredientCodes, ingredientQuants;
+	ingredientCodes = new int[2]{ 3, 1 };
+	ingredientQuants = new int[2]{ 10, 5 };
+	itemLibrary[306].reset(new Item(3, 306, "Steel Armor", 1, 1.0, 3, 0.0, 1, 0, 6, 0.8, true, false, false, false, 2, ingredientCodes, ingredientQuants, 403, 1));
+	delete[] ingredientCodes, ingredientQuants;
+	ingredientCodes = new int[4]{ 3, 1, 5, 4 };
+	ingredientQuants = new int[4]{ 20, 15, 4, 2 };
+	itemLibrary[307].reset(new Item(3, 307, "Gemstone Armor", 1, 1.0, 10, 0.0, 1, 0, 6, 1.1, true, false, false, false, 4, ingredientCodes, ingredientQuants, 404, 1));
+	delete[] ingredientCodes, ingredientQuants;
+
+	// armor,	    ClassCode == 4, 401 - 500
+	itemLibrary[401].reset(new Item(4, 401, "Wood Armor",     1, 102.0, 4,  0.0, 0, 1, 2, 1.0, true, false, false, false));
+	itemLibrary[402].reset(new Item(4, 402, "Rock Armor",     1, 102.0, 3,  0.0, 0, 3, 4, 0.9, true, false, false, false));
+	itemLibrary[403].reset(new Item(4, 403, "Steel Armor",    1, 102.0, 2,  0.0, 0, 6, 6, 0.8, true, false, false, false));
+	itemLibrary[404].reset(new Item(4, 404, "Gemstone Armor", 1, 102.0, 10, 0.0, 0, 6, 10, 1.1, true, false, false, false));
 
 	//					<itemCode, texX, texY, r,g,b, strength, health, quant
-	std::vector<int> dirt =    { 0,		0,0,255,255,255, 0,  2, 3 };
-	std::vector<int> stone =   { 1,		5,0,255,255,255, 1,  4, 1 };
-	std::vector<int> steel =   { 2,		2,0,255,255,255, 1,  6, 0 };
-	std::vector<int> wood =    { 3,	    1,1,255,255,255, 0,  3, 2 };
-	std::vector<int> ruby =    { 4,		4,0,255,255,255, 2, 10, 0 };
-	std::vector<int> emerald = { 5,		1,0,255,255,255, 2,  6, 0 };
-	std::vector<int> orange =  { 201,   3,0,255,255,255, 0, 10, 6 };
-	std::vector<int> greenLeaf = { 7,   3,1,255,255,255, 0,  3, 2 };
-	std::vector<int> redLeaf = { 8,     4,1,255,255,255, 0,  3, 2 };
+	std::vector<int> dirt =      { 0,		0,0,255,255,255,  0,  2, 3 };
+	std::vector<int> stone =     { 1,		5,0,255,255,255,  1,  4, 1 };
+	std::vector<int> steel =	 { 2,		2,0,255,255,255,  1,  6, 0 };
+	std::vector<int> wood =      { 3,	    1,1,255,255,255,  0,  3, 2 };
+	std::vector<int> ruby =      { 4,		4,0,255,255,255,  2, 10, 0 };
+	std::vector<int> emerald =   { 5,		1,0,255,255,255,  2,  6, 0 };
+	std::vector<int> orange =  { 201,       3,0,255,255,255,  0, 10, 6 };
+	std::vector<int> greenLeaf = { 3,       3,1,255,255,255,  0,  3, 2 };
+	std::vector<int> redLeaf =   { 3,       4,1,255,255,255,  0,  3, 2 };
+	std::vector<int> mapEdge =   { 9,       2,0,255,255,255, 20,  3, 2 };
 
 	std::vector<std::vector<int>> materials;
 	materials.push_back(dirt);
@@ -68,6 +92,7 @@ int main(void)
 	materials.push_back(orange);
 	materials.push_back(greenLeaf);
 	materials.push_back(redLeaf);
+	materials.push_back(mapEdge);
 
 	// structures <itemCode, xGrid, yGrid, zGrid>
 	// Tree type 1
@@ -104,14 +129,76 @@ int main(void)
 	tree2.push_back({ 7,   0, 4, 1 });
 	tree2.push_back({ 8,   0, 4, -1 });
 
+	//Shrub
+	std::vector<std::vector<int>> shrub;
+	shrub.push_back({ 7,  0,0,0 });
+	shrub.push_back({ 7,  1,0,0 });
+	shrub.push_back({ 7,  -1,0,0 });
+	shrub.push_back({ 7,  0,0,1 });
+	shrub.push_back({ 7,  -1,0,1 });
+	shrub.push_back({ 7,  1,0,1 });
+	shrub.push_back({ 7,  -1,0,-1 });
+	shrub.push_back({ 7,  1,0,-1 });
+	shrub.push_back({ 7,  0,0,-1 });
+	shrub.push_back({ 7,  2,0,0 });
+	shrub.push_back({ 7,  -2,0,0 });
+	shrub.push_back({ 7,  0,0,-2 });
+	shrub.push_back({ 7,  0,0,2 });
+	shrub.push_back({ 7,  0,1,0 });
+	shrub.push_back({ 7,  1,1,0 });
+	shrub.push_back({ 7,  -1,1,0 });
+	shrub.push_back({ 7,  0,1,-1 });
+	shrub.push_back({ 7,  0,1,1 });
+
+	//Stone Structure
+	std::vector<std::vector<int>> stonetower;
+	stonetower.push_back({ 1,  0,0,0 });
+	stonetower.push_back({ 1,  1,0,0 });
+	stonetower.push_back({ 1,  -1,0,0 });
+	stonetower.push_back({ 1,  0,0,1 });
+	stonetower.push_back({ 1,  0,0,-1 });
+	stonetower.push_back({ 1,  -1,0,1 });
+	stonetower.push_back({ 1,  1,0,1 });
+	stonetower.push_back({ 1,  -1,0,-1 });
+	stonetower.push_back({ 1,  1,0,-1 });
+	stonetower.push_back({ 1,  0,1,0 });
+	stonetower.push_back({ 1,  1,1,0 });
+	stonetower.push_back({ 1,  -1,1,0 });
+	stonetower.push_back({ 1,  0,1,1 });
+	stonetower.push_back({ 1,  0,1,-1 });
+	stonetower.push_back({ 1,  -1,1,1 });
+	stonetower.push_back({ 1,  1,1,1 });
+	stonetower.push_back({ 1,  -1,1,-1 });
+	stonetower.push_back({ 1,  1,1,-1 });
+	stonetower.push_back({ 1,  1,2,0 });
+	stonetower.push_back({ 1,  -1,2,0 });
+	stonetower.push_back({ 1,  0,2,1 });
+	stonetower.push_back({ 1,  0,2,-1 });
+	stonetower.push_back({ 1,  -1,2,1 });
+	stonetower.push_back({ 1,  1,2,1 });
+	stonetower.push_back({ 1,  -1,2,-1 });
+	stonetower.push_back({ 1,  1,2,-1 });
+	stonetower.push_back({ 1,  0,2,0 });
+	stonetower.push_back({ 1,  1,2,0 });
+	stonetower.push_back({ 1,  -1,2,0 });
+	stonetower.push_back({ 1,  0,2,1 });
+	stonetower.push_back({ 1,  0,2,-1 });
+	stonetower.push_back({ 1,  -1,2,1 });
+	stonetower.push_back({ 1,  1,2,1 });
+	stonetower.push_back({ 1,  -1,2,-1 });
+	stonetower.push_back({ 1,  1,2,-1 });
+
 	std::vector< std::vector<std::vector<int>>> structureLibrary;
 	structureLibrary.push_back(tree1);
 	structureLibrary.push_back(tree2);
+	structureLibrary.push_back(shrub);
+	structureLibrary.push_back(stonetower);
 
 	Grid inventory(20, 20, 350, 500, 20);
 	Grid toolbar(100, 500, 700, 600, 10);
 	Grid crafting(400, 20, 700, 240, 10);
 	Grid ReqChart(400, 260, 700, 500, 10);
+	Grid ActiveWepArmor(WINWID - 250, WINHEI - 150, WINWID - 50, WINHEI - 50, 2);
 	Button but;
 
 	crafting.AddPermElement(itemLibrary);
@@ -154,13 +241,15 @@ int main(void)
 	glBindTexture(GL_TEXTURE_2D, texId);	// Select the current texture.
 	int xGrid, yGrid, zGrid;
 
+	char* guiText;
+
 	while (0 == terminate)
 	{
 		FsPollDevice();
 
 		int wid, hei;
 		FsGetWindowSize(wid, hei);
-
+		toolbar.UpdateToolbarSize(wid, hei);
 		key = FsInkey();
 
 		switch (key)
@@ -212,57 +301,60 @@ int main(void)
 		glPolygonOffset(1, 1);
 
 		//Enemy Chase Dynamics
-		int calcHit,damage2Player=0;
-		int bumpCheck = 0;
-		int enemyNum = 0;
-		for (auto &enemy : enemyList)
+		if (camera.cursorLock)
 		{
-			gotHit = enemy.chase(camera, worldGrid.blockMap);
-			if (enemy.frenemy.health <= 0)
+			int calcHit, damage2Player = 0;
+			int bumpCheck = 0;
+			int enemyNum = 0;
+			for (auto &enemy : enemyList)
 			{
-				printf("DELETING ENEMY\n");
-				enemyList.erase(enemyList.begin() + enemyNum);
-				break;
+				gotHit = enemy.chase(camera, worldGrid.blockMap);
+				if (enemy.frenemy.health <= 0)
+				{
+					printf("DELETING ENEMY\n");
+					enemyList.erase(enemyList.begin() + enemyNum);
+					break;
+				}
 			}
-			enemyNum++;
+
+			if (gotHit == 1)
+			{
+				hitEnable = 1;
+			}
+
+			if (hitEnable == 1)
+			{
+				camera.vertVel = 0.5;		//enemy bump function here
+			}
+
+			for (auto &enemy : enemyList)
+			{
+				if (enemy.xGrid() == camera.xGrid() && enemy.yGrid() == camera.yGrid() && enemy.zGrid() == camera.zGrid())
+				{
+					bumpCheck++;
+				}
+			}
+
+			if (bumpCheck == 0)
+			{
+				for (auto &enemy : enemyList)
+				{
+					damage2Player += (enemy.hitPlayer*enemy.damage);
+					enemy.hitPlayer = 0;
+				}
+				bumpCheck = 0;
+				hitEnable = 0;
+			}
+
+			camera.health -= damage2Player;
+			damage2Player = 0;
 		}
 
+		// draw enemies
 		for (auto &enemy : enemyList)
 		{
 			enemy.drawEnemy();
 		}
-
-		if (gotHit == 1)
-		{
-			hitEnable = 1;
-		}
-
-		if (hitEnable == 1)
-		{
-			camera.vertVel = 0.5;		//enemy bump function here
-		}
-
-		for (auto &enemy : enemyList)
-		{
-			if (enemy.xGrid() == camera.xGrid() && enemy.yGrid() == camera.yGrid() && enemy.zGrid() == camera.zGrid())
-			{
-				bumpCheck++;
-			}
-		}
-
-		if (bumpCheck == 0)
-		{
-			for (auto &enemy : enemyList)
-			{
-				damage2Player += (enemy.hitPlayer*enemy.damage);
-				enemy.hitPlayer = 0;
-			}
-			bumpCheck = 0;
-			hitEnable = 0;
-		}
-
-		camera.health -= damage2Player;
-		damage2Player = 0;
 
 #if defined(_WIN32_WINNT)
 		if (switchCamera)
@@ -281,8 +373,40 @@ int main(void)
 			}
 			worldGrid.DrawTerrain(camera, reductionMode, key, texturesOn);
 		}
-#endif
 
+		if (camera.activeTool != NULLINT)
+		{
+			//printf("activeTool = %d\n", camera.activeTool);
+			toolbar.activeTool = camera.activeTool;
+			//printf("classType = %d\n", toolbar.gridVec[toolbar.activeTool]->classType);
+			if (toolbar.gridVec[camera.activeTool] == nullptr || toolbar.gridVec[toolbar.activeTool]->classType == 4)
+			{
+				ActiveWepArmor.gridVec[0].reset();
+			}
+			else
+			{
+				printf("setting new wep\n");
+				if (ActiveWepArmor.gridVec[0] == nullptr || toolbar.gridVec[toolbar.activeTool]->classID != ActiveWepArmor.gridVec[0]->classID)
+				{
+					switch (toolbar.gridVec[toolbar.activeTool]->classType)
+					{
+					case 0:
+						ActiveWepArmor.gridVec[0].reset(new Material);
+						ActiveWepArmor.gridVec[0]->copyFrom(itemLibrary[toolbar.gridVec[toolbar.activeTool]->classID]);
+						break;
+					case 1:
+						ActiveWepArmor.gridVec[0].reset(new Weapon);
+						ActiveWepArmor.gridVec[0]->copyFrom(itemLibrary[toolbar.gridVec[toolbar.activeTool]->classID]);
+						break;
+					case 2:
+						ActiveWepArmor.gridVec[0].reset(new Useable);
+						ActiveWepArmor.gridVec[0]->copyFrom(itemLibrary[toolbar.gridVec[toolbar.activeTool]->classID]);
+						break;
+					}
+				}
+			}
+		}
+#endif
 		if (!camera.cursorLock)
 		{
 			switch (FsGetMouseEvent(lb, mb, rb, mx, my))
@@ -460,6 +584,8 @@ int main(void)
 				}
 				else // item is selected
 				{
+					printf("Class Code = %d\n", toolbar.gridVec[toolbar.activeTool]->classType);
+
 					switch (toolbar.gridVec[toolbar.activeTool]->classType)
 					{
 					case 0: // material
@@ -496,6 +622,22 @@ int main(void)
 							{
 								toolbar.gridVec[toolbar.activeTool].reset();
 							}
+						}
+						break;
+					case 4: // armor
+						if (ActiveWepArmor.gridVec[1] == nullptr || toolbar.gridVec[toolbar.activeTool]->classID != ActiveWepArmor.gridVec[1]->classID)
+						{
+							printf("In here\n");
+							camera.armor = toolbar.gridVec[toolbar.activeTool]->strength;
+							camera.speedMult = toolbar.gridVec[toolbar.activeTool]->speed;
+							camera.maxHealth = toolbar.gridVec[toolbar.activeTool]->health*camera.baseMaxHealth;
+							camera.maxJump = toolbar.gridVec[toolbar.activeTool]->weight;
+							ActiveWepArmor.gridVec[1].reset(new Armor);
+							ActiveWepArmor.gridVec[1]->copyFrom(toolbar.gridVec[toolbar.activeTool]);
+						}
+						else
+						{
+							//do nothing
 						}
 						break;
 					}
@@ -576,6 +718,39 @@ int main(void)
 			}
 			worldGrid.DrawTerrain(camera, reductionMode, key, texturesOn);
 		}
+
+		if (camera.activeTool != NULLINT)
+		{
+			//printf("activeTool = %d\n", camera.activeTool);
+			toolbar.activeTool = camera.activeTool;
+			//printf("classType = %d\n", toolbar.gridVec[toolbar.activeTool]->classType);
+			if (toolbar.gridVec[camera.activeTool] == nullptr || toolbar.gridVec[toolbar.activeTool]->classType == 4)
+			{
+				ActiveWepArmor.gridVec[0].reset();
+			}
+			else
+			{
+				printf("setting new wep\n");
+				if (ActiveWepArmor.gridVec[0] == nullptr || toolbar.gridVec[toolbar.activeTool]->classID != ActiveWepArmor.gridVec[0]->classID)
+				{
+					switch (toolbar.gridVec[toolbar.activeTool]->classType)
+					{
+					case 0:
+						ActiveWepArmor.gridVec[0].reset(new Material);
+						ActiveWepArmor.gridVec[0]->copyFrom(itemLibrary[toolbar.gridVec[toolbar.activeTool]->classID]);
+						break;
+					case 1:
+						ActiveWepArmor.gridVec[0].reset(new Weapon);
+						ActiveWepArmor.gridVec[0]->copyFrom(itemLibrary[toolbar.gridVec[toolbar.activeTool]->classID]);
+						break;
+					case 2:
+						ActiveWepArmor.gridVec[0].reset(new Useable);
+						ActiveWepArmor.gridVec[0]->copyFrom(itemLibrary[toolbar.gridVec[toolbar.activeTool]->classID]);
+						break;
+					}
+				}
+			}
+		}
 #endif
 
 		// Set up 2D drawing
@@ -615,9 +790,13 @@ int main(void)
 				glVertex2i(wid / 2, hei / 2 + 12);
 				glEnd();
 				glLineWidth(1);
+
+				ActiveWepArmor.UpdateWepBarSize(wid, hei);
+				ActiveWepArmor.Draw(texId);
 			}
 
 			// draw toolbar
+			FsGetWindowSize(wid, hei);
 			toolbar.activeTool = camera.activeTool;
 			toolbar.Draw(texId); // always draw the toolbar
 
@@ -625,24 +804,101 @@ int main(void)
 			int x0 = 50, y0 = 50;
 			glColor3ub(0, 0, 0);
 			glRasterPos2d(x0, y0);
-			char playerHealth[20];
-			sprintf(playerHealth, "Player Health = %2d / %2d", camera.health, camera.maxHealth);
-			YsGlDrawFontBitmap20x32(playerHealth);
+			guiText = new char[50];
+			sprintf(guiText, "Player Health = %2d / %2d", camera.health, camera.maxHealth);
+			YsGlDrawFontBitmap20x32(guiText);
 
 			glBegin(GL_QUADS);
 			glColor3ub(0, 255, 0);
 			glVertex2i(x0 - 10, y0 + 8);
 			glVertex2i(x0 - 10, y0 - 8 - 32);
-			glVertex2i(x0 + 20 * strlen(playerHealth)*(double)camera.health / (double)camera.maxHealth + 10, y0 - 8 - 32);
-			glVertex2i(x0 + 20 * strlen(playerHealth)*(double)camera.health / (double)camera.maxHealth + 10, y0 + 8);
+			glVertex2i(x0 + 20 * strlen(guiText)*(double)camera.health / (double)camera.maxHealth + 10, y0 - 8 - 32);
+			glVertex2i(x0 + 20 * strlen(guiText)*(double)camera.health / (double)camera.maxHealth + 10, y0 + 8);
 
 			glColor3ub(255, 0, 0);
 			glVertex2i(x0 - 10, y0 + 8);
 			glVertex2i(x0 - 10, y0 - 8 - 32);
-			glVertex2i(x0 + 20 * strlen(playerHealth) + 10, y0 - 8 - 32);
-			glVertex2i(x0 + 20 * strlen(playerHealth) + 10, y0 + 8);
-			
+			glVertex2i(x0 + 20 * strlen(guiText) + 10, y0 - 8 - 32);
+			glVertex2i(x0 + 20 * strlen(guiText) + 10, y0 + 8);
+
 			glEnd();
+			delete[] guiText;
+
+			y0 += 50;
+
+			// draw player damage
+			glColor3ub(0, 0, 0);
+			glRasterPos2d(x0, y0);
+			guiText = new char[50];
+			if (ActiveWepArmor.gridVec[0] == nullptr)
+			{
+				sprintf(guiText, "Damage = %d", 1);
+			}
+			else
+			{
+				sprintf(guiText, "Damage = %d", ActiveWepArmor.gridVec[0]->damage);
+			}
+			YsGlDrawFontBitmap12x16(guiText);
+			delete[] guiText;
+			y0 += 25;
+
+			// draw player strength
+			glColor3ub(0, 0, 0);
+			glRasterPos2d(x0, y0);
+			guiText = new char[50];
+			if (ActiveWepArmor.gridVec[0] == nullptr)
+			{
+				sprintf(guiText, "Power = %d", 0);
+			}
+			else
+			{
+				sprintf(guiText, "Power = %d", ActiveWepArmor.gridVec[0]->strength);
+			}
+			YsGlDrawFontBitmap12x16(guiText);
+			delete[] guiText;
+			y0 += 25;
+
+			// draw player range
+			glColor3ub(0, 0, 0);
+			glRasterPos2d(x0, y0);
+			guiText = new char[50];
+			if (ActiveWepArmor.gridVec[0] == nullptr)
+			{
+				sprintf(guiText, "Range = %lf", 8.0*blockSize);
+			}
+			else
+			{
+				sprintf(guiText, "Range = %lf", ActiveWepArmor.gridVec[0]->range*blockSize);
+			}
+			YsGlDrawFontBitmap12x16(guiText);
+			delete[] guiText;
+			y0 += 25;
+
+			// draw player armor
+			glColor3ub(0, 0, 0);
+			glRasterPos2d(x0, y0);
+			guiText = new char[50];
+			sprintf(guiText, "Armor = %2d", camera.armor);
+			YsGlDrawFontBitmap12x16(guiText);
+			delete[] guiText;
+			y0 += 25;
+
+			// draw player speed
+			glColor3ub(0, 0, 0);
+			glRasterPos2d(x0, y0);
+			guiText = new char[50];
+			sprintf(guiText, "Speed = %lfx", camera.speedMult);
+			YsGlDrawFontBitmap12x16(guiText);
+			delete[] guiText;
+			y0 += 25;
+
+			// draw player jump
+			glColor3ub(0, 0, 0);
+			glRasterPos2d(x0, y0);
+			guiText = new char[50];
+			sprintf(guiText, "Jumps = %d", camera.jumps);
+			YsGlDrawFontBitmap12x16(guiText);
+			delete[] guiText;
 		}
 
 		glDisable(GL_DEPTH_TEST);

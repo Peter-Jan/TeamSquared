@@ -116,23 +116,29 @@ void Terrain::CreateResourceDeposit(std::vector<int> &resource, int size, int xL
 	int curIndex = ValidIndex(roomSize, xLoc, yLoc, zLoc);
 	for (auto &i : indexCheck)
 	{
-		newIndex = curIndex + i;
+		IndexToXYZ(roomSize, curIndex + i, x, y, z);
+		newIndex = ValidIndex(roomSize, x, y, z);
 		printf("CurIndex = %d || New Index = %d\n", curIndex, newIndex);
-		if (IndicesAdjacent(roomSize, newIndex, curIndex))
+		if (IndicesAdjacent(roomSize, newIndex, curIndex) && blockMap.find(newIndex) == blockMap.end())
 		{
 			if (blockMap.find(newIndex) == blockMap.end() || blockMap[newIndex]->itemCode != blockMap[curIndex]->itemCode)
 			{
 				IndexToXYZ(roomSize, newIndex, x, y, z);
-				std::unique_ptr<materialBlock> newPtr;
 
+				std::unique_ptr<materialBlock> newPtr;
 				newPtr.reset(new materialBlock(roomSize, x, y, z, resource));
+
+				printf("Places at %d %d %d\n", x, y, z);
 				blockMap[newIndex] = std::move(newPtr);
 				size--;
-				if (size >= 0)
+				if (size == 0)
 				{
 					CreateResourceDeposit(resource, size, x, y, z);
 				}
 			}
+		}
+		else
+		{
 		}
 	}
 }
@@ -162,7 +168,14 @@ void Terrain::GenerateFunctionTerrain(void)
 			{
 				index = x + roomSize*z + pow(roomSize, 2)*y;
 				std::unique_ptr<materialBlock> newPtr;
-				newPtr.reset(new materialBlock(roomSize, x, y, z, matList->at(0)));
+				if (y == 0)
+				{
+					newPtr.reset(new materialBlock(roomSize, x, y, z, matList->at(9))); // indestructible block
+				}
+				else
+				{
+					newPtr.reset(new materialBlock(roomSize, x, y, z, matList->at(0)));
+				}
 				blockMap[index] = std::move(newPtr);
 				y--;
 				blockNum++;
@@ -170,25 +183,28 @@ void Terrain::GenerateFunctionTerrain(void)
 		}
 	}
 
-	for (int i = 0; i < (int)sqrt(roomSize); i++) // plant trees
+	for (int s = 0; s < structList->size(); s++)
 	{
-		int x, z, structID;
-		x = rand() % roomSize;
-		z = rand() % roomSize;
-		structID = rand() % structList->size();
-		int y = 0;
-		PlaceStructure(structList->at(structID), *matList, x, y, z);
+		for (int i = 0; i < (int)sqrt(roomSize); i++) // plant trees
+		{
+			int x, z, structID;
+			x = rand() % roomSize;
+			z = rand() % roomSize;
+			//structID = rand() % structList->size();
+			int y = 0;
+			PlaceStructure(structList->at(s), *matList, x, y, z);
+		}
 	}
-
+	
 	for (auto &resource : *matList) // Place resource deposits
 	{
 		if (resource[0] < 100 && resource[6] > 0)
 		{
-			for (int i = 0; i < (int)sqrt(roomSize) / (1 + resource[6]); i++) // plant resources
+			for (int i = 0; i < (int)sqrt(roomSize/(1.0+(double)resource[6])); i++) // plant resources
 			{
 				int x, y, z;
-				int size = (1 + resource[8])*2;
-				index = rand() % blockNum;
+				int size = 5;
+				index = rand() % (int)pow(roomSize,3)/2;
 				printf("Index = %d, Size = %d\n", index, size);
 				IndexToXYZ(roomSize, index, x, y, z);
 
@@ -216,7 +232,6 @@ void inline Terrain::GenerateRandom(void)
 
 void inline Terrain::GenerateOrdered(void) // ordered blocks (starts at "y=0" plane, actually y = roomHeight/2)
 {
-	//int y = roomSize/2;
 	Block tempBlock;
 	blockNum = 0;
 	for (int y = 0; y < 3; y++)
@@ -279,15 +294,8 @@ void Terrain::HideSingleBlockSides(int i) // for block i in the block-Vector, ch
 			auto &b1 = blockMap[idx];
 			if (BlockDist(b, b1) == 1)
 			{
-				if (b->strength == 0)
-				{
-					b->sideVisible[e] = 0;
-
-				}
-				if (b1->strength == 0)
-				{
-					b1->sideVisible[eReverse] = 0;
-				}
+				b->sideVisible[e] = 0;
+				b1->sideVisible[eReverse] = 0;
 			}
 			else if ((b->getX() % roomSize == 0 || (b->getY() / roomSize) % roomSize == 0) || b1->getX() % roomSize == 0 || (b1->getZ() / roomSize) % roomSize)
 			{
@@ -640,9 +648,6 @@ bool Terrain::FindBlock(CameraObject &camera, int range, int &x, int &y, int &z,
 	int blockSize = camera.blockSize;
 	int index;
 	std::vector<double> location = { camera.playerBlock.xM, camera.playerBlock.pos[1] + camera.camHeight, camera.playerBlock.zM };
-	//printf("Camera Position = %lf, %lf, %lf\n", location[0], location[1], location[2]);
-	//printf("Forward Vector = %lf, %lf, %lf\n", camera.forwardVector[0], camera.forwardVector[1], camera.forwardVector[2]);
-	//SetVec(location, camera.pos);
 	index = (int)location[0] / blockSize + (int)location[2] / blockSize * roomSize + (int)location[1] / blockSize * pow(roomSize, 2);
 
 	while (i <= blockSize * range)

@@ -55,7 +55,7 @@ Block::Block(int roomSizeIn)
 
 Block::Block(int roomSizeIn, int x, int y, int z)
 {
-	printf("Location = %d %d %d\n", x, y, z);
+	//printf("Location = %d %d %d\n", x, y, z);
 	Initialize(roomSizeIn, x, y, z);
 }
 

@@ -77,10 +77,7 @@ public:
 	Material();
 	~Material();
 	Material(char perm[], int q);
-	//void Use(void);
 	void CleanUp(void);
-	//template<class Player, class World>
-	//void Use(Player &player, World &worldGrid, std::vector<std::vector<int>> &materials);
 };
 
 class Useable : public Item
@@ -104,6 +101,13 @@ public:
 	~Recipe() {}
 };
 
+class Armor : public Item
+{
+public:
+	Armor() {}
+	~Armor() {}
+};
+
 class Grid
 {
 public:
@@ -116,6 +120,8 @@ public:
 	int highlightColor[3] = { 100, 100, 0 };
 	int activeItemHighlight[3] = { 255,0,0 };
 	int tempColor[3] = { 0,0,0 };
+	int xCenter, yCenter, width, height;
+	double gridWidth, gridHeight;
 	int xLeft, yTop, xRight, yBottom, rows, cols, border;
 
 	double cellWidth, cellHeight, xBorder, yBorder;
@@ -124,6 +130,8 @@ public:
 	Grid(int x0, int y0, int x1, int y1, int numObjects);
 	void CleanUp(void);
 	void Draw(GLuint texId);
+	void UpdateWepBarSize(int screenWidth, int screenHeight);
+	void UpdateToolbarSize(int screenWidth, int screenHeight);
 	bool AddElement(std::map<int, std::unique_ptr<Item>> &itemLibrary, int ClassCode);
 	bool AddElement(std::map<int, std::unique_ptr<Item>> &itemLibrary, std::unique_ptr<Item> &item);
 	bool AddElement(int elemIndex, std::unique_ptr<Item> &item);
