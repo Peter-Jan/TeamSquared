@@ -36,7 +36,7 @@ public:
 	void Initialize(int randomVsOrdered);
 
 	void inline GenerateRandom(void);
-	void inline GenerateOrdered(void);
+	void inline Terrain::GenerateOrdered(void);
 	void GenerateFunctionTerrain(void);
 
 	void HideSides(void);
