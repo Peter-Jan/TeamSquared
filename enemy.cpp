@@ -25,12 +25,16 @@ enemy::enemy(int roomSize)
 	initialize(roomSize, xSpawn*blockSize,((double)roomSize*8 / 2),zSpawn*blockSize);
 }
 
-enemy::enemy(int roomSize,double startX,double startY,double startZ,int healthIn,int damageIn)
+enemy::enemy(int roomSize,double startX,double startY,double startZ,int healthIn,int damageIn,int texX, int texY,double speedScaler)
 {
 	initialize(roomSize,startX,startY,startZ);
-	frenemy.healthParam = 20;
+	frenemy.healthParam = healthIn;
 	frenemy.health = frenemy.healthParam;
+    frenemy.textMapX=texX;
+    frenemy.textMapY=texY;
 	damage = damageIn;
+    scale = speedScaler;
+    
 }
 
 double enemy::x(void)

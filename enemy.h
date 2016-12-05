@@ -28,7 +28,7 @@ public:
 
 	enemy();
 	enemy(int roomSize);
-	enemy(int roomSize, double xLoc, double yLoc, double zLoc, int healthIn, int damageIn);
+	enemy(int roomSize, double xLoc, double yLoc, double zLoc, int healthIn, int damageIn,int texX,int texY,double speedScaler);
 	~enemy();
 
 	void initialize(int roomSize, double startX, double startY, double startZ);

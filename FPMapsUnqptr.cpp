@@ -32,7 +32,8 @@ int main(void)
     
     GetLocalTimeHourMinSec(hour,min,sec);
     initTime = hour*3600+min*60+sec;
-
+    int numEnemy = 5;
+    std::vector<enemy> enemyList;
     
 	std::map<int, std::unique_ptr<Item>> itemLibrary;
 	//							 <ClassCode, itemCode, name, quant, texture#, weight, range, damage, health, strength, speed, hitscan, stackable, highlight, outline, numIngedients, matCodes[numIngedients], quantities[numIngedients], craftedItemCode, craftedQuant>
@@ -283,8 +284,7 @@ int main(void)
 		//Enemy Chase Dynamics
         //Generate Enemies
         
-        int numEnemy = 5;
-        std::vector<enemy> enemyList;
+
         int calcHit,damage2Player=0;
 		int bumpCheck = 0;
 		int enemyNum = 0;
