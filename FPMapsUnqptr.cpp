@@ -309,7 +309,7 @@ int main(void)
             {
                 for (int ii = 0; ii < (waveCount/3)*numEnemy; ii++)
                 {
-                    enemyList.push_back(enemy(roomSize,rand()%roomSize,(rand()%roomSize)/2,rand()%roomSize,100,50,4,2,2.0));
+                    enemyList.push_back(enemy(roomSize,rand()%roomSize,(rand()%roomSize)/2,rand()%roomSize,20,10,4,2,2.0));
                     
                 }
             }
