@@ -283,13 +283,13 @@ void Block::DrawTexture(GLuint texId,double imageX,double imageY)
 	{
 		if (imageX == 0 && imageY == 0)
 		{
-			glTexCoord2d(imageX / 6, 0.666);
+			glTexCoord2d(imageX / 6, 0.5);
 			glVertex3d(pos[0], y1, z1);
-			glTexCoord2d(imageX / 6, 0.333);
+			glTexCoord2d(imageX / 6, 0.25);
 			glVertex3d(pos[0], y1, pos[2]);
-			glTexCoord2d((imageX + 1) / 6, 0.333);
+			glTexCoord2d((imageX + 1) / 6, 0.25);
 			glVertex3d(x1, y1, pos[2]);
-			glTexCoord2d((imageX + 1) / 6, 0.666);
+			glTexCoord2d((imageX + 1) / 6, 0.5);
 			glVertex3d(x1, y1, z1);
 		}
 		else
