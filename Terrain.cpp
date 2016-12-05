@@ -555,6 +555,8 @@ void Terrain::DrawTerrain(CameraObject &cameraView, bool reductionMode, int &key
 	glVertex3d(0, roomSize*blockSize, 0);
 	glEnd();
 
+    
+    
 
 	// Draw ground lattice
 	glColor3ub(0, 0, 255);

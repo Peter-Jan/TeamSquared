@@ -8,7 +8,7 @@
 class enemy
 {
 public:
-    double scale = 2.0;
+    double scale = 0.7;
 	int health = 0;
 	int damage = 0;
 	double vertVel = 0;

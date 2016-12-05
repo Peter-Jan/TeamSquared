@@ -4,6 +4,17 @@
 #include "ObjectGridClass.h"
 #include "enemy.h"
 
+void GetLocalTimeHourMinSec(int &hour,int &min,int &sec)
+{
+    struct tm *localTime;
+    time_t t=time(NULL);
+    localTime=localtime(&t);
+    
+    hour=localTime->tm_hour;
+    min=localTime->tm_min;
+    sec=localTime->tm_sec;
+}
+
 int main(void)
 {
 	srand((int)time(nullptr));
@@ -16,7 +27,13 @@ int main(void)
 	int hitCounter = 0;
 	int enemyDist = 0;
 	int hitEnable = 0;
+    int hour,min,sec,time4assWhoop;
+    int initTime=0,deltaT=0;
+    
+    GetLocalTimeHourMinSec(hour,min,sec);
+    initTime = hour*3600+min*60+sec;
 
+    
 	std::map<int, std::unique_ptr<Item>> itemLibrary;
 	//							 <ClassCode, itemCode, name, quant, texture#, weight, range, damage, health, strength, speed, hitscan, stackable, highlight, outline, numIngedients, matCodes[numIngedients], quantities[numIngedients], craftedItemCode, craftedQuant>
 	// materials,   ClassCode == 0,   0 - 100
@@ -67,6 +84,7 @@ int main(void)
 	std::vector<int> orange =  { 201,   3,0,255,255,255, 0, 10, 6 };
 	std::vector<int> greenLeaf = { 7,   3,1,255,255,255, 0,  3, 2 };
 	std::vector<int> redLeaf = { 8,     4,1,255,255,255, 0,  3, 2 };
+
 
 	std::vector<std::vector<int>> materials;
 	materials.push_back(dirt);
@@ -126,6 +144,11 @@ int main(void)
 
 	crafting.AddPermElement(itemLibrary);
 
+    
+    
+    
+    
+    
 	Terrain worldGrid(roomSize, 2, materials, structureLibrary);
 
 	CameraObject camera(roomSize, (double)(roomSize*blockSize/2), (double)(roomSize*blockSize / 2), (double)(roomSize*blockSize / 2)), camera2(worldGrid.roomSize);
@@ -138,13 +161,8 @@ int main(void)
 	worldGrid.AddBlock(5, 5, 5, orange);
 
 	//Generate Enemies
-	int numEnemy = 10;
+	int numEnemy = 5;
 	std::vector<enemy> enemyList;
-	for (int ii = 0; ii < numEnemy; ii++)
-	{
-		enemyList.push_back(enemy(roomSize));
-        
-	}
 
 	camera.playerBlock.roomSize = worldGrid.roomSize;
 	camera2.playerBlock.roomSize = worldGrid.roomSize;
@@ -164,11 +182,62 @@ int main(void)
 	glCullFace(GL_BACK); // back 3 sides of each block are automatically removed by this openGL culling function
 	glBindTexture(GL_TEXTURE_2D, texId);	// Select the current texture.
 	int xGrid, yGrid, zGrid;
-
+    int waveCount=0;int release =0;
 	while (0 == terminate)
 	{
+        int wid1, hei1;
+        FsGetWindowSize(wid1, hei1);
+        // Set up 2D drawing
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(0, (float)wid1 - 1, (float)hei1 - 1, 0, -1, 1);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        
+        // draw player health
+        int x000 = 50, y0 = 50;
+        glColor3ub(0, 0, 0);
+        glRasterPos2d(x000, y0);
+        char playerHealth[20];
+        sprintf(playerHealth, "Get ready for wave %d", waveCount        );
+        YsGlDrawFontBitmap20x32(playerHealth);
+        
+        
 		FsPollDevice();
+        GetLocalTimeHourMinSec(hour,min,sec);
+        time4assWhoop = hour*3600+min*60+sec;
+        deltaT = time4assWhoop -initTime;
 
+        
+        if(deltaT>=120)
+        {
+            initTime =hour*3600+min*60+sec;
+            deltaT =0;
+            waveCount++;
+            release = 1;
+        }
+
+        if(waveCount>0 && release==1)
+        {
+            for (int ii = 0; ii < waveCount*numEnemy; ii++)
+            {
+                enemyList.push_back(enemy(roomSize));
+
+                
+            }
+            if(waveCount%3==0)
+            {
+                for (int ii = 0; ii < (waveCount/3)*numEnemy; ii++)
+                {
+                    enemyList.push_back(enemy(roomSize,rand()%roomSize  ,(rand()%roomSize)/2,rand()%roomSize,100,50,4,2,2.0));
+                    
+                }
+            }
+            release=0;
+        }
+
+        
+        
 		int wid, hei;
 		FsGetWindowSize(wid, hei);
 
@@ -648,7 +717,7 @@ int main(void)
 			glBegin(GL_QUADS);
 			glColor3ub(0, 255, 0);
 			glVertex2i(x0 - 10, y0 + 8);
-			glVertex2i(x0 - 10, y0 - 8 - 32);
+			glVertex2i(x0- 10, y0 - 8 - 32);
 			glVertex2i(x0 + 20 * strlen(playerHealth)*(double)camera.health / (double)camera.maxHealth + 10, y0 - 8 - 32);
 			glVertex2i(x0 + 20 * strlen(playerHealth)*(double)camera.health / (double)camera.maxHealth + 10, y0 + 8);
 
@@ -659,9 +728,31 @@ int main(void)
 			glVertex2i(x0 + 20 * strlen(playerHealth) + 10, y0 + 8);
 			
 			glEnd();
-		}
-
-		glDisable(GL_DEPTH_TEST);
+            
+            int x00 = wid - 200, y00 = 50               ;
+            glColor3ub(0, 0, 0);
+            glRasterPos2d(x00, y00      );
+            char waveDisp[20];
+            sprintf(waveDisp, "Wave # %d", waveCount);
+            YsGlDrawFontBitmap20x32(waveDisp);
+            
+            glBegin(GL_QUADS);
+//            glColor3ub(0, 255, 0);
+//            glVertex2i(x00 - 10, y00 + 8);
+//            glVertex2i(x00 - 10, y00 - 8 - 32);
+//            glVertex2i(x00 + 20 * strlen(waveDisp)*(double)camera.health / (double)camera.maxHealth + 10, y00- 8 - 32);
+//            glVertex2i(x00 + 20 * strlen(waveDisp)*(double)camera.health / (double)camera.maxHealth + 10, y00 + 8);
+            
+            glColor3ub(255, 0, 0);
+            glVertex2i(x00 - 10, y00 + 8);
+            glVertex2i(x00 - 10, y00 - 8 - 32);
+            glVertex2i(x00 + 20 * strlen(waveDisp) + 10, y00 - 8 - 32);
+            glVertex2i(x00 + 20 * strlen(waveDisp) + 10, y00 + 8);
+            
+            glEnd();
+        }
+        
+        glDisable(GL_DEPTH_TEST);
 
 		// 2D drawing from here
 		FsSwapBuffers();
