@@ -397,6 +397,9 @@ int main(void)
 				if (gotHit == 1)
 				{
 					hitEnable = 1;
+					camera.xVel += enemy.chaseVec[0];
+					camera.zVel += enemy.chaseVec[2];
+					camera.yVel += .02;
 				}
 
 				if (hitEnable == 1)
