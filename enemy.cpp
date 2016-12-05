@@ -18,26 +18,19 @@ enemy::enemy(int roomSize)
 	ySpawn = rand() % roomSize;
 	zSpawn = rand() % roomSize;
 	printf("xS: %lf, zS: %lf\n",xSpawn,zSpawn);
+
 	frenemy.healthParam = 20;
 	frenemy.health = frenemy.healthParam;
 	damage = 10;
-    frenemy.textMapX=2;
-    frenemy.textMapY=1;
 	initialize(roomSize, xSpawn*blockSize,((double)roomSize*8 / 2),zSpawn*blockSize);
 }
 
-enemy::enemy(int roomSize,double startX,double startY,double startZ,int healthIn,int damageIn,int texX,int texY,double speedScaler)
+enemy::enemy(int roomSize,double startX,double startY,double startZ,int healthIn,int damageIn)
 {
-//    printf("roomsize: %d, x:: %lf, y: %lf, z: %lf, health: %d, damage: %d, texX: %d, texY: %d, scale: %lf\n",roomSize,startX*blockSize,startY,startZ,healthIn,damageIn,texX,texY,speedScaler);
-	frenemy.healthParam = healthIn;
-    printf("BLOCKSIZE: %d",blockSize);
+	initialize(roomSize,startX,startY,startZ);
+	frenemy.healthParam = 20;
 	frenemy.health = frenemy.healthParam;
 	damage = damageIn;
-    frenemy.textMapX=texX;
-    frenemy.textMapY=texY;
-    initialize(roomSize,startX*blockSize,startY*blockSize,startZ*blockSize);
-    scale = speedScaler;
-//    while(1){}
 }
 
 double enemy::x(void)
@@ -74,8 +67,8 @@ void enemy::initialize(int roomSizeIn, double startX, double startY, double star
 {
 	roomSize = roomSizeIn;
 	SetVec(pos, startX, startY, startZ);
-	printf("xG: %d, yG: %d, zG: %d\n", gridLocation[0], gridLocation[1], gridLocation[2]);
-	printf("xG: %lf, yG: %lf, zG: %lf\n", startX, startY, startZ);
+	//printf("xG: %d, yG: %d, zG: %d\n", gridLocation[0], gridLocation[1], gridLocation[2]);
+	//printf("xG: %lf, yG: %lf, zG: %lf\n", startX, startY, startZ);
 
 	SetGridLocation();
 	frenemy.setCoordinate(gridLocation[0], gridLocation[1], gridLocation[2]);		//takes grid coordinates
@@ -113,7 +106,7 @@ void enemy::drawEnemy(void)
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, (GLuint)1);
 	glBegin(GL_QUADS);
-	frenemy.DrawTexture((GLuint)1,frenemy.textMapX,frenemy.textMapY);
+	frenemy.DrawTexture((GLuint)1,2.0,1.0);
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
 }
@@ -121,6 +114,7 @@ void enemy::drawEnemy(void)
 int enemy::chase(CameraObject player, std::map<int, std::unique_ptr<Block>> &blockMap)
 {
 	double magnitude=0;
+	double scale = 2.0;
 
 	magnitude = sqrt(pow(player.x() - pos[0], 2) + pow(player.y() - pos[1], 2) + pow(player.z() - pos[2], 2));
 	chaseVec[0] = (player.x() - (pos[0]+blockSize/2))/(scale*magnitude);
@@ -134,6 +128,7 @@ int enemy::chase(CameraObject player, std::map<int, std::unique_ptr<Block>> &blo
 //	printf("ENEMY GRID: x: %d,y: %d,z: %d \n\n", xGrid(), yGrid(), zGrid());
 //	printf("PLAYER: x: %lf,y: %lf,z: %lf \n", player.x(), player.y(), player.z());
 //	printf("PLAYER GRID: x: %d,y: %d,z: %d \n\n", player.xGrid(), player.yGrid(), player.zGrid());
+
 	frenemy.setPosition(pos[0], pos[1], pos[2]);
 	hitCheck(player,blockMap, chaseVec);
 	if (player.xGrid() == xGrid() && player.yGrid() == yGrid() && player.zGrid() == zGrid())

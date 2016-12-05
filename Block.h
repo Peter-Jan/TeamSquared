@@ -24,6 +24,7 @@ private:
 	int w, h, l;
 public:
     int texRows = 4; //Number of rows in texture file
+
 	int roomSize = 10;
 	int itemCode, strength, health, healthParam, quantity, textMapX = 0, textMapY = 0;
 	double x1, xM, y1, yM, z1, zM;
