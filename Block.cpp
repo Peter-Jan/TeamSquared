@@ -111,14 +111,14 @@ int Block::getB() const
 void Block::setCoordinate(int xin, int yin, int zin)
 {
 	x = xin; y = yin; z = zin;
- 	pos[0] = (x)*blockSize; pos[1] = (y)*blockSize; pos[2] = (z)*blockSize;
- 	xM = pos[0] + blockSize / 2; yM = pos[1] + blockSize / 2; zM = pos[2] + blockSize / 2;
- 	x1 = pos[0] + blockSize;     y1 = pos[1] + blockSize;     z1 = pos[2] + blockSize;
- 	centerPos[0] = xM; centerPos[1] = yM; centerPos[2] = zM;
+	pos[0] = (x)*blockSize; pos[1] = (y)*blockSize; pos[2] = (z)*blockSize;
+	xM = pos[0] + blockSize / 2; yM = pos[1] + blockSize / 2; zM = pos[2] + blockSize / 2;
+	x1 = pos[0] + blockSize;     y1 = pos[1] + blockSize;     z1 = pos[2] + blockSize;
+	centerPos[0] = xM; centerPos[1] = yM; centerPos[2] = zM;
 	index = x + roomSize*z + pow(roomSize, 2)*y;
 }
 
-void Block::setTexture(int x,int y)
+void Block::setTexture(int x, int y)
 {
 	textMapX = x;
 	textMapY = y;
@@ -132,8 +132,8 @@ void Block::setPosition(double xLoc, double yLoc, double zLoc)
 	y = (int)(yLoc / blockSize);
 	z = (int)(zLoc / blockSize);
 	xM = pos[0] + blockSize / 2; yM = pos[1] + blockSize / 2; zM = pos[2] + blockSize / 2;
- 	x1 = pos[0] + blockSize;     y1 = pos[1] + blockSize;     z1 = pos[2] + blockSize;
- 	centerPos[0] = xM; centerPos[1] = yM; centerPos[2] = zM;
+	x1 = pos[0] + blockSize;     y1 = pos[1] + blockSize;     z1 = pos[2] + blockSize;
+	centerPos[0] = xM; centerPos[1] = yM; centerPos[2] = zM;
 	index = x + roomSize*z + pow(roomSize, 2)*y;
 }
 
@@ -209,72 +209,72 @@ void Block::DrawSolid(void)
 	}
 }
 
-void Block::DrawTexture(GLuint texId,double imageX,double imageY)
+void Block::DrawTexture(GLuint texId, double imageX, double imageY)
 {
 
-	glColor3d(health / (double)healthParam, health/(double)healthParam, health/ (double)healthParam);           	// Current color is solid white
+	glColor3d(health / (double)healthParam, health / (double)healthParam, health / (double)healthParam);           	// Current color is solid white
 
-	//Left side
+																													//Left side
 
 	if (sideVisible[0])
 	{
-		glTexCoord2d((imageX)/6, (imageY+1) / texRows);
+		glTexCoord2d((imageX) / 6, (imageY + 1) / texRows);
 		glVertex3d(pos[0], pos[1], pos[2]);
-		glTexCoord2d((imageX)/6, (imageY ) / texRows);
+		glTexCoord2d((imageX) / 6, (imageY) / texRows);
 		glVertex3d(pos[0], y1, pos[2]);
-		glTexCoord2d((imageX+1)/6, (imageY ) / texRows);
+		glTexCoord2d((imageX + 1) / 6, (imageY) / texRows);
 		glVertex3d(pos[0], y1, z1);
-		glTexCoord2d((imageX+1)/6, (imageY + 1)/texRows);
+		glTexCoord2d((imageX + 1) / 6, (imageY + 1) / texRows);
 		glVertex3d(pos[0], pos[1], z1);
 	}
 
 	// Right Side
-	if (sideVisible[1])   
+	if (sideVisible[1])
 	{
-		glTexCoord2d((imageX+1)/6, (imageY+1) / texRows);
+		glTexCoord2d((imageX + 1) / 6, (imageY + 1) / texRows);
 		glVertex3d(x1, pos[1], z1);
-		glTexCoord2d((imageX+1)/6, (imageY) / texRows);
+		glTexCoord2d((imageX + 1) / 6, (imageY) / texRows);
 		glVertex3d(x1, y1, z1);
-		glTexCoord2d(imageX/6, (imageY) / texRows);
+		glTexCoord2d(imageX / 6, (imageY) / texRows);
 		glVertex3d(x1, y1, pos[2]);
-		glTexCoord2d(imageX/6, (imageY+1) / texRows);
+		glTexCoord2d(imageX / 6, (imageY + 1) / texRows);
 		glVertex3d(x1, pos[1], pos[2]);
 	}
 	// Back Side
 	if (sideVisible[2])
 	{
-		glTexCoord2d(imageX/6, (imageY+1) / texRows);
+		glTexCoord2d(imageX / 6, (imageY + 1) / texRows);
 		glVertex3d(x1, pos[1], pos[2]);
-		glTexCoord2d(imageX/6, (imageY) / texRows);
+		glTexCoord2d(imageX / 6, (imageY) / texRows);
 		glVertex3d(x1, y1, pos[2]);
-		glTexCoord2d((imageX+1)/6, (imageY) / texRows);
+		glTexCoord2d((imageX + 1) / 6, (imageY) / texRows);
 		glVertex3d(pos[0], y1, pos[2]);
-		glTexCoord2d((imageX+1)/6, (imageY+1) / texRows);
+		glTexCoord2d((imageX + 1) / 6, (imageY + 1) / texRows);
 		glVertex3d(pos[0], pos[1], pos[2]);
 
 	}
 	// Front Side
 	if (sideVisible[3])
 	{
-		glTexCoord2d(imageX/6, (imageY+1) / texRows);
+		glTexCoord2d(imageX / 6, (imageY + 1) / texRows);
 		glVertex3d(pos[0], pos[1], z1);
-		glTexCoord2d(imageX/6, (imageY) / texRows);
+		glTexCoord2d(imageX / 6, (imageY) / texRows);
 		glVertex3d(pos[0], y1, z1);
-		glTexCoord2d((imageX+1)/6, (imageY) / texRows);
+		glTexCoord2d((imageX + 1) / 6, (imageY) / texRows);
 		glVertex3d(x1, y1, z1);
-		glTexCoord2d((imageX+1)/6, (imageY+1) / texRows);
+		glTexCoord2d((imageX + 1) / 6, (imageY + 1) / texRows);
 		glVertex3d(x1, pos[1], z1);
 	}
 	// Bottom Side
 	if (sideVisible[4])
 	{
-		glTexCoord2d(imageX/6, (imageY+1) / texRows);
+		glTexCoord2d(imageX / 6, (imageY + 1) / texRows);
 		glVertex3d(pos[0], pos[1], pos[2]);
-		glTexCoord2d(imageX/6, (imageY) / texRows);
+		glTexCoord2d(imageX / 6, (imageY) / texRows);
 		glVertex3d(pos[0], pos[1], z1);
-		glTexCoord2d((imageX+1)/6, (imageY) / texRows);
+		glTexCoord2d((imageX + 1) / 6, (imageY) / texRows);
 		glVertex3d(x1, pos[1], z1);
-		glTexCoord2d((imageX+1)/6, (imageY+1) / texRows);
+		glTexCoord2d((imageX + 1) / 6, (imageY + 1) / texRows);
 		glVertex3d(x1, pos[1], pos[2]);
 	}
 
@@ -294,13 +294,13 @@ void Block::DrawTexture(GLuint texId,double imageX,double imageY)
 		}
 		else
 		{
-			glTexCoord2d(imageX/6, (imageY+1) / texRows);
+			glTexCoord2d(imageX / 6, (imageY + 1) / texRows);
 			glVertex3d(pos[0], y1, z1);
-			glTexCoord2d(imageX/6, (imageY) / texRows);
+			glTexCoord2d(imageX / 6, (imageY) / texRows);
 			glVertex3d(pos[0], y1, pos[2]);
-			glTexCoord2d((imageX+1)/6, (imageY) / texRows);
+			glTexCoord2d((imageX + 1) / 6, (imageY) / texRows);
 			glVertex3d(x1, y1, pos[2]);
-			glTexCoord2d((imageX+1)/6, (imageY+1) / texRows);
+			glTexCoord2d((imageX + 1) / 6, (imageY + 1) / texRows);
 			glVertex3d(x1, y1, z1);
 
 		}
